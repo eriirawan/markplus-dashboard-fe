@@ -1,9 +1,8 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 /* eslint-disable arrow-body-style */
 import { useContext } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import Permissions from '@/permissions';
 import { AppContext } from '@/context/AppContext';
+import { useAuth } from '@/hooks/useAuth';
 
 const iconSize = 20;
 
@@ -22,20 +21,33 @@ const useSidebarMenus = () => {
           },
           name: 'Dashboard',
           path: 'home',
-        }
+        },
       ],
     },
     {
-      group: 'user',
+      group: 'users',
       menus: [
         {
           icon: {
             active: 'UserActive',
             inActive: 'UserNormal',
           },
-          name: 'User',
-          path: 'user',
-        }
+          name: 'Users',
+          path: 'users',
+        },
+      ],
+    },
+    {
+      group: 'management',
+      menus: [
+        {
+          icon: {
+            active: 'SettingActive',
+            inActive: 'SettingNormal',
+          },
+          name: 'User Management',
+          path: 'user-management',
+        },
       ],
     },
   ];

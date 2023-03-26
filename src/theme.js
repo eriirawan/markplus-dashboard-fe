@@ -201,10 +201,10 @@ const theme = createTheme({
 
   palette: {
     error: {
-      '100': '#FEF2F1', // Danger | 10%
-      '200': '#FDDFDC', // Danger | 20%
-      '300': '#F75D4F', // Danger | 80%
-      '400': '#D13F31', // Danger | 100%
+      100: '#FEF2F1', // Danger | 10%
+      200: '#FDDFDC', // Danger | 20%
+      300: '#F75D4F', // Danger | 80%
+      400: '#D13F31', // Danger | 100%
       main: '#F75D4F', // Danger | 80%
     },
     neutral: {
@@ -217,21 +217,21 @@ const theme = createTheme({
       lighterGrey: '#F0F6FC',
     },
     primary: {
-      '100': '#EBF6FD', // Alice Blue Solid
-      '200': '#CCE8FA', // Water Solid
-      '300': '#99D1F4', // Blue Eyes Solid
-      '400': '#7BBFFF', // Main Blue | 20%
-      '500': '#008DE4', // Main Blue | 40%
-      '600': '#0067E7', // Main Blue | 80%
-      '700': '#023C9B', // Main Blue | 100%
+      100: '#EBF6FD', // Alice Blue Solid
+      200: '#CCE8FA', // Water Solid
+      300: '#99D1F4', // Blue Eyes Solid
+      400: '#7BBFFF', // Main Blue | 20%
+      500: '#008DE4', // Main Blue | 40%
+      600: '#0067E7', // Main Blue | 80%
+      700: '#023C9B', // Main Blue | 100%
       light: '#CCE8FA',
-      main: '#008DE4', // Main Blue | 40%
+      main: '#2E459A',
     },
     success: {
-      '100': '#ECFBF5', // Success  10%
-      '200': '#D0F4E5', // Success  20%
-      '300': '#13C77F', // Success  80%
-      '400': '#119460', // Success  100%
+      100: '#ECFBF5', // Success  10%
+      200: '#D0F4E5', // Success  20%
+      300: '#13C77F', // Success  80%
+      400: '#119460', // Success  100%
       main: '#13C77F', // Success  80%
     },
     text: {
@@ -240,10 +240,10 @@ const theme = createTheme({
       secondary: '#5E758D',
     },
     warning: {
-      '100': '#FFFAEB', // Warning | 8%
-      '200': '#FFF1CC', // Warning | 20%
-      '300': '#FFBB00', // Warning | 80%
-      '400': '#E47D09', // Warning | 100%
+      100: '#FFFAEB', // Warning | 8%
+      200: '#FFF1CC', // Warning | 20%
+      300: '#FFBB00', // Warning | 80%
+      400: '#E47D09', // Warning | 100%
       main: '#FFBB00', // Warning | 80%
     },
   },
@@ -273,9 +273,9 @@ const theme = createTheme({
     fontFamily: ['Poppins', 'sans-serif'].join(','),
 
     h1: {
-      fontSize: '22px',
+      fontSize: '30px',
       fontWeight: 700,
-      lineHeight: '36px',
+      lineHeight: '39px',
     },
 
     h2: {

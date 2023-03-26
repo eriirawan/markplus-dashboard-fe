@@ -1,15 +1,15 @@
-import { Box, ClickAwayListener, Grid, Stack, Typography } from '@mui/material';
+import { Box, ClickAwayListener, Grid, Stack } from '@mui/material';
 // import { alpha } from '@mui/material/styles';
 import { useContext, useState } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom';
 // import TaskListDrawer from '@/components/TaskListDrawer';
 // import ProfileBarDrawer from '@/components/ProfileBarDrawer';
 // import NotificationDrawer from '@/components/notification/NotificationDrawer';
-import { appBarHeight, protectedContentWidth, sideBarContentWidth } from '../../../helpers/Constants';
 import { getWindowDimensions } from '@/helpers/Utils';
-import { useAuth } from '@/hooks/useAuth';
 import { AppContext } from '@/context/AppContext';
 import { AppBarContext, useStore } from '@/context/AppBarContext';
+import { useAuth } from '@/hooks/useAuth';
+import { appBarHeight } from '../../../helpers/Constants';
 import Appbar from '../../Appbar';
 import useSidebarMenus from '../SidebarMenu';
 import Sidebar from './Sidebar';
@@ -32,22 +32,24 @@ const ProtectedLayout = () => {
 
   const styles = {
     appBarContainer: {
+      alignItems: 'center',
+      bgcolor: 'primary.main',
       borderBottom: '1px solid #C7D5EA',
-      height: appBarHeight,
+      borderRadius: 1.25,
       layout: 'fixed',
       m: 0,
       overflow: 'hidden',
       pl: 2.5,
       pr: 1.5,
       py: 1,
+      // width: `calc(100% - ${sideBarContentWidth}px)`
     },
-    appContainer: { height: `calc(100% - ${appBarHeight}px)`, layout: 'fixed' },
+    appContainer: { height: '100%', layout: 'fixed' },
     outletContainer: {
-      height: windowDimensions.height - appBarHeight,
+      height: windowDimensions.height - appBarHeight - 64,
       overflow: 'auto',
-      p: 3,
       pt: 3,
-      width: `calc(100% - ${sideBarContentWidth}px)`,
+      // width: `calc(100% - ${sideBarContentWidth}px)`,
     },
   };
 
@@ -62,59 +64,38 @@ const ProtectedLayout = () => {
   };
 
   return (
-    <AppBarContext.Provider value={store}>
+    <AppBarContext.Provider value={store} style={{ padding: '32px' }}>
       <Grid container>
-        <Grid item container xs={12} sx={styles.appBarContainer}>
-          <Appbar
-            openNotification={openNotification}
-            openTaskList={openTaskList}
-            openProfileBar={openProfileBar}
-            setOpenNotification={setOpenNotification}
-            setOpenTaskList={setOpenTaskList}
-            setOpenProfileBar={setOpenProfileBar}
-            setShowDrawerBackground={setShowDrawerBackground}
-          />
-        </Grid>
+        {/* <Grid item container xs={12} sx={styles.appBarContainer}>
+        </Grid> */}
         <Grid item container direction="row" xs={12} sx={styles.appContainer}>
-          <ClickAwayListener onClickAway={() => handleOpenSidebar(false)}>
-            <Box>
-              <Sidebar openSidebar={openSideBar} handleOpenSidebar={handleOpenSidebar} menus={menus} />
-              <SidebarSmall
-                height={windowDimensions.height - appBarHeight}
-                handleOpenSidebar={handleOpenSidebar}
-                menus={menus}
-              />
-            </Box>
-          </ClickAwayListener>
-          <Box sx={styles.outletContainer}>
-            <Stack sx={{ minWidth: protectedContentWidth, overflow: 'auto' }}>
-              {outlet}
+          <Stack direction="row" width="100%" spacing={4}>
+            <ClickAwayListener onClickAway={() => handleOpenSidebar(false)}>
+              <Box position="relative">
+                <Sidebar openSidebar={openSideBar} handleOpenSidebar={handleOpenSidebar} menus={menus} />
+                <SidebarSmall height="100%" handleOpenSidebar={handleOpenSidebar} menus={menus} />
+              </Box>
+            </ClickAwayListener>
+            <Stack flex={1} width="100%">
+              <Box sx={styles.appBarContainer}>
+                <Appbar
+                  openNotification={openNotification}
+                  openTaskList={openTaskList}
+                  openProfileBar={openProfileBar}
+                  setOpenNotification={setOpenNotification}
+                  setOpenTaskList={setOpenTaskList}
+                  setOpenProfileBar={setOpenProfileBar}
+                  setShowDrawerBackground={setShowDrawerBackground}
+                />
+              </Box>
+              <Box sx={styles.outletContainer}>
+                <Stack sx={{ ':-webkit-scrollbar': { display: 'none' }, height: '100%', overflow: 'auto' }}>
+                  {outlet}
+                </Stack>
+              </Box>
             </Stack>
-          </Box>
-        </Grid>
-        {location.pathname === '/home' && (
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            sx={{
-              borderTopColor: 'neutral.lightGrey',
-              borderTopStyle: 'solid',
-              borderTopWidth: 1,
-              bottom: 0,
-              height: 40,
-              position: 'fixed',
-              pt: 1.5,
-              px: 3,
-              right: 0,
-              width: `calc(100% - ${sideBarContentWidth}px)`,
-            }}
-          >
-            <Box> </Box>
-            <Typography variant="body2" sx={{ color: 'neutral.greyScale02' }}>
-              © 2023 MarkPlus. All Right Reserved.
-            </Typography>
           </Stack>
-        )}
+        </Grid>
         {/* <Box
           justifyContent="flex-end"
           alignItems="flex-end"

@@ -1,6 +1,6 @@
 export const protectedContentWidth = 1390;
-export const sideBarContentWidth = 50;
-export const appBarHeight = 56;
+export const sideBarContentWidth = 60;
+export const appBarHeight = 60;
 
 export const tokenString = 'markPlus-token';
 export const userDataString = 'markPlus-userData';

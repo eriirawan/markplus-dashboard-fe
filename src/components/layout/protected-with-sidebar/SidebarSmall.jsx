@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { Box, List, ListItem, ListItemButton, alpha, lighten } from '@mui/material';
+import { Box, List, ListItem, ListItemButton, Stack, alpha } from '@mui/material';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 // import CustomTooltip from '@/components/CustomTooltip';
-import MPlusIcon from '../../Icon';
+import { MPlusIcon } from '../../Icon';
 
 const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
   const location = useLocation();
@@ -14,11 +14,12 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
   return (
     <Box
       sx={(theme) => ({
-        backgroundColor: lighten(theme.palette.neutral.lighterGrey, 0.5),
+        backgroundColor: 'white',
+        borderRadius: '10px',
         borderRight: `1px solid ${theme.palette.neutral.lightGrey}`,
         height,
         overflow: 'hidden',
-        width: 50,
+        width: 60,
       })}
     >
       <List disablePadding>
@@ -26,90 +27,103 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
         <Box>
           <ListItem disablePadding>
             {/* <CustomTooltip title="Open Sidebar" placement="right"> */}
-              <ListItemButton
-                onClick={() => {
-                  handleOpenSidebar(true);
-                }}
-                sx={(theme) => ({
-                  '&:hover': {
-                    backgroundColor: alpha(theme.palette.neutral.lightGrey, 0.5),
+            <ListItemButton
+              onClick={() => {
+                handleOpenSidebar(true);
+              }}
+              sx={(theme) => ({
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.neutral.lightGrey, 0.5),
+                },
+                backgroundColor: 'inherit',
+                display: 'flex',
+                justifyContent: 'center',
+                mx: 'auto',
+                px: 1.5,
+              })}
+            >
+              <Box
+                lineHeight={0}
+                sx={{
+                  '& svg': {
+                    opacity: 1,
+                    width: 'inherit',
                   },
-                  backgroundColor: 'inherit',
-                  display: 'flex',
-                  mx: 'auto',
-                  px: 1.5,
-                })}
+                }}
               >
-                <Box
-                  lineHeight={0}
-                  sx={{
-                    '& svg': {
-                      opacity: 1,
-                    },
-                  }}
-                >
-                  <MPlusIcon sx={{ color: 'neutral.greyScale02' }} name="KeyboardDoubleArrowRight" />
-                </Box>
-              </ListItemButton>
+                <MPlusIcon sx={{ color: 'neutral.greyScale02' }} name="KeyboardDoubleArrowRight" />
+              </Box>
+            </ListItemButton>
             {/* </CustomTooltip> */}
           </ListItem>
         </Box>
         {menus
           .filter((menu) => !menu.hidden)
           .map((menu) => (
-            <Box key={menu.group} sx={{ mb: 2 }}>
+            <Box key={menu.group} sx={{ mb: 1.25 }}>
               {menu.menus.map((mainMenu) => (
                 <ListItem
                   key={mainMenu.path}
                   disablePadding
-                  sx={{ display: mainMenu.hidden ? 'none' : 'block', height: 44 }}
+                  sx={{ display: mainMenu.hidden ? 'none' : 'block' }}
                   onMouseEnter={() => setHoveredPath(mainMenu.path)}
                   onMouseLeave={() => setHoveredPath('')}
                 >
                   {/* <CustomTooltip title={mainMenu.name} placement="right"> */}
-                    <ListItemButton
-                      onClick={() => {
-                        if (!mainMenu.subItems) {
-                          if (!mainMenu.path.startsWith('http')) {
-                            navigate(mainMenu.path);
-                            return;
-                          }
-
-                          window.open(mainMenu.path, '_blank');
+                  <ListItemButton
+                    onClick={() => {
+                      if (!mainMenu.subItems) {
+                        if (!mainMenu.path.startsWith('http')) {
+                          navigate(mainMenu.path);
+                          return;
                         }
 
-                        handleOpenSidebar(true);
-                      }}
-                      disabled={mainMenu.disabled}
-                      sx={(theme) => ({
-                        '&:hover': {
-                          backgroundColor: alpha(theme.palette.neutral.lightGrey, 0.5),
-                        },
-                        backgroundColor:
-                          mainMenu.path === paths[1] ? alpha(theme.palette.primary.main, 0.08) : 'inherit',
-                        display: 'flex',
-                        mx: 'auto',
-                        px: 1.5,
-                      })}
-                    >
+                        window.open(mainMenu.path, '_blank');
+                      }
+
+                      handleOpenSidebar(true);
+                    }}
+                    disabled={mainMenu.disabled}
+                    sx={(theme) => ({
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.neutral.lightGrey, 0.5),
+                      },
+                      backgroundColor: 'inherit',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      mx: 'auto',
+                      px: 1.5,
+                    })}
+                  >
+                    {mainMenu.path === paths[1] && (
                       <Box
-                        lineHeight={0}
-                        sx={{
-                          '& svg': {
-                            opacity: 1,
-                          },
-                        }}
-                      >
-                        <Box width={40} height={25}>
-                          {hoveredPath === mainMenu.path || mainMenu.path === paths[1] ? (
-                            <MPlusIcon name={mainMenu.icon.active} />
-                          ) : (
-                            <MPlusIcon name={mainMenu.icon.inActive} />
-                          )}
-                        </Box>
-                        {/* <MPlusIcon>{mainMenu.icon as BoxProps['children']}</Icon> */}
+                        width="2px"
+                        position="absolute"
+                        left={0}
+                        borderRadius={1.25}
+                        height={22}
+                        bgcolor="primary.main"
+                      />
+                    )}
+                    <Box
+                      lineHeight={0}
+                      sx={{
+                        '& svg': {
+                          opacity: 1,
+                          width: 'inherit',
+                        },
+                      }}
+                    >
+                      <Box width={40}>
+                        {hoveredPath === mainMenu.path || mainMenu.path === paths[1] ? (
+                          <MPlusIcon name={mainMenu.icon.active} />
+                        ) : (
+                          <MPlusIcon name={mainMenu.icon.inActive} />
+                        )}
                       </Box>
-                    </ListItemButton>
+                      {/* <MPlusIcon>{mainMenu.icon as BoxProps['children']}</Icon> */}
+                    </Box>
+                  </ListItemButton>
                   {/* </CustomTooltip> */}
                 </ListItem>
               ))}
