@@ -1,21 +1,14 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import { createContext, useContext, useMemo } from 'react';
 import { AppContext } from '@/context/AppContext';
-import {
-  userAvatarString,
-  userIdString,
-} from '@/helpers/Constants';
+import { userAvatarString, userIdString } from '@/helpers/Constants';
 import { BroadcastChannel } from 'broadcast-channel';
 import useLocalStorage from './useLocalStorage';
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-  const {
-    me,
-    userToken,
-    setUserToken,
-    setMe
-  } = useContext(AppContext);
+  const { me, userToken, setUserToken, setMe } = useContext(AppContext);
   const [userId, setUserId] = useLocalStorage(userIdString, null);
   const [userAvatar, setUserAvatar] = useLocalStorage(userAvatarString, null);
   const logoutChannel = new BroadcastChannel('logout');
@@ -36,19 +29,20 @@ export const AuthProvider = ({ children }) => {
     localStorage.clear();
   };
 
-  const login = async (data) => {
+  const login = async () => {
     const token = 'test-token';
     setUserToken(token);
     setMe({
       firstName: 'admin',
       lastName: 'admin',
-    })
-  }
+    });
+  };
 
-  const refreshMeData =  () => setMe({
-    firstName: 'admin',
-    lastName: 'admin',
-  });
+  const refreshMeData = () =>
+    setMe({
+      firstName: 'admin',
+      lastName: 'admin',
+    });
 
   const logout = () => {
     clearLocalStorage();

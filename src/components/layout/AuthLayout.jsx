@@ -1,6 +1,6 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { getYear } from 'date-fns';
-import { FC, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';

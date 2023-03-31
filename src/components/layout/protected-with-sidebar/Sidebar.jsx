@@ -75,12 +75,12 @@ const Sidebar = ({ menus, openSidebar, handleOpenSidebar }) => {
     <Slide direction="right" in={openSidebar} unmountOnExit mountOnEnter>
       <Box
         sx={(theme) => ({
-          backgroundColor: lighten(theme.palette.neutral.lighterGrey, 0.5),
+          backgroundColor: 'white',
           borderRight: `1px solid ${theme.palette.neutral.lightGrey}`,
           height: '100%',
           overflow: 'auto',
           pb: 20,
-          position: 'fixed',
+          position: 'absolute',
           width: 250,
           zIndex: 1000,
         })}
@@ -90,33 +90,33 @@ const Sidebar = ({ menus, openSidebar, handleOpenSidebar }) => {
           <Box>
             <ListItem disablePadding>
               {/* <CustomTooltip title="Close Sidebar" placement="right"> */}
-                <ListItemButton
-                  onClick={() => {
-                    handleOpenSidebar(false);
-                  }}
-                  sx={(theme) => ({
-                    '&:hover': {
-                      backgroundColor: alpha(theme.palette.neutral.lightGrey, 0.5),
+              <ListItemButton
+                onClick={() => {
+                  handleOpenSidebar(false);
+                }}
+                sx={(theme) => ({
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.neutral.lightGrey, 0.5),
+                  },
+                  alignItems: 'center',
+                  backgroundColor: lighten(theme.palette.neutral.lighterGrey, 0.5),
+                  display: 'flex',
+                  justifyContent: 'center',
+                  mx: 'auto',
+                  px: 1.5,
+                })}
+              >
+                <Box
+                  lineHeight={0}
+                  sx={{
+                    '& svg': {
+                      opacity: 1,
                     },
-                    alignItems: 'center',
-                    backgroundColor: lighten(theme.palette.neutral.lighterGrey, 0.5),
-                    display: 'flex',
-                    justifyContent: 'center',
-                    mx: 'auto',
-                    px: 1.5,
-                  })}
+                  }}
                 >
-                  <Box
-                    lineHeight={0}
-                    sx={{
-                      '& svg': {
-                        opacity: 1,
-                      },
-                    }}
-                  >
-                    <MPlusIcon sx={{ color: 'neutral.greyScale02' }} name="KeyboardDoubleArrowLeft" />
-                  </Box>
-                </ListItemButton>
+                  <MPlusIcon sx={{ color: 'neutral.greyScale02' }} name="KeyboardDoubleArrowLeft" />
+                </Box>
+              </ListItemButton>
               {/* </CustomTooltip> */}
             </ListItem>
           </Box>
@@ -221,33 +221,33 @@ const Sidebar = ({ menus, openSidebar, handleOpenSidebar }) => {
                                     />
                                     {item.addActionPath ? (
                                       // <CustomTooltip title={item.addActionLabel} placement="top">
-                                        <ListItemIcon
+                                      <ListItemIcon
+                                        sx={(theme) => ({
+                                          cursor: 'pointer',
+                                          minWidth: 'unset',
+                                          pr: 1,
+                                        })}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          e.preventDefault();
+                                          navigate(item.addActionPath);
+                                          handleOpenSidebar(false);
+                                        }}
+                                      >
+                                        <MPlusIcon
+                                          id="iconAdd"
+                                          name="AddBox"
+                                          fontSize="small"
                                           sx={(theme) => ({
-                                            cursor: 'pointer',
-                                            minWidth: 'unset',
-                                            pr: 1,
+                                            '&:hover': {
+                                              color: theme.palette.primary.main,
+                                            },
+                                            display: 'none',
                                           })}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            e.preventDefault();
-                                            navigate(item.addActionPath);
-                                            handleOpenSidebar(false);
-                                          }}
-                                        >
-                                          <MPlusIcon
-                                            id="iconAdd"
-                                            name="AddBox"
-                                            fontSize="small"
-                                            sx={(theme) => ({
-                                              '&:hover': {
-                                                color: theme.palette.primary.main,
-                                              },
-                                              display: 'none',
-                                            })}
-                                          />
-                                        </ListItemIcon>
-                                      // </CustomTooltip>
-                                    ) : null}
+                                        />
+                                      </ListItemIcon>
+                                    ) : // </CustomTooltip>
+                                    null}
                                   </ListItemButton>
                                 </Link>
                               </List>
@@ -310,33 +310,33 @@ const Sidebar = ({ menus, openSidebar, handleOpenSidebar }) => {
                           />
                           {mainMenu.addActionPath ? (
                             // <CustomTooltip title={mainMenu.addActionLabel} placement="top">
-                              <ListItemIcon
+                            <ListItemIcon
+                              sx={(theme) => ({
+                                cursor: 'pointer',
+                                minWidth: 'unset',
+                                pr: 0.3,
+                              })}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                navigate(mainMenu.addActionPath);
+                                handleOpenSidebar(false);
+                              }}
+                            >
+                              <MPlusIcon
+                                id="iconAdd"
+                                name="AddBox"
+                                fontSize="small"
                                 sx={(theme) => ({
-                                  cursor: 'pointer',
-                                  minWidth: 'unset',
-                                  pr: 0.3,
+                                  '&:hover': {
+                                    color: theme.palette.primary.main,
+                                  },
+                                  display: 'none',
                                 })}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  e.preventDefault();
-                                  navigate(mainMenu.addActionPath);
-                                  handleOpenSidebar(false);
-                                }}
-                              >
-                                <MPlusIcon
-                                  id="iconAdd"
-                                  name="AddBox"
-                                  fontSize="small"
-                                  sx={(theme) => ({
-                                    '&:hover': {
-                                      color: theme.palette.primary.main,
-                                    },
-                                    display: 'none',
-                                  })}
-                                />
-                              </ListItemIcon>
-                            // </CustomTooltip>
-                          ) : null}
+                              />
+                            </ListItemIcon>
+                          ) : // </CustomTooltip>
+                          null}
                         </ListItemButton>
                       </ListItem>
                     )}

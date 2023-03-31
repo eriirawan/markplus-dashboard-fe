@@ -13,6 +13,8 @@ import { AuthProvider } from '@/hooks/useAuth';
 const Loading = lazy(() => import('../components/Loading'));
 
 const Home = lazy(() => import('../pages/home'));
+const User = lazy(() => import('../pages/user'));
+const UserManagement = lazy(() => import('../pages/user-management'));
 
 const LazyComponent = ({ children }) => <Suspense fallback={<Loading open />}>{children}</Suspense>;
 
@@ -49,10 +51,16 @@ const router = createBrowserRouter(
       <Route path="/" element={<ProtectedLayout />} errorElement={<ErrorBoundary />}>
         <Route index element={<Navigate to="/home" />} errorElement={<ErrorBoundary />} />
         <Route path="home" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
+        <Route path="users" element={<LazyComponent children={<User />} />} errorElement={<ErrorBoundary />} />
+        <Route
+          path="user-management"
+          element={<LazyComponent children={<UserManagement />} />}
+          errorElement={<ErrorBoundary />}
+        />
       </Route>
     </>
   )
-)
+);
 
 const AppRoutes = () => (
   <AuthProvider>

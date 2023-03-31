@@ -3,12 +3,8 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: [
-    'plugin:react/recommended',
-    'airbnb',
-    'prettier',
-  ],
-  parser: '@typescript-eslint/parser',
+  extends: ['plugin:react/recommended', 'airbnb', 'prettier', 'eslint:recommended'],
+  parser: '@babel/eslint-parser',
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -87,9 +83,8 @@ module.exports = {
         map: [['@', './src']],
       },
       node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        extensions: ['.js', '.jsx'],
       },
-      typescript: {},
     },
   },
 };

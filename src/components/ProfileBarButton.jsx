@@ -1,6 +1,6 @@
 import { AppContext } from '@/context/AppContext';
 import { AccountCircle, ExpandLess, ExpandMore } from '@mui/icons-material';
-import { Avatar, Box, IconButton, Typography } from '@mui/material';
+import { Stack, Box, IconButton, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useContext } from 'react';
 
@@ -19,7 +19,6 @@ const ProfileBarButton = ({
         backgroundColor: openProfileBar ? alpha(theme.palette.primary.main, 0.08) : 'none',
         borderRadius: 1,
         cursor: 'pointer',
-        p: 0.9,
       })}
     >
       <IconButton
@@ -36,10 +35,15 @@ const ProfileBarButton = ({
         disableRipple
         sx={{ m: 0, p: 0 }}
       >
-        <AccountCircle sx={{ color: openProfileBar ? 'primary.main' : 'neutral.greyScale02', fontSize: 25 }} />
-        <Typography variant="body1" fontWeight={600} sx={{ mx: 1 }}>
-          {me ? `${me?.firstName} ${me?.lastName}` : ''}
-        </Typography>
+        <Stack alignItems="end">
+          <Typography color="white" variant="body1" fontWeight={600} sx={{ mx: 1 }}>
+            {me ? `${me?.firstName} ${me?.lastName}` : ''}
+          </Typography>
+          <Typography color="white" variant="body2" sx={{ mx: 1 }}>
+            Admin
+          </Typography>
+        </Stack>
+        <AccountCircle sx={{ color: openProfileBar ? 'primary.main' : 'white', fontSize: 25 }} />
       </IconButton>
     </Box>
   );
