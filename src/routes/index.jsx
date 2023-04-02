@@ -15,6 +15,10 @@ const Loading = lazy(() => import('../components/Loading'));
 const Home = lazy(() => import('../pages/home'));
 const User = lazy(() => import('../pages/user'));
 const UserManagement = lazy(() => import('../pages/user-management'));
+const Login = lazy(() => import('../pages/login'));
+const ForgotPassword = lazy(() => import('../pages/forgotPassword'));
+const ForgotPasswordSuccess = lazy(() => import('../pages/forgotPasswordSuccess'));
+const ResetPassword = lazy(() => import('../pages/resetPassword'));
 
 const LazyComponent = ({ children }) => <Suspense fallback={<Loading open />}>{children}</Suspense>;
 
@@ -27,7 +31,7 @@ const ErrorBoundary = () => {
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      {/* <Route path="/login" element={<LazyComponent children={<Login />} />} errorElement={<ErrorBoundary />} />
+      <Route path="/login" element={<LazyComponent children={<Login />} />} errorElement={<ErrorBoundary />} />
       <Route
         path="/forgot-password"
         element={<LazyComponent children={<ForgotPassword />} />}
@@ -43,7 +47,7 @@ const router = createBrowserRouter(
         element={<LazyComponent children={<ResetPassword />} />}
         errorElement={<ErrorBoundary />}
       />
-      <Route
+      {/* <Route
         path="/reset-password-success"
         element={<LazyComponent children={<ResetPasswordSuccess />} />}
         errorElement={<ErrorBoundary />}
