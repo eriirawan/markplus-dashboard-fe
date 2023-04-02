@@ -238,6 +238,7 @@ const theme = createTheme({
       disabled: '#ABBAD0',
       primary: '#002245',
       secondary: '#5E758D',
+      lightPrimary: '#2E459A',
     },
     warning: {
       100: '#FFFAEB', // Warning | 8%
