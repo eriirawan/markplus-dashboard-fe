@@ -1,13 +1,14 @@
 import React from 'react';
 import { Button, TextField, Card, Box, Typography } from '@mui/material';
 import styled from 'styled-components';
-import Logo from '../../assets/logo-light.png';
+import Logo from '@/assets/logo-light.png';
 import { ChevronLeft } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import media from '../../helpers/MediaQueries';
+import media from '@/helpers/MediaQueries';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
+
   return (
     <Container
       sx={(theme) => ({
@@ -15,11 +16,11 @@ const ForgotPassword = () => {
       })}
     >
       <Box sx={{ maxWidth: '640px' }}>
-        <Button variant="text" startIcon={<ChevronLeft />} sx={{ maxWidth: '54px', marginBottom: '32px' }}>
+        <Button variant="text" startIcon={<ChevronLeft />} sx={{ marginBottom: '32px', maxWidth: '54px' }}>
           Back
         </Button>
         <CardContainer>
-          <Image src={Logo}></Image>
+          <Image src={Logo} />
           <HeaderCard>Recover your password</HeaderCard>
           <DesctiptionCard>
             Enter the email that you used when register to recover your password. You will receive a password reset
@@ -40,7 +41,7 @@ const ForgotPassword = () => {
                 color: theme.palette.primary.lightBlue,
               },
             })}
-          ></EmailField>
+          />
           <SendLinkButton color="primary" variant="contained" onClick={() => navigate('/forgot-password-success')}>
             Send Link
           </SendLinkButton>

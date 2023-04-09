@@ -17,6 +17,7 @@ module.exports = {
     'comma-dangle': 'off',
     'function-paren-newline': 'off',
     'implicit-arrow-linebreak': 'off',
+    'import/no-named-as-default': 0,
     'import/extensions': [
       'error',
       'ignorePackages',
@@ -80,6 +81,7 @@ module.exports = {
   settings: {
     'import/resolver': {
       alias: {
+        extensions: ['.js', '.jsx'],
         map: [['@', './src']],
       },
       node: {
