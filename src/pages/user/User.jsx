@@ -165,8 +165,10 @@ const User = () => {
 
   const handleClose = () => {
     setOpenPopup(false);
-    setAction('');
-    methods.reset(defaultForm);
+    setTimeout(() => {
+      setAction('');
+      methods.reset(defaultForm);
+    }, 500);
   };
 
   return (
