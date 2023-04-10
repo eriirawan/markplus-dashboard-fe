@@ -125,17 +125,6 @@ const theme = createTheme({
       },
     },
 
-    MuiSelect: {
-      styleOverrides: {
-        select: {
-          boxSizing: 'inherit',
-          color: '#002245',
-          height: 32,
-          paddingTop: 6,
-        },
-      },
-    },
-
     MuiTableCell: {
       styleOverrides: {
         root: {
@@ -157,37 +146,6 @@ const theme = createTheme({
             fontWeight: 'bold',
           },
         },
-      },
-    },
-
-    /** Customize Textfield  */
-    MuiTextField: {
-      defaultProps: {
-        size: 'small',
-      },
-      styleOverrides: {
-        root: ({ ownerState }) => ({
-          '& fieldset': {
-            borderColor: '#ABBAD0',
-          },
-          color: '#002245',
-          ...(ownerState.size === 'small' && {
-            '& .Mui-disabled': {
-              height: '14px',
-            },
-            '& .MuiInputBase-root': {
-              height: '32px',
-            },
-          }),
-          ...(ownerState.size === 'medium' && {
-            '& .Mui-disabled': {
-              height: '18px',
-            },
-            '& .MuiInputBase-root': {
-              height: '40px',
-            },
-          }),
-        }),
       },
     },
 

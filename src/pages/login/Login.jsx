@@ -1,13 +1,10 @@
-import { Button, Card, TextField } from '@mui/material';
-import { Box, InputAdornment } from '@mui/material';
+import { Box, InputAdornment, TextField } from '@mui/material';
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import Logo from '../../assets/icons/graphics/Logo-Light.svg';
-import { Link } from 'react-router-dom';
+import Logo from '@/assets/logo-light.png';
 import MPlusIcon from '@/components/Icon';
-import media from '../../helpers/MediaQueries';
+import { Container, CardContainer, LoginButton, ForgotPassword, Image, Content, HeaderCard } from './Login.style';
 
-export default function Login() {
+const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -29,6 +26,7 @@ export default function Login() {
                 textAlign: 'center',
               },
             }}
+            InputLabelProps={{ shrink: true }}
             sx={(theme) => ({
               '& .Mui-focused': {
                 color: theme.palette.primary.lightBlue,
@@ -40,18 +38,19 @@ export default function Login() {
             placeholder="Your Password"
             type={showPassword ? 'text' : 'password'}
             InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Box width={24} height={24} sx={{ cursor: 'pointer' }} onClick={() => setShowPassword(!showPassword)}>
+                    <MPlusIcon name={showPassword ? 'EyeHide' : 'EyeShow'} />
+                  </Box>
+                </InputAdornment>
+              ),
               style: {
                 height: '44px',
                 textAlign: 'center',
               },
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Box width={24} height={24} sx={{ cursor: 'pointer' }} onClick={() => setShowPassword(!showPassword)}>
-                    <MPlusIcon name={showPassword ? 'EyeHide' : 'EyeShow'}></MPlusIcon>
-                  </Box>
-                </InputAdornment>
-              ),
             }}
+            InputLabelProps={{ shrink: true }}
           />
           <LoginButton variant="contained" color="primary">
             Log in
@@ -61,54 +60,6 @@ export default function Login() {
       </CardContainer>
     </Container>
   );
-}
+};
 
-const Container = styled(Box)`
-  display: flex;
-  justify-content: center;
-  height: 100vh;
-  align-items: center;
-`;
-
-const CardContainer = styled(Card)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  ${media.phone`
-    padding: 32px;
-  `}
-  padding: 64px;
-  max-height: 577px;
-  max-width: 384px;
-  width: 100%;
-`;
-
-const LoginButton = styled(Button)``;
-
-const ForgotPassword = styled(Link)`
-  margin-top: 32px;
-  color: #2e459a;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 18px;
-`;
-
-const Image = styled.img`
-  margin-bottom: 32;
-`;
-const Content = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 41px;
-  max-width: 256px;
-  width: 100%;
-`;
-
-const HeaderCard = styled.p`
-  font-family: 'Poppins';
-  font-weight: 700;
-  font-size: 30px;
-  line-height: 39px;
-  text-align: center;
-  color: #2e459a;
-`;
+export default Login;

@@ -18,7 +18,7 @@ const Loading = ({ open }) => {
       sx={{ backgroundColor: 'rgba(255,255,255,0.7)', color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
       open={open}
     >
-      <Stack alignItems="center" justifyContent="center">
+      <Stack alignItems="center" justifyContent="center" width={150}>
         <Lottie lottieRef={lottieRef} animationData={loadingSample} loop />
       </Stack>
     </Backdrop>
