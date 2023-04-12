@@ -1,69 +1,24 @@
+import { Delete, Edit, InfoOutlined, Search } from '@mui/icons-material';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import {
-  Paper,
-  Typography,
-  Breadcrumbs,
-  Stack,
   Box,
-  TextField,
+  Breadcrumbs,
   InputAdornment,
   MenuItem,
   Pagination,
   PaginationItem,
+  Paper,
   Select,
+  Stack,
+  TextField,
+  Typography,
 } from '@mui/material';
-import { useLocation, Link } from 'react-router-dom';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { Delete, Edit, InfoOutlined, Search } from '@mui/icons-material';
-import { useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { useDemoData } from '@mui/x-data-grid-generator';
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
-const dummyData = [
-  {
-    activeDate: '2021-09-17 19:09:10',
-    email: 'info@markplusinc.com',
-    firstName: 'Mark',
-    imgName: 'markplus.jpeg',
-    imgUrl: '/',
-    lastName: 'Plus',
-    role: 'Admin',
-    userId: '000000001',
-    userName: 'markplus.inc',
-  },
-  {
-    activeDate: '2021-09-17 19:09:10',
-    email: 'info@markplusinc.com',
-    firstName: 'Pertamina',
-    imgName: 'markplus.jpeg',
-    imgUrl: '/',
-    lastName: 'Indonesia',
-    role: 'Admin',
-    userId: '000000002',
-    userName: 'markplus.inc',
-  },
-  {
-    activeDate: '2021-09-17 19:09:10',
-    email: 'info@markplusinc.com',
-    firstName: 'PLN',
-    imgName: 'markplus.jpeg',
-    imgUrl: '/',
-    lastName: 'Indonesia',
-    role: 'Admin',
-    userId: '000000003',
-    userName: 'markplus.inc',
-  },
-  {
-    activeDate: '2021-09-17 19:09:10',
-    email: 'info@markplusinc.com',
-    firstName: 'Bank',
-    imgName: 'markplus.jpeg',
-    imgUrl: '/',
-    lastName: 'BCA',
-    role: 'Admin',
-    userId: '000000004',
-    userName: 'markplus.inc',
-  },
-];
+import dummyData from './dummy';
 
 const UserManagement = () => {
   const location = useLocation();
@@ -222,7 +177,7 @@ const UserManagement = () => {
                   </MenuItem>
                 ))}
               </Select>
-              {`of ${dummyData.length} entries`}
+              {`of ${dummyData?.length} entries`}
             </Box>
           </Box>
         </Box>

@@ -1,0 +1,48 @@
+const dummyData = [
+  {
+    activeDate: '2021-09-17 19:09:10',
+    email: 'info@markplusinc.com',
+    firstName: 'Mark',
+    imgName: 'markplus.jpeg',
+    imgUrl: '/',
+    lastName: 'Plus',
+    role: 'Admin',
+    userId: '000000001',
+    userName: 'markplus.inc',
+  },
+  {
+    activeDate: '2021-09-17 19:09:10',
+    email: 'info@markplusinc.com',
+    firstName: 'Pertamina',
+    imgName: 'markplus.jpeg',
+    imgUrl: '/',
+    lastName: 'Indonesia',
+    role: 'Admin',
+    userId: '000000002',
+    userName: 'markplus.inc',
+  },
+  {
+    activeDate: '2021-09-17 19:09:10',
+    email: 'info@markplusinc.com',
+    firstName: 'PLN',
+    imgName: 'markplus.jpeg',
+    imgUrl: '/',
+    lastName: 'Indonesia',
+    role: 'Admin',
+    userId: '000000003',
+    userName: 'markplus.inc',
+  },
+  {
+    activeDate: '2021-09-17 19:09:10',
+    email: 'info@markplusinc.com',
+    firstName: 'Bank',
+    imgName: 'markplus.jpeg',
+    imgUrl: '/',
+    lastName: 'BCA',
+    role: 'Admin',
+    userId: '000000004',
+    userName: 'markplus.inc',
+  },
+];
+
+export default dummyData;
