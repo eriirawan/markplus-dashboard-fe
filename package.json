@@ -2,6 +2,7 @@
   "name": "markplus",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://dagati-tech.github.io/markplus-dashboard-fe",
   "imports": {
     "@/*": "./src/*"
   },
@@ -9,6 +10,7 @@
     "start": "yarn && vite",
     "dev": "vite",
     "build": "vite build",
+    "deploy": "gh-pages -d dist",
     "preview": "vite preview",
     "prepare": "husky install"
   },
@@ -74,6 +76,7 @@
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "eslint-plugin-storybook": "^0.6.7",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "gh-pages": "^5.0.0",
     "git-precommit-checks": "^3.1.0",
     "husky": "^8.0.0",
     "javascript-obfuscator": "^4.0.2",
