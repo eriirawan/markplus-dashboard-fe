@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 import ProtectedLayout from '../components/layout/protected-with-sidebar/ProtectedLayout';
 import { AuthProvider } from '@/hooks/useAuth';
+import { DashboardProvider } from '@/hooks/useDashboard';
 
 const Loading = lazy(() => import('../components/Loading'));
 
@@ -19,6 +20,7 @@ const Login = lazy(() => import('../pages/login'));
 const ForgotPassword = lazy(() => import('../pages/forgotPassword'));
 const ForgotPasswordSuccess = lazy(() => import('../pages/forgotPasswordSuccess'));
 const ResetPassword = lazy(() => import('../pages/resetPassword'));
+const AddChart = lazy(() => import('../pages/addChart'));
 
 const LazyComponent = ({ children }) => <Suspense fallback={<Loading open />}>{children}</Suspense>;
 
@@ -61,6 +63,7 @@ const router = createBrowserRouter(
           element={<LazyComponent children={<UserManagement />} />}
           errorElement={<ErrorBoundary />}
         />
+        <Route path="add-chart" element={<LazyComponent children={<AddChart />} />} errorElement={<ErrorBoundary />} />
       </Route>
     </>
   )
@@ -68,7 +71,9 @@ const router = createBrowserRouter(
 
 const AppRoutes = () => (
   <AuthProvider>
-    <RouterProvider router={router} />
+    <DashboardProvider>
+      <RouterProvider router={router} />
+    </DashboardProvider>
   </AuthProvider>
 );
 
