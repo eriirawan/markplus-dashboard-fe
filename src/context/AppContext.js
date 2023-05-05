@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  tokenString,
-  userDataString
-} from '../helpers/Constants';
+import { tokenString, userDataString } from '../helpers/Constants';
 
 import useLocalStorage from '../hooks/useLocalStorage';
 
@@ -15,9 +12,8 @@ export const useStore = () => {
     setUserToken,
     me,
     setMe,
-  }
-}
-
+  };
+};
 
 const AppContextBody = React.createContext({});
 AppContextBody.displayName = 'MarkPlusGlobalState';
