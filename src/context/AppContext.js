@@ -8,10 +8,10 @@ export const useStore = () => {
   const [me, setMe] = useLocalStorage(userDataString, null);
 
   return {
-    userToken,
-    setUserToken,
     me,
     setMe,
+    setUserToken,
+    userToken,
   };
 };
 

@@ -25,3 +25,17 @@ export const ISODateToLuxon = (ISODateString) => {
 
   return DateTime.fromISO(ISODateString);
 };
+
+export const capitalizeString = (sentence) => {
+  const words = sentence.split(' ');
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < words.length; i++) {
+    words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+  }
+
+  return words.join(' ');
+};
+
+export const generatePageTitle = (title) => {
+  window.document.title = `${title} - Mark Plus Dashboard`;
+};
