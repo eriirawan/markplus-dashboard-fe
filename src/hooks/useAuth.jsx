@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }) => {
       firstName: 'admin',
       lastName: 'admin',
     });
+    window.location.href = `/home`;
   };
 
   const refreshMeData = () =>

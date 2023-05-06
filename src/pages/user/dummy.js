@@ -8,7 +8,7 @@ const dummyData = [
     lastName: 'Plus',
     role: 'Admin',
     userId: '000000001',
-    userName: 'markplus.inc',
+    username: 'markplus.inc',
   },
   {
     activeDate: '2021-09-17 19:09:10',
@@ -19,7 +19,7 @@ const dummyData = [
     lastName: 'Indonesia',
     role: 'Admin',
     userId: '000000002',
-    userName: 'markplus.inc',
+    username: 'markplus.inc',
   },
   {
     activeDate: '2021-09-17 19:09:10',
@@ -30,7 +30,7 @@ const dummyData = [
     lastName: 'Indonesia',
     role: 'Admin',
     userId: '000000003',
-    userName: 'markplus.inc',
+    username: 'markplus.inc',
   },
   {
     activeDate: '2021-09-17 19:09:10',
@@ -41,7 +41,7 @@ const dummyData = [
     lastName: 'BCA',
     role: 'Admin',
     userId: '000000004',
-    userName: 'markplus.inc',
+    username: 'markplus.inc',
   },
 ];
 

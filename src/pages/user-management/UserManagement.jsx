@@ -1,4 +1,4 @@
-import { Delete, Edit, InfoOutlined, Search } from '@mui/icons-material';
+import { FileOpenOutlined, PanoramaOutlined, Search, SettingsOutlined } from '@mui/icons-material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import {
   Box,
@@ -12,11 +12,13 @@ import {
   Stack,
   TextField,
   Typography,
+  Link,
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useDemoData } from '@mui/x-data-grid-generator';
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { ISODateToLuxon } from '../../helpers/Utils';
 
 import dummyData from './dummy';
 
@@ -31,25 +33,41 @@ const UserManagement = () => {
   });
 
   const columns = [
-    { field: 'userId', headerName: 'ID', width: 111 },
-    { field: 'userName', headerName: 'Username', width: 171 },
-    { field: 'email', headerName: 'Email', width: 219 },
-    { field: 'firstName', headerName: 'First Name', width: 142 },
-    { field: 'lastName', headerName: 'Last Name', width: 141 },
-    { field: 'imgName', headerName: 'Profile Picture', width: 164 },
-    { field: 'role', headerName: 'Role', width: 127 },
-    { field: 'activeDate', headerName: 'Active Date', width: 171 },
+    { field: 'fileId', headerName: 'ID', width: 111 },
+    { field: 'username', headerName: 'Username', width: 256 },
+    {
+      field: 'imgName',
+      flex: 1,
+      headerName: 'File/Link',
+      renderCell: (params) =>
+        params.row.fileName || params.row.link ? (
+          <Link href={params.row.link} target="_blank" rel="noopener noreferrer">
+            {params.row.fileName || params.row.link}
+          </Link>
+        ) : (
+          <Typography>no data yet</Typography>
+        ),
+    },
+    {
+      field: 'activeDate',
+      headerName: 'Last modified',
+      valueGetter: (params) =>
+        ISODateToLuxon(new Date(params.row.updatedAt || params.row.createdAt).toISOString()).toFormat(
+          'dd MMM yyyy HH:mm:ss'
+        ),
+      width: 171,
+    },
     {
       field: 'action',
-      flex: 1,
       headerName: 'Action',
       renderCell: () => (
-        <Stack direction="row" spacing={2.5}>
-          <InfoOutlined sx={{ fontSize: 20 }} />
-          <Edit sx={{ fontSize: 20 }} />
-          <Delete sx={{ color: '#E56363', fontSize: 20 }} />
+        <Stack direction="row" spacing={2}>
+          <FileOpenOutlined sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }} />
+          <PanoramaOutlined sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }} />
+          <SettingsOutlined sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }} />
         </Stack>
       ),
+      width: 111,
     },
   ];
 
@@ -124,7 +142,7 @@ const UserManagement = () => {
               {...data}
               columns={columns}
               rows={dummyData}
-              getRowId={(row) => row.userId}
+              getRowId={(row) => row.fileId}
               sx={{
                 '& .MuiDataGrid-cell': {
                   bgcolor: '#EEF0F5',

@@ -1,11 +1,28 @@
 import { Box, InputAdornment, TextField } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Logo from '@/assets/logo-light.png';
 import MPlusIcon from '@/components/Icon';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { Container, CardContainer, LoginButton, ForgotPassword, Image, Content, HeaderCard } from './Login.style';
 
 const Login = () => {
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleLogin = async (data) => {
+    try {
+      await login(data);
+    } catch (e) {
+      console.warn('error login');
+    }
+  };
+
+  useEffect(() => {
+    if (user) navigate('/home');
+  }, []);
 
   return (
     <Container
@@ -52,7 +69,7 @@ const Login = () => {
             }}
             InputLabelProps={{ shrink: true }}
           />
-          <LoginButton variant="contained" color="primary">
+          <LoginButton variant="contained" color="primary" onClick={handleLogin}>
             Log in
           </LoginButton>
         </Content>

@@ -7,9 +7,9 @@ import {
   RouterProvider,
   useRouteError,
 } from 'react-router-dom';
-import ProtectedLayout from '../components/layout/protected-with-sidebar/ProtectedLayout';
 import { AuthProvider } from '@/hooks/useAuth';
 import { DashboardProvider } from '@/hooks/useDashboard';
+import ProtectedLayout from '../components/layout/protected-with-sidebar/ProtectedLayout';
 
 const Loading = lazy(() => import('../components/Loading'));
 
