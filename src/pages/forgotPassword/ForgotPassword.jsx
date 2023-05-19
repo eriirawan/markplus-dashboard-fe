@@ -16,7 +16,12 @@ const ForgotPassword = () => {
       })}
     >
       <Box sx={{ maxWidth: '640px' }}>
-        <Button variant="text" startIcon={<ChevronLeft />} sx={{ marginBottom: '32px', maxWidth: '54px' }}>
+        <Button
+          variant="text"
+          startIcon={<ChevronLeft />}
+          sx={{ marginBottom: '32px', maxWidth: '54px' }}
+          onClick={() => navigate('/login', { replace: true })}
+        >
           Back
         </Button>
         <CardContainer>

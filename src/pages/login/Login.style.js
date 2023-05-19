@@ -6,8 +6,8 @@ import media from '../../helpers/MediaQueries';
 export const Container = styled(Box)`
   display: flex;
   justify-content: center;
-  height: 100vh;
   align-items: center;
+  height: 100%;
 `;
 
 export const CardContainer = styled(Card)`

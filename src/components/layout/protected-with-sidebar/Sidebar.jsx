@@ -79,7 +79,7 @@ const Sidebar = ({ menus, openSidebar, handleOpenSidebar }) => {
           borderRight: `1px solid ${theme.palette.neutral.lightGrey}`,
           height: '100%',
           overflow: 'auto',
-          pb: 20,
+          // pb: 20,
           position: 'absolute',
           width: 250,
           zIndex: 1000,

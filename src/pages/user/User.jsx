@@ -128,7 +128,7 @@ const User = () => {
 
   return (
     <>
-      <Dialog maxWidth="md" open={openPopup} PaperProps={{ sx: { p: 3 } }}>
+      <Dialog maxWidth="md" open={openPopup} PaperProps={{ sx: { p: 3 } }} transitionDuration={500}>
         <DialogTitle>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography variant="h1" color="primary.main">
@@ -234,7 +234,7 @@ const User = () => {
           </FormProvider>
         </DialogContent>
       </Dialog>
-      <Paper sx={{ borderRadius: 1.25, display: 'flex', height: '100%', mt: 1, p: 4 }}>
+      <Paper sx={{ display: 'flex', height: '100%', p: 4 }}>
         <Stack width="100%">
           <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
             <Link to="/home" style={{ textDecoration: 'none' }}>

@@ -415,7 +415,7 @@ const Home = () => {
         width: '100%',
       }}
     >
-      <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '512px', mt: 1, padding: '25px 32px' }}>
+      <Paper sx={{ display: 'flex', maxHeight: '512px', padding: '25px 32px' }}>
         <Stack direction="row" alignItems="center" gap="30px">
           <Typography fontSize="18px" lineHeight="27px" fontWeight="700" color="primary">
             Set dashboard for

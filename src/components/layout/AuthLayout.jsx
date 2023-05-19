@@ -17,7 +17,7 @@ const AuthLayout = ({ children }) => {
     if (user) navigate('/home');
   }, []);
 
-  return <Box sx={{ height: 0.8 * windowDimensions.height }}>{children}</Box>;
+  return <Box sx={{ height: windowDimensions.height }}>{children}</Box>;
 };
 
 export default AuthLayout;
