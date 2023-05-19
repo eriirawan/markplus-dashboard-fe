@@ -33,11 +33,12 @@ const UserManagement = () => {
   });
 
   const columns = [
-    { field: 'fileId', headerName: 'ID', width: 111 },
-    { field: 'username', headerName: 'Username', width: 256 },
+    { field: 'fileId', headerAlign: 'center', headerName: 'ID', width: 111 },
+    { field: 'username', headerAlign: 'center', headerName: 'Username', width: 256 },
     {
       field: 'imgName',
       flex: 1,
+      headerAlign: 'center',
       headerName: 'File/Link',
       renderCell: (params) =>
         params.row.fileName || params.row.link ? (
@@ -50,6 +51,7 @@ const UserManagement = () => {
     },
     {
       field: 'activeDate',
+      headerAlign: 'center',
       headerName: 'Last modified',
       valueGetter: (params) =>
         ISODateToLuxon(new Date(params.row.updatedAt || params.row.createdAt).toISOString()).toFormat(
@@ -59,6 +61,7 @@ const UserManagement = () => {
     },
     {
       field: 'action',
+      headerAlign: 'center',
       headerName: 'Action',
       renderCell: () => (
         <Stack direction="row" spacing={2}>

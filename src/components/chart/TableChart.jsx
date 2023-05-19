@@ -31,6 +31,7 @@ const TableChart = () => {
       backgroundColor: theme.palette.primary.main,
       color: theme.palette.common.white,
       padding: '10px 0 10px 16px',
+      textAlign: 'center',
     },
     [`&.${tableCellClasses.body}`]: {
       fontSize: 14,

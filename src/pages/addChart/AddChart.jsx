@@ -1,5 +1,4 @@
-import React, { useMemo, useState, useContext, useEffect, useRef } from 'react';
-import { DashboardContext } from '../home/Home';
+import React, { useMemo, useState, useRef } from 'react';
 import {
   Breadcrumbs,
   Paper,
@@ -18,7 +17,7 @@ import {
   OutlinedInput,
 } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { SketchPicker, CustomPicker, HuePicker } from 'react-color';
+import { SketchPicker } from 'react-color';
 
 import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
@@ -26,7 +25,6 @@ import LineChart from '../../components/chart/LineChart';
 import { defaultColorChart, defaultDataChartBar, defaultDataChartLine } from '../../helpers/DummyDataChart';
 import BarChart from '../../components/chart/BarChart';
 import DonutChart from '../../components/chart/DonutChart';
-import AreaChart from '../../components/chart/AreaChart';
 import { useDashboard } from '../../hooks/useDashboard';
 
 const optionData = [
@@ -77,11 +75,11 @@ const AddChart = () => {
   const chartRef = useRef();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    chartType: '',
-    chartLabel: '',
     chartData: [],
-    verticalAxisLabel: '',
+    chartLabel: '',
+    chartType: '',
     horizontalAxisLabel: '',
+    verticalAxisLabel: '',
   });
   //   const [chartData, setChartData] = useState({
   //     labels: ['Jan'],
@@ -92,38 +90,39 @@ const AddChart = () => {
   //   },[formData])
   const dataChartDonut = useMemo(
     () => ({
-      labels: formData.chartData.map((el) => el.name),
       datasets: [
         {
-          data: formData.chartData.map((el, index) => defaultDataChartBar[index]),
           //   borderColor: defaultColorChart[index],
           backgroundColor: formData.chartData.map((el, index) => defaultColorChart[index]),
+
+          data: formData.chartData.map((el, index) => defaultDataChartBar[index]),
         },
       ],
+      labels: formData.chartData.map((el) => el.name),
     }),
     [formData]
   );
   const dataChart = useMemo(
     () => ({
-      labels: ['Jan'],
       datasets: formData.chartData.map((data, index) => ({
-        label: data.name,
-        data: [defaultDataChartBar[index]],
-        borderColor: defaultColorChart[index],
         backgroundColor: defaultColorChart[index],
+        borderColor: defaultColorChart[index],
+        data: [defaultDataChartBar[index]],
+        label: data.name,
       })),
+      labels: ['Jan'],
     }),
     [formData]
   );
   const dataChartLine = useMemo(
     () => ({
-      labels: formData.chartData.map((el) => el.name),
       datasets: formData.chartData.map((data, index) => ({
-        label: data.name,
-        data: formData.chartData.map((_, idx) => defaultDataChartLine[index][idx]),
-        borderColor: defaultColorChart[index],
         backgroundColor: defaultColorChart[index],
+        borderColor: defaultColorChart[index],
+        data: formData.chartData.map((_, idx) => defaultDataChartLine[index][idx]),
+        label: data.name,
       })),
+      labels: formData.chartData.map((el) => el.name),
     }),
     [formData]
   );
@@ -205,12 +204,12 @@ const AddChart = () => {
         case 'Line': {
           setDisplayInputLabel(true);
           return (
-            <Box sx={{ maxWidth: '549px', marginTop: '20px' }}>
+            <Box sx={{ marginTop: '20px', maxWidth: '549px' }}>
               <LineChart
                 refChart={chartRef}
-                width={'549px'}
-                height={'335px'}
-                maxWidthLegend={'369px'}
+                width="549px"
+                height="335px"
+                maxWidthLegend="369px"
                 labelX={formData.verticalAxisLabel}
                 labelY={formData.horizontalAxisLabel}
                 options={{
@@ -223,19 +222,19 @@ const AddChart = () => {
                   },
                 }}
                 chartData={dataChartLine}
-              ></LineChart>
+              />
             </Box>
           );
         }
         case 'Vertical Bar': {
           setDisplayInputLabel(true);
           return (
-            <Box sx={{ maxWidth: '549px', marginTop: '20px' }}>
+            <Box sx={{ marginTop: '20px', maxWidth: '549px' }}>
               <BarChart
                 refChart={chartRef}
-                width={'549px'}
-                height={'335px'}
-                maxWidthLegend={'369px'}
+                width="549px"
+                height="335px"
+                maxWidthLegend="369px"
                 chartData={dataChart}
                 labelX={formData.verticalAxisLabel}
                 labelY={formData.horizontalAxisLabel}
@@ -255,24 +254,24 @@ const AddChart = () => {
         case 'Horizontal Bar': {
           setDisplayInputLabel(true);
           return (
-            <Box sx={{ maxWidth: '549px', marginTop: '20px' }}>
+            <Box sx={{ marginTop: '20px', maxWidth: '549px' }}>
               <BarChart
                 refChart={chartRef}
-                width={'549px'}
-                height={'335px'}
-                maxWidthLegend={'369px'}
-                indexAxis={'y'}
+                width="549px"
+                height="335px"
+                maxWidthLegend="369px"
+                indexAxis="y"
                 labelX={formData.verticalAxisLabel}
                 labelY={formData.horizontalAxisLabel}
                 chartData={{
                   axis: 'y',
-                  labels: ['Jan'],
                   datasets: formData.chartData.map((data, index) => ({
-                    label: data.name,
-                    data: [Math.floor(Math.random() * 140)],
-                    borderColor: defaultColorChart[index],
                     backgroundColor: defaultColorChart[index],
+                    borderColor: defaultColorChart[index],
+                    data: [Math.floor(Math.random() * 140)],
+                    label: data.name,
                   })),
+                  labels: ['Jan'],
                 }}
                 options={{
                   onClick(evt, elements, chart) {
@@ -290,12 +289,12 @@ const AddChart = () => {
         case 'Donut': {
           setDisplayInputLabel(false);
           return (
-            <Box sx={{ maxWidth: '549px', marginTop: '20px' }}>
+            <Box sx={{ marginTop: '20px', maxWidth: '549px' }}>
               <DonutChart
                 refChart={chartRef}
-                width={'549px'}
-                height={'335px'}
-                maxWidthLegend={'369px'}
+                width="549px"
+                height="335px"
+                maxWidthLegend="369px"
                 chartData={dataChartDonut}
                 options={{
                   onClick(evt, elements, chart) {
@@ -313,12 +312,12 @@ const AddChart = () => {
         case 'Area': {
           setDisplayInputLabel(true);
           return (
-            <Box sx={{ maxWidth: '549px', marginTop: '20px' }}>
+            <Box sx={{ marginTop: '20px', maxWidth: '549px' }}>
               <LineChart
                 refChart={chartRef}
-                width={'549px'}
-                height={'335px'}
-                maxWidthLegend={'369px'}
+                width="549px"
+                height="335px"
+                maxWidthLegend="369px"
                 labelX={formData.verticalAxisLabel}
                 labelY={formData.horizontalAxisLabel}
                 chartData={{
@@ -334,15 +333,15 @@ const AddChart = () => {
                     }
                   },
                 }}
-              ></LineChart>
+              />
             </Box>
           );
         }
         default: {
           setDisplayInputLabel(false);
           return (
-            <Box sx={{ width: '100%', height: '100%' }} display="flex" justifyContent={'center'} alignItems="center">
-              <Typography fontSize={'18px'} lineHeight="27px" fontWeight={400} color="#BFBFBF">
+            <Box sx={{ height: '100%', width: '100%' }} display="flex" justifyContent="center" alignItems="center">
+              <Typography fontSize="18px" lineHeight="27px" fontWeight={400} color="#BFBFBF">
                 No available
               </Typography>
             </Box>
@@ -358,8 +357,8 @@ const AddChart = () => {
         setDisplayInputLabel(false);
       }
       return (
-        <Box sx={{ width: '100%', height: '100%' }} display="flex" justifyContent={'center'} alignItems="center">
-          <Typography fontSize={'18px'} lineHeight="27px" fontWeight={400} color="#BFBFBF">
+        <Box sx={{ height: '100%', width: '100%' }} display="flex" justifyContent="center" alignItems="center">
+          <Typography fontSize="18px" lineHeight="27px" fontWeight={400} color="#BFBFBF">
             No available
           </Typography>
         </Box>
@@ -370,36 +369,36 @@ const AddChart = () => {
   }, [formData, displayColorPicker, colorSelected]);
   return (
     <Stack
-      direction={'column'}
+      direction="column"
       sx={{
         height: '100%',
         width: '100%',
       }}
       //   onClick={() => handleClickCover()}
     >
-      <Stack direction={'row'} gap={'32px'} sx={{ marginBottom: '32px' }}>
-        <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '548px', mt: 1 }}>
-          <Box sx={{ height: 768, my: 'auto', p: 4, width: '592px' }}>
+      <Stack direction="row" gap="32px" sx={{ marginBottom: '32px', width: '100%' }}>
+        <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '548px', width: '100%' }}>
+          <Box sx={{ height: 768, my: 'auto', p: 4, width: '100%' }}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>{breadcrumbs}</Breadcrumbs>
             <Typography
               fontWeight={700}
               fontSize="30px"
-              lineHeight={'39px'}
+              lineHeight="39px"
               color="primary"
-              sx={{ marginTop: '16px', marginBottom: '32px' }}
+              sx={{ marginBottom: '32px', marginTop: '16px' }}
             >
               Add Chart
             </Typography>
             <Typography
               fontWeight={700}
               fontSize="18px"
-              lineHeight={'27px'}
+              lineHeight="27px"
               color="primary"
               sx={{ marginBottom: '25px' }}
             >
               Chart Settings
             </Typography>
-            <Box display={'flex'} gap={'32px'} flexDirection="column">
+            <Box display="flex" gap="32px" flexDirection="column">
               <Autocomplete
                 disablePortal
                 options={optionDataChartType}
@@ -409,11 +408,11 @@ const AddChart = () => {
                   <Paper
                     sx={(theme) => ({
                       border: `${theme.palette.primary.main} 1px solid`,
-                      marginTop: '4px',
                       borderRadius: '10px',
+                      marginTop: '4px',
                     })}
                     {...props}
-                  ></Paper>
+                  />
                 )}
                 renderInput={(params) => (
                   <TextField
@@ -428,16 +427,16 @@ const AddChart = () => {
                 onChange={(e, newValue) => {
                   handleChangeForm('chartType', newValue?.value || '');
                 }}
-              ></Autocomplete>
+              />
               <TextField
                 label="Chart Label"
                 placeholder="Chart Label"
                 InputProps={{ style: { height: '44px' } }}
                 InputLabelProps={{ shrink: true }}
                 onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
-              ></TextField>
+              />
               <FormControl sx={{}}>
-                <InputLabel shrink htmlFor={'multiple-checkbox-label'} id="multiple-checkbox-label">
+                <InputLabel shrink htmlFor="multiple-checkbox-label" id="multiple-checkbox-label">
                   Choose Data
                 </InputLabel>
                 <Select
@@ -485,7 +484,7 @@ const AddChart = () => {
                 </Select>
               </FormControl>
               {displayInputLabel && (
-                <Stack direction={'row'} gap="16px">
+                <Stack direction="row" gap="16px">
                   <TextField
                     label="Vertical Axis Label"
                     placeholder="Vertical Axis Label"
@@ -493,7 +492,7 @@ const AddChart = () => {
                     sx={{ maxWidth: '256px', width: '100%' }}
                     InputLabelProps={{ shrink: true }}
                     onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
-                  ></TextField>
+                  />
                   <TextField
                     label="Horizontal Axis Label"
                     placeholder="Horizontal Axis Label"
@@ -501,15 +500,15 @@ const AddChart = () => {
                     sx={{ maxWidth: '256px', width: '100%' }}
                     InputLabelProps={{ shrink: true }}
                     onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
-                  ></TextField>
+                  />
                 </Stack>
               )}
             </Box>
           </Box>
         </Paper>
-        <Paper sx={{ borderRadius: 1.25, display: 'flex', minWidth: '548px', mt: 1 }}>
-          <Box sx={{ height: '100%', my: 'auto', p: 4, width: '640px' }}>
-            <Typography fontSize="18px" fontWeight={700} lineHeight="27px" color={'primary'}>
+        <Paper sx={{ borderRadius: 1.25, display: 'flex', width: '100%' }}>
+          <Box sx={{ height: '100%', my: 'auto', p: 4, width: '100%' }}>
+            <Typography fontSize="18px" fontWeight={700} lineHeight="27px" color="primary">
               Color Setting
             </Typography>
             {SettingContent}
@@ -517,20 +516,20 @@ const AddChart = () => {
               <Box
                 sx={{
                   position: 'absolute',
-                  zIndex: '2',
                   top: '100px',
+                  zIndex: '2',
                 }}
               >
                 <Box
                   sx={{
-                    position: 'fixed',
-                    top: '0px',
-                    right: '0px',
                     bottom: '0px',
                     left: '0px',
+                    position: 'fixed',
+                    right: '0px',
+                    top: '0px',
                   }}
                   onClick={handleClickCover}
-                ></Box>
+                />
                 <SketchPicker
                   color={colorSelected}
                   disableAlpha
@@ -596,19 +595,14 @@ const AddChart = () => {
           </Box>
         </Paper>
       </Stack>
-      <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '105px', maxWidth: '1264px', mt: 1 }}>
-        <Box
-          sx={{ width: '100%', maxWidth: '1264px', my: 'auto', p: 4 }}
-          display="flex"
-          justifyContent={'flex-end'}
-          alignItems="center"
-        >
+      <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '105px', mt: 1 }}>
+        <Box sx={{ my: 'auto', p: 4, width: '100%' }} display="flex" justifyContent="flex-end" alignItems="center">
           <Typography fontWeight={700} fontSize="18px" lineHeight="27px" color="primary">
             Create column?
           </Typography>
           <Button
             sx={{ marginLeft: '32px', marginRight: '16px', maxWidth: '256px', width: '100%' }}
-            onClick={(_) => {
+            onClick={() => {
               submitChart();
             }}
           >

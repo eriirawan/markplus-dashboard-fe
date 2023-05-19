@@ -62,17 +62,18 @@ const User = () => {
   const imgUrl = methods.watch('imgUrl');
 
   const columns = [
-    { field: 'userId', headerName: 'ID', width: 111 },
-    { field: 'username', headerName: 'Username', width: 171 },
-    { field: 'email', headerName: 'Email', width: 219 },
-    { field: 'firstName', headerName: 'First Name', width: 142 },
-    { field: 'lastName', headerName: 'Last Name', width: 141 },
-    { field: 'imgName', headerName: 'Profile Picture', width: 164 },
-    { field: 'role', headerName: 'Role', width: 127 },
-    { field: 'activeDate', headerName: 'Active Date', width: 171 },
+    { field: 'userId', headerAlign: 'center', headerName: 'ID', width: 111 },
+    { field: 'username', headerAlign: 'center', headerName: 'Username', width: 171 },
+    { field: 'email', headerAlign: 'center', headerName: 'Email', width: 219 },
+    { field: 'firstName', headerAlign: 'center', headerName: 'First Name', width: 142 },
+    { field: 'lastName', headerAlign: 'center', headerName: 'Last Name', width: 141 },
+    { field: 'imgName', headerAlign: 'center', headerName: 'Profile Picture', width: 164 },
+    { field: 'role', headerAlign: 'center', headerName: 'Role', width: 127 },
+    { field: 'activeDate', headerAlign: 'center', headerName: 'Active Date', width: 171 },
     {
       field: 'action',
       flex: 1,
+      headerAlign: 'center',
       headerName: 'Action',
       renderCell: () => (
         <Stack direction="row" spacing={2.5}>
@@ -216,7 +217,7 @@ const User = () => {
               <Divider flexItem orientation="vertical" sx={{ borderColor: 'primary.main', borderWidth: 1 }} />
               <Stack spacing={2}>
                 <Typography variant="h3" color="primary.main" sx={{ textAlign: 'center' }}>
-                  Profile Picture
+                  Company Logo
                 </Typography>
                 <Box px={1} component="img" src={imgUrl || DefaultImg} height={169} />
                 {action !== 'detail' && <Button>Select Image</Button>}
