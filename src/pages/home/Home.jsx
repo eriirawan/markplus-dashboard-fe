@@ -456,8 +456,7 @@ const Home = () => {
           borderRadius: 1.25,
           display: 'flex',
           maxHeight: '512px',
-          mt: 4,
-          p: 1,
+          p: 3,
           width: '100%',
         }}
       >
