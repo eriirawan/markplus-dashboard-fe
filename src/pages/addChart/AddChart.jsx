@@ -15,11 +15,11 @@ import {
   ListItemText,
   Checkbox,
   OutlinedInput,
+  Box,
 } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { SketchPicker } from 'react-color';
 
-import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import LineChart from '../../components/chart/LineChart';
 import { defaultColorChart, defaultDataChartBar, defaultDataChartLine } from '../../helpers/DummyDataChart';
@@ -372,12 +372,13 @@ const AddChart = () => {
       direction="column"
       sx={{
         height: '100%',
+        p: 3,
         width: '100%',
       }}
       //   onClick={() => handleClickCover()}
     >
       <Stack direction="row" gap="32px" sx={{ marginBottom: '32px', width: '100%' }}>
-        <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '548px', width: '100%' }}>
+        <Paper sx={{ borderRadius: 2, display: 'flex', maxHeight: '548px', width: '100%' }}>
           <Box sx={{ height: 768, my: 'auto', p: 4, width: '100%' }}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>{breadcrumbs}</Breadcrumbs>
             <Typography
@@ -418,7 +419,7 @@ const AddChart = () => {
                   <TextField
                     {...params}
                     InputProps={{ style: { height: '44px' }, ...params.InputProps }}
-                    InputLabelProps={{ shrink: true, ...params.InputLabelProps }}
+                    InputLabelProps={{ shrink: true, sx: { color: 'primary.main' }, ...params.InputLabelProps }}
                     label="Chart Type"
                     placeholder="Chart Type"
                   />
@@ -432,11 +433,16 @@ const AddChart = () => {
                 label="Chart Label"
                 placeholder="Chart Label"
                 InputProps={{ style: { height: '44px' } }}
-                InputLabelProps={{ shrink: true }}
+                InputLabelProps={{ shrink: true, sx: { color: 'primary.main' } }}
                 onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
               />
               <FormControl sx={{}}>
-                <InputLabel shrink htmlFor="multiple-checkbox-label" id="multiple-checkbox-label">
+                <InputLabel
+                  shrink
+                  htmlFor="multiple-checkbox-label"
+                  id="multiple-checkbox-label"
+                  sx={{ color: 'primary.main' }}
+                >
                   Choose Data
                 </InputLabel>
                 <Select
@@ -445,7 +451,9 @@ const AddChart = () => {
                   multiple
                   value={formData.chartData}
                   onChange={(e) => handleChangeForm('chartData', e.target.value)}
+                  placeholder="Choose Data"
                   inputProps={{
+                    // focused: true,
                     placeholder: 'Choose Data',
                   }}
                   input={
@@ -466,6 +474,12 @@ const AddChart = () => {
                         marginTop: '10px',
                         maxHeight: '245px',
                       },
+                    },
+                  }}
+                  sx={{
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: 1,
                     },
                   }}
                 >
@@ -490,7 +504,7 @@ const AddChart = () => {
                     placeholder="Vertical Axis Label"
                     InputProps={{ style: { height: '44px' } }}
                     sx={{ maxWidth: '256px', width: '100%' }}
-                    InputLabelProps={{ shrink: true }}
+                    InputLabelProps={{ shrink: true, sx: { color: 'primary.main' } }}
                     onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
                   />
                   <TextField
@@ -498,7 +512,7 @@ const AddChart = () => {
                     placeholder="Horizontal Axis Label"
                     InputProps={{ style: { height: '44px', maxWidth: '256px' } }}
                     sx={{ maxWidth: '256px', width: '100%' }}
-                    InputLabelProps={{ shrink: true }}
+                    InputLabelProps={{ shrink: true, sx: { color: 'primary.main' } }}
                     onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
                   />
                 </Stack>
@@ -597,19 +611,16 @@ const AddChart = () => {
       </Stack>
       <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '105px', mt: 1 }}>
         <Box sx={{ my: 'auto', p: 4, width: '100%' }} display="flex" justifyContent="flex-end" alignItems="center">
-          <Typography fontWeight={700} fontSize="18px" lineHeight="27px" color="primary">
-            Create column?
-          </Typography>
+          <Button sx={{ maxWidth: '256px', width: '100%' }} color="inherit">
+            Cancel
+          </Button>
           <Button
             sx={{ marginLeft: '32px', marginRight: '16px', maxWidth: '256px', width: '100%' }}
             onClick={() => {
               submitChart();
             }}
           >
-            Yes
-          </Button>
-          <Button sx={{ maxWidth: '256px', width: '100%' }} color="inherit">
-            Cancel
+            Create Chart
           </Button>
         </Box>
       </Paper>

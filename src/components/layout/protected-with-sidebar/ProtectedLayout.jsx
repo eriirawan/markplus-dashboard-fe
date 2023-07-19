@@ -42,11 +42,11 @@ const ProtectedLayout = () => {
       pl: 2.5,
       pr: 1.5,
       py: 1,
-      width: `calc(100% - ${sideBarContentWidth}px)`,
+      // width: `calc(100% - ${sideBarContentWidth}px)`,
     },
     appContainer: { height: '100%', layout: 'fixed' },
     outletContainer: {
-      height: windowDimensions.height - appBarHeight,
+      height: windowDimensions.height,
       overflow: 'auto',
       // p: 3,
       position: 'relative',
@@ -68,7 +68,7 @@ const ProtectedLayout = () => {
   return (
     <AppBarContext.Provider value={store}>
       <Grid container>
-        <Grid item container xs={12} sx={styles.appBarContainer}>
+        {/* <Grid item container xs={12} sx={styles.appBarContainer}>
           <Appbar
             openNotification={openNotification}
             openTaskList={openTaskList}
@@ -78,7 +78,7 @@ const ProtectedLayout = () => {
             setOpenProfileBar={setOpenProfileBar}
             setShowDrawerBackground={setShowDrawerBackground}
           />
-        </Grid>
+        </Grid> */}
         <Grid item container direction="row" xs={12} sx={styles.appContainer}>
           <Stack direction="row" width="100%">
             <ClickAwayListener onClickAway={() => handleOpenSidebar(false)}>
@@ -89,6 +89,17 @@ const ProtectedLayout = () => {
             </ClickAwayListener>
             <Box sx={styles.outletContainer}>
               <Stack sx={{ ':-webkit-scrollbar': { display: 'none' }, height: '100%', overflow: 'auto' }}>
+                <Box sx={styles.appBarContainer} width="100%">
+                  <Appbar
+                    openNotification={openNotification}
+                    openTaskList={openTaskList}
+                    openProfileBar={openProfileBar}
+                    setOpenNotification={setOpenNotification}
+                    setOpenTaskList={setOpenTaskList}
+                    setOpenProfileBar={setOpenProfileBar}
+                    setShowDrawerBackground={setShowDrawerBackground}
+                  />
+                </Box>
                 {outlet}
               </Stack>
             </Box>

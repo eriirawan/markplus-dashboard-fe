@@ -8,6 +8,17 @@ const theme = createTheme({
       defaultProps: {
         size: 'small', // default size `small`
       },
+      styleOverrides: {
+        root: () => ({
+          '& fieldset': {
+            borderColor: '#2E459A !important',
+            borderWidth: '1px',
+          },
+          ':hover': {
+            borderColor: '#2E459A !important',
+          },
+        }),
+      },
     },
 
     /** Customize button  */
@@ -118,7 +129,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& fieldset': {
-            borderColor: '#ABBAD0',
+            borderColor: '#2E459A',
           },
           color: '#002245',
         },
@@ -146,6 +157,24 @@ const theme = createTheme({
             fontWeight: 'bold',
           },
         },
+      },
+    },
+
+    /** Customize Textfield  */
+    MuiTextField: {
+      defaultProps: {
+        size: 'small',
+      },
+      styleOverrides: {
+        root: () => ({
+          '& fieldset': {
+            borderColor: '#2E459A',
+            borderWidth: '1px',
+          },
+          ':hover': {
+            borderColor: '#2E459A',
+          },
+        }),
       },
     },
 
@@ -194,9 +223,9 @@ const theme = createTheme({
     },
     text: {
       disabled: '#ABBAD0',
+      lightPrimary: '#2E459A',
       primary: '#002245',
       secondary: '#5E758D',
-      lightPrimary: '#2E459A',
     },
     warning: {
       100: '#FFFAEB', // Warning | 8%
