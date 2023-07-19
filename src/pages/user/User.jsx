@@ -298,8 +298,8 @@ const User = () => {
               </TextField>
             </Box>
           </Stack>
-          <Box sx={{ pt: 4, width: '100%' }}>
-            <div style={{ width: '100%' }}>
+          <Box sx={{ overflowX: 'auto', pt: 4, width: '100%' }}>
+            <Box style={{ overflowX: 'auto', width: '1440px' }}>
               <DataGrid
                 {...data}
                 columns={columns}
@@ -326,6 +326,7 @@ const User = () => {
                     visibility: 'hidden',
                   },
                   border: 0,
+                  overflowX: 'auto',
                 }}
                 hideFooter
                 autoHeight
@@ -333,7 +334,7 @@ const User = () => {
                 disableColumnFilter
                 disableColumnSelector
               />
-            </div>
+            </Box>
             <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', mt: 4 }}>
               <Pagination
                 page={1}
