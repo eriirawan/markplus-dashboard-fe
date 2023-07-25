@@ -20,11 +20,14 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ISODateToLuxon } from '../../helpers/Utils';
 
+import UserThemeSettings from './components/UserThemeSettings';
 import dummyData from './dummy';
 
 const UserManagement = () => {
   const location = useLocation();
   const [age, setAge] = useState('test');
+  const [openPopupTheme, setOpenPopupTheme] = useState(false);
+  const [username, setUsername] = useState('');
   const { data } = useDemoData({
     dataSet: 'Commodity',
     maxColumns: 6,
@@ -63,11 +66,17 @@ const UserManagement = () => {
       field: 'action',
       headerAlign: 'center',
       headerName: 'Action',
-      renderCell: () => (
+      renderCell: (params) => (
         <Stack direction="row" spacing={2}>
           <FileOpenOutlined sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }} />
           <PanoramaOutlined sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }} />
-          <SettingsOutlined sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }} />
+          <SettingsOutlined
+            onClick={() => {
+              setOpenPopupTheme(true);
+              setUsername(params.row?.username);
+            }}
+            sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }}
+          />
         </Stack>
       ),
       width: 111,
@@ -80,6 +89,9 @@ const UserManagement = () => {
 
   return (
     <Paper sx={{ display: 'flex', height: '100%', p: 4 }}>
+      {openPopupTheme && (
+        <UserThemeSettings openPopup={openPopupTheme} setOpenPopup={setOpenPopupTheme} username={username} />
+      )}
       <Stack width="100%">
         <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
           <Link to="/home" style={{ textDecoration: 'none' }}>
