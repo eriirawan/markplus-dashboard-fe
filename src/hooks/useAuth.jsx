@@ -1,16 +1,21 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
+import { useSnackbar } from 'notistack';
+import { BroadcastChannel } from 'broadcast-channel';
+import axios from 'axios';
+
 import { AppContext } from '@/context/AppContext';
 import { userAvatarString, userIdString } from '@/helpers/Constants';
-import { BroadcastChannel } from 'broadcast-channel';
 import useLocalStorage from './useLocalStorage';
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const { me, userToken, setUserToken, setMe } = useContext(AppContext);
   const [userId, setUserId] = useLocalStorage(userIdString, null);
   const [userAvatar, setUserAvatar] = useLocalStorage(userAvatarString, null);
+  const [isLoading, setIsLoading] = useState(false);
   const logoutChannel = new BroadcastChannel('logout');
 
   const handleSetUserId = (newUserId) => setUserId(newUserId);
@@ -29,21 +34,59 @@ export const AuthProvider = ({ children }) => {
     localStorage.clear();
   };
 
-  const login = async () => {
-    const token = 'test-token';
-    setUserToken(token);
-    setMe({
-      firstName: 'admin',
-      lastName: 'admin',
-    });
-    window.location.href = `/home`;
+  const login = async (data) => {
+    try {
+      setIsLoading(true);
+      const result = await axios.post(`${import.meta.env.VITE_API_URL}/dashboard/v1/auth`, {
+        email: data?.userName,
+        password: data?.password,
+      });
+
+      if (result.error) throw new Error('Error');
+
+      const { token = null, ...userData } = result?.data?.data;
+
+      setUserToken(token);
+      handleSetUserId(userData?.id);
+      window.location.href = `/home`;
+    } catch (err) {
+      setIsLoading(false);
+      throw new Error(err.response.data.message);
+    }
   };
 
-  const refreshMeData = () =>
-    setMe({
-      firstName: 'admin',
-      lastName: 'admin',
-    });
+  const resetPassword = async (email) => {
+    try {
+      const result = await axios.post(`${import.meta.env.VITE_API_URL}/dashboard/v1/auth/password/reset`, { email });
+
+      if (result.error) throw new Error('Error');
+
+      return result;
+    } catch (err) {
+      setIsLoading(false);
+      throw new Error(err.response.data.message);
+    }
+  };
+
+  const refreshMeData = async () => {
+    try {
+      setIsLoading(true);
+      const result = await axios.get(`${import.meta.env.VITE_API_URL}/dashboard/v1/users/${userId}`, {
+        headers: { Authorization: userToken },
+      });
+
+      if (result.error) throw new Error('Error');
+
+      const userDetail = result?.data?.data;
+      setMe(userDetail);
+    } catch (err) {
+      setIsLoading(false);
+      enqueueSnackbar(err?.response?.data?.message, {
+        variant: 'errorSnackbar',
+      });
+      throw new Error(err?.response?.data?.message);
+    }
+  };
 
   const logout = () => {
     clearLocalStorage();
@@ -77,8 +120,10 @@ export const AuthProvider = ({ children }) => {
       user: userToken,
       userAvatar,
       userId,
+      isLoading,
+      resetPassword,
     }),
-    [userToken]
+    [userToken, isLoading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,17 +1,9 @@
-import CheckBox from '@/components/CheckBox';
-import MPTextField from '@/components/TextField';
-import { Close, Delete, Edit, InfoOutlined, Search } from '@mui/icons-material';
+import { Delete, Edit, InfoOutlined, Search, SettingsOutlined } from '@mui/icons-material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import {
   Box,
   Breadcrumbs,
   Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Grid,
-  IconButton,
   InputAdornment,
   MenuItem,
   Pagination,
@@ -24,13 +16,15 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useDemoData } from '@mui/x-data-grid-generator';
-import { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 
-import DefaultImg from '@/assets/images/default-image.png';
-
-import dummyData from './dummy';
+import useAxios from '@/hooks/useAxios';
+import ModalUserDetail from './components/ModalUserDetail';
+import Loading from '../../components/Loading';
+import UserThemeSettings from './components/UserThemeSettings';
+import { ISODateToLuxon } from '../../helpers/Utils';
 
 const defaultForm = {
   email: '',
@@ -39,7 +33,7 @@ const defaultForm = {
   imgUrl: '',
   lastName: '',
   role: '',
-  userName: '',
+  username: '',
 };
 
 const User = () => {
@@ -47,11 +41,16 @@ const User = () => {
   const [age, setAge] = useState('test');
   const [openPopup, setOpenPopup] = useState(false);
   const [action, setAction] = useState('');
-  const { data } = useDemoData({
-    dataSet: 'Commodity',
-    maxColumns: 6,
-    rowLength: 5,
-    sortable: false,
+  const [search, setSearch] = useState('');
+  const [pageSize, setPageSize] = useState(10);
+  const [page, setPage] = useState(1);
+  const [openPopupTheme, setOpenPopupTheme] = useState(false);
+
+  const [{ response, loading }, reFetch] = useAxios({
+    url: `/dashboard/v1/users/list?page=${page}&page_size=${pageSize}&sort_by=id&sort_dir=DESC&search=${
+      search || '%20'
+    }`,
+    method: 'get',
   });
 
   const methods = useForm({
@@ -59,33 +58,59 @@ const User = () => {
     mode: 'onChange',
   });
 
-  const imgUrl = methods.watch('imgUrl');
+  // useEffect(() => {
+  //   reFetch();
+  // }, [search, pageSize, page])
+
+  const { data } = useDemoData({
+    dataSet: 'Commodity',
+    maxColumns: 6,
+    rowLength: 5,
+    sortable: false,
+  });
 
   const columns = [
-    { field: 'userId', headerAlign: 'center', headerName: 'ID', width: 111 },
-    { field: 'username', headerAlign: 'center', headerName: 'Username', width: 171 },
-    { field: 'email', headerAlign: 'center', headerName: 'Email', width: 219 },
-    { field: 'firstName', headerAlign: 'center', headerName: 'First Name', width: 142 },
-    { field: 'lastName', headerAlign: 'center', headerName: 'Last Name', width: 141 },
-    { field: 'imgName', headerAlign: 'center', headerName: 'Profile Picture', width: 164 },
-    { field: 'role', headerAlign: 'center', headerName: 'Role', width: 127 },
-    { field: 'activeDate', headerAlign: 'center', headerName: 'Active Date', width: 171 },
+    { field: 'nanoId', headerAlign: 'center', sortable: false, headerName: 'ID', width: 100, align: 'center' },
+    { field: 'username', headerAlign: 'center', sortable: false, headerName: 'Username', flex: 1 },
+    { field: 'email', headerAlign: 'center', sortable: false, headerName: 'Email', flex: 1 },
+    { field: 'firstName', headerAlign: 'center', sortable: false, headerName: 'First Name', width: 142 },
+    { field: 'lastName', headerAlign: 'center', sortable: false, headerName: 'Last Name', width: 141 },
+    { field: 'imgName', headerAlign: 'center', sortable: false, headerName: 'Profile Picture', flex: 1 },
+    { field: 'role', headerAlign: 'center', sortable: false, headerName: 'Role', width: 127 },
+    {
+      field: 'created_at',
+      headerAlign: 'center',
+      sortable: false,
+      headerName: 'Active Date',
+      width: 171,
+      valueGetter: (params) => ISODateToLuxon(params?.value)?.toFormat('dd MMMM yyyy') || '-',
+      align: 'center',
+    },
     {
       field: 'action',
       flex: 1,
       headerAlign: 'center',
+      sortable: false,
       headerName: 'Action',
-      renderCell: () => (
+      align: 'center',
+      renderCell: (params) => (
         <Stack direction="row" spacing={2.5}>
+          <SettingsOutlined
+            onClick={() => {
+              setOpenPopupTheme(true);
+            }}
+            sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }}
+          />
           <InfoOutlined
             sx={{ cursor: 'pointer', fontSize: 20 }}
             onClick={() => {
               setAction('detail');
               setOpenPopup(true);
-              methods.setValue(
-                'imgUrl',
-                'https://1.bp.blogspot.com/-tR59_3q2Z2Y/YIJ62ioh6NI/AAAAAAAACkc/W5JTyrlwi7oQGKYb1XWDtZySUbBM_THiQCNcBGAsYHQ/s2048/Pertamina.png'
-              );
+              methods.reset({
+                ...params.row,
+                imgUrl:
+                  'https://1.bp.blogspot.com/-tR59_3q2Z2Y/YIJ62ioh6NI/AAAAAAAACkc/W5JTyrlwi7oQGKYb1XWDtZySUbBM_THiQCNcBGAsYHQ/s2048/Pertamina.png',
+              });
             }}
           />
           <Edit
@@ -93,15 +118,9 @@ const User = () => {
             onClick={() => {
               methods.reset(
                 {
-                  email: 'pcc135@pertamina.com',
-                  firstName: 'Pertamina',
-                  id: 111,
-                  imgName: 'Pertamina.jpg',
+                  ...params?.row,
                   imgUrl:
                     'https://1.bp.blogspot.com/-tR59_3q2Z2Y/YIJ62ioh6NI/AAAAAAAACkc/W5JTyrlwi7oQGKYb1XWDtZySUbBM_THiQCNcBGAsYHQ/s2048/Pertamina.png',
-                  lastName: 'Indonesia',
-                  role: 'View',
-                  username: 'pertaminaindonesia',
                 },
                 { keepDirty: false, keepTouched: false }
               );
@@ -119,124 +138,17 @@ const User = () => {
     setAge(event.target.value);
   };
 
-  const handleClose = () => {
-    setOpenPopup(false);
-    setTimeout(() => {
-      setAction('');
-      methods.reset(defaultForm);
-    }, 500);
-  };
-
   return (
     <>
-      <Dialog maxWidth="md" open={openPopup} PaperProps={{ sx: { p: 3 } }} transitionDuration={500}>
-        <DialogTitle>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="h1" color="primary.main">
-              {action === 'detail' ? 'View User Details' : action === 'edit' ? 'Edit User' : 'Add New User'}
-            </Typography>
-            <IconButton
-              aria-label="delete"
-              sx={{ border: 1.5, color: 'primary.main', height: '44px', width: '44px' }}
-              onClick={handleClose}
-            >
-              <Close />
-            </IconButton>
-          </Stack>
-        </DialogTitle>
-        <DialogContent>
-          <FormProvider {...methods}>
-            <Stack direction="row" spacing={2}>
-              {action === 'detail' ? (
-                <Grid container width={380}>
-                  <Grid item xs={6}>
-                    <Stack spacing={0.5}>
-                      <Typography variant="h4" color="primary.main">
-                        User ID
-                      </Typography>
-                      <Typography>000000002</Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Stack spacing={0.5}>
-                      <Typography variant="h4" color="primary.main">
-                        Role
-                      </Typography>
-                      <Typography>Viewer</Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Stack spacing={0.5}>
-                      <Typography variant="h4" color="primary.main">
-                        Username
-                      </Typography>
-                      <Typography>pertaminaindonesia</Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Stack spacing={0.5}>
-                      <Typography variant="h4" color="primary.main">
-                        Email
-                      </Typography>
-                      <Typography>pcc135@pertamina.com</Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Stack spacing={0.5}>
-                      <Typography variant="h4" color="primary.main">
-                        First Name
-                      </Typography>
-                      <Typography>Pertamina</Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Stack spacing={0.5}>
-                      <Typography variant="h4" color="primary.main">
-                        Last Name
-                      </Typography>
-                      <Typography>Indonesia</Typography>
-                    </Stack>
-                  </Grid>
-                </Grid>
-              ) : (
-                <Stack spacing={3}>
-                  <Typography variant="h3" color="primary.main">
-                    User Details
-                  </Typography>
-                  <Stack direction="row" spacing={2}>
-                    <MPTextField label="Username" name="username" placeholder="Company Name" size="normal" />
-                    <MPTextField label="Role" name="role" />
-                  </Stack>
-                  <MPTextField label="Email" name="email" placeholder="companyemail@emaildomain.com" sx={{ my: 2 }} />
-                  <Stack direction="row" spacing={2}>
-                    <MPTextField label="First Name" name="firstName" placeholder="PT AAA" />
-                    <MPTextField label="Last Name" name="lastName" placeholder="Tbk" />
-                  </Stack>
-                </Stack>
-              )}
-              <Divider flexItem orientation="vertical" sx={{ borderColor: 'primary.main', borderWidth: 1 }} />
-              <Stack spacing={2}>
-                <Typography variant="h3" color="primary.main" sx={{ textAlign: 'center' }}>
-                  Company Logo
-                </Typography>
-                <Box px={1} component="img" src={imgUrl || DefaultImg} height={169} />
-                {action !== 'detail' && <Button>Select Image</Button>}
-              </Stack>
-            </Stack>
-            {!action && <CheckBox name="isSendEmail" label="Send email confirmation" />}
-            {action !== 'detail' && (
-              <Stack direction="row" spacing={2} width="62%" sx={{ mt: 2 }}>
-                <Button fullWidth>{action === 'edit' ? 'Save Changes' : 'Add User'}</Button>
-                <Button fullWidth variant="outlined" onClick={handleClose}>
-                  Cancel
-                </Button>
-              </Stack>
-            )}
-          </FormProvider>
-        </DialogContent>
-      </Dialog>
+      <ModalUserDetail openPopup={openPopup} setOpenPopup={setOpenPopup} action={action} methods={methods} />
+      <UserThemeSettings
+        openPopup={openPopupTheme}
+        setOpenPopup={setOpenPopupTheme}
+        username={methods.getValues('username')}
+      />
+      <Loading open={loading} />
       <Paper sx={{ display: 'flex', height: '100%', p: 4 }}>
-        <Stack width="100%">
+        <Stack width="100%" height="max-content">
           <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
             <Link to="/home" style={{ textDecoration: 'none' }}>
               <Typography variant="body2" color="text.primary">
@@ -253,11 +165,19 @@ const User = () => {
             </Typography>
           </Box>
           <Stack direction="row" pt={4.25} justifyContent="space-between" width="100%">
-            <Button size="medium" sx={{ fontWeight: 500 }} onClick={() => setOpenPopup(true)}>
+            <Button
+              size="medium"
+              sx={{ fontWeight: 500 }}
+              onClick={() => {
+                setOpenPopup(true);
+                methods.reset(defaultForm);
+              }}
+            >
               + Add New User
             </Button>
             <Box>
               <TextField
+                value={search}
                 label="Search"
                 placeholder="Search by ID/Username/Email/First Name/Last Name/Role"
                 sx={{ mr: 2, width: 528 }}
@@ -271,6 +191,7 @@ const User = () => {
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 size="small"
+                onChange={(e) => setSearch(e.target.value)}
               />
               <TextField
                 value={age}
@@ -298,13 +219,13 @@ const User = () => {
               </TextField>
             </Box>
           </Stack>
-          <Box sx={{ overflowX: 'auto', pt: 4, width: '100%' }}>
-            <Box style={{ overflowX: 'auto', width: '1440px' }}>
+          <Box sx={{ pt: 4, width: '100%' }}>
+            <Box sx={{ display: 'flex', minHeight: 400 }}>
               <DataGrid
                 {...data}
                 columns={columns}
-                rows={dummyData}
-                getRowId={(row) => row.userId}
+                rows={response?.data ? response?.data?.map((item) => ({ ...item, nanoId: item?.id })) : []}
+                getRowId={(row) => row.id}
                 sx={{
                   '& .MuiDataGrid-cell': {
                     bgcolor: '#EEF0F5',
@@ -335,31 +256,37 @@ const User = () => {
                 disableColumnSelector
               />
             </Box>
-            <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <Pagination
-                page={1}
-                count={10}
-                color="primary"
-                sx={{ display: 'flex', flex: 2, justifyContent: 'right' }}
-                renderItem={(item) => (
-                  <PaginationItem
-                    component={Link}
-                    to={`/inbox${item.page === 1 ? '' : `?page=${item.page}`}`}
-                    {...item}
-                  />
-                )}
-              />
-              <Box sx={{ alignItems: 'center', display: 'flex', flex: 1, justifyContent: 'right' }}>
-                Show
-                <Select size="small" value={10} sx={{ mx: 1 }} onChange={(e) => console.log(e)}>
-                  {[5, 10, 20, 50, 100].map((item) => (
-                    <MenuItem key={item} value={item}>
-                      {item}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {`of ${dummyData?.length} entries`}
-              </Box>
+          </Box>
+          <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Pagination
+              page={page || 1}
+              count={response?.meta?.total_page || 1}
+              color="primary"
+              sx={{ display: 'flex', flex: 1, justifyContent: 'right' }}
+              onChange={(e, val) => setPage(val)}
+            />
+            <Box sx={{ alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'right' }}>
+              Show
+              <Select
+                size="small"
+                value={pageSize}
+                sx={{ mx: 1 }}
+                onChange={(e) => {
+                  setPageSize(e.target.value);
+                  setPage(
+                    page > Math.ceil(response?.meta?.total_data / e.target.value)
+                      ? Math.ceil(response?.meta?.total_data / e.target.value)
+                      : page
+                  );
+                }}
+              >
+                {[5, 10, 20, 50, 100].map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+              {`of ${response?.meta?.total_data || 0} entries`}
             </Box>
           </Box>
         </Stack>

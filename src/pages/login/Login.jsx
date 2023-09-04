@@ -1,4 +1,4 @@
-import { Box, InputAdornment, TextField } from '@mui/material';
+import { Box, InputAdornment, TextField, CircularProgress } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import Logo from '@/assets/logo-light.png';
 import MPlusIcon from '@/components/Icon';
@@ -8,16 +8,21 @@ import { useNavigate } from 'react-router-dom';
 import { Container, CardContainer, LoginButton, ForgotPassword, Image, Content, HeaderCard } from './Login.style';
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, user, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(false);
+  const [data, setData] = useState({
+    userName: '',
+    password: '',
+  });
   const navigate = useNavigate();
-  const { user } = useAuth();
 
-  const handleLogin = async (data) => {
+  const handleLogin = async () => {
     try {
+      setError(false);
       await login(data);
     } catch (e) {
-      console.warn('error login');
+      setError(true);
     }
   };
 
@@ -37,8 +42,10 @@ const Login = () => {
           <HeaderCard>Log in</HeaderCard>
           <Content>
             <TextField
+              error={error}
               label="Username"
               placeholder="Your Username"
+              value={data?.userName}
               InputProps={{
                 style: {
                   height: '44px',
@@ -51,9 +58,12 @@ const Login = () => {
                   color: theme.palette.primary.lightBlue,
                 },
               })}
+              onChange={(e) => setData({ ...data, userName: e.target.value })}
             />
             <TextField
+              error={error}
               label="Password"
+              value={data?.password}
               placeholder="Your Password"
               type={showPassword ? 'text' : 'password'}
               InputProps={{
@@ -75,8 +85,19 @@ const Login = () => {
                 },
               }}
               InputLabelProps={{ shrink: true }}
+              onChange={(e) => setData({ ...data, password: e.target.value })}
             />
-            <LoginButton variant="contained" color="primary" onClick={handleLogin}>
+            <LoginButton
+              loading={isLoading}
+              disabled={isLoading}
+              variant="contained"
+              color="primary"
+              onClick={handleLogin}
+              {...(isLoading && {
+                loadingPosition: 'start',
+                startIcon: <CircularProgress size={16} />,
+              })}
+            >
               Log in
             </LoginButton>
           </Content>

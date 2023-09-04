@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Box, Card, Button } from '@mui/material';
+import { Box, Card } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+
 import styled from 'styled-components';
 import media from '../../helpers/MediaQueries';
 
@@ -23,7 +25,7 @@ export const CardContainer = styled(Card)`
   width: 100%;
 `;
 
-export const LoginButton = styled(Button)``;
+export const LoginButton = styled(LoadingButton)``;
 
 export const ForgotPassword = styled(Link)`
   margin-top: 32px;

@@ -1,13 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, TextField, Card, Box, Typography } from '@mui/material';
 import styled from 'styled-components';
 import Logo from '@/assets/logo-light.png';
 import { ChevronLeft } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+
 import media from '@/helpers/MediaQueries';
+import { useAuth } from '../../hooks/useAuth';
 
 const ForgotPassword = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const { resetPassword } = useAuth();
+  const [email, setEmail] = useState('');
+  const [isError, setIsError] = useState(false);
+
+  const handleForgetPassword = async () => {
+    try {
+      if (email) {
+        await resetPassword(email);
+        navigate('/forgot-password-success');
+      } else {
+        setIsError(true);
+      }
+    } catch (e) {
+      setIsError(true);
+      enqueueSnackbar(e?.message, {
+        variant: 'errorSnackbar',
+      });
+    }
+  };
 
   return (
     <Container
@@ -32,9 +55,11 @@ const ForgotPassword = () => {
             link.
           </DesctiptionCard>
           <EmailField
+            value={email}
             size="small"
             label="Email"
             placeholder="Your registered email"
+            error={isError}
             InputProps={{
               style: {
                 height: '44px',
@@ -46,8 +71,12 @@ const ForgotPassword = () => {
                 color: theme.palette.primary.lightBlue,
               },
             })}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setIsError(false);
+            }}
           />
-          <SendLinkButton color="primary" variant="contained" onClick={() => navigate('/forgot-password-success')}>
+          <SendLinkButton color="primary" variant="contained" onClick={() => handleForgetPassword()}>
             Send Link
           </SendLinkButton>
         </CardContainer>
