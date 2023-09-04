@@ -4,56 +4,58 @@ import styled from 'styled-components';
 import Logo from '../../assets/logo-light.png';
 import media from '../../helpers/MediaQueries';
 
-const ResetPassword = () => (
-  <Container
-    sx={(theme) => ({
-      backgroundColor: theme.palette.primary.lightMain,
-    })}
-  >
-    <CardContainer>
-      <Image src={Logo} />
-      <HeaderCard>Update Password</HeaderCard>
-      <Form>
-        <NewPassword
-          size="small"
-          label="New password"
-          placeholder="Your new password"
-          InputProps={{
-            style: {
-              height: '44px',
-              textAlign: 'center',
-            },
-          }}
-          sx={(theme) => ({
-            '& .Mui-focused': {
-              color: theme.palette.primary.lightBlue,
-            },
-          })}
-        />
-        <ConfrimPassword
-          size="small"
-          label="Confrim password"
-          placeholder="Retype your new password"
-          InputProps={{
-            style: {
-              height: '44px',
-              textAlign: 'center',
-            },
-          }}
-          sx={(theme) => ({
-            '& .Mui-focused': {
-              color: theme.palette.primary.lightBlue,
-            },
-          })}
-        />
+const ResetPassword = () => {
+  return (
+    <Container
+      sx={(theme) => ({
+        backgroundColor: theme.palette.primary.lightMain,
+      })}
+    >
+      <CardContainer>
+        <Image src={Logo} />
+        <HeaderCard>Update Password</HeaderCard>
+        <Form>
+          <NewPassword
+            size="small"
+            label="New password"
+            placeholder="Your new password"
+            InputProps={{
+              style: {
+                height: '44px',
+                textAlign: 'center',
+              },
+            }}
+            sx={(theme) => ({
+              '& .Mui-focused': {
+                color: theme.palette.primary.lightBlue,
+              },
+            })}
+          />
+          <ConfrimPassword
+            size="small"
+            label="Confrim password"
+            placeholder="Retype your new password"
+            InputProps={{
+              style: {
+                height: '44px',
+                textAlign: 'center',
+              },
+            }}
+            sx={(theme) => ({
+              '& .Mui-focused': {
+                color: theme.palette.primary.lightBlue,
+              },
+            })}
+          />
 
-        <ButtonSetPassword color="primary" variant="contained">
-          Set new password
-        </ButtonSetPassword>
-      </Form>
-    </CardContainer>
-  </Container>
-);
+          <ButtonSetPassword color="primary" variant="contained">
+            Set new password
+          </ButtonSetPassword>
+        </Form>
+      </CardContainer>
+    </Container>
+  );
+};
 
 export default ResetPassword;
 

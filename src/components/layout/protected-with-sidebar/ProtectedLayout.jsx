@@ -14,6 +14,7 @@ import Appbar from '../../Appbar';
 import useSidebarMenus from '../SidebarMenu';
 import Sidebar from './Sidebar';
 import SidebarSmall from './SidebarSmall';
+import useAfterLoginStartup from '@/hooks/useAfterLogin';
 
 const ProtectedLayout = () => {
   const { refreshMeData } = useAuth();
@@ -29,6 +30,7 @@ const ProtectedLayout = () => {
   const [openProfileBar, setOpenProfileBar] = useState(false);
   const [showDrawerBackground, setShowDrawerBackground] = useState(false);
   const windowDimensions = getWindowDimensions();
+  const { refreshMasterData } = useAfterLoginStartup();
 
   const styles = {
     appBarContainer: {
@@ -46,7 +48,7 @@ const ProtectedLayout = () => {
     },
     appContainer: { height: '100%', layout: 'fixed' },
     outletContainer: {
-      height: windowDimensions.height,
+      height: windowDimensions.height > 1000 ? windowDimensions.height : 1000,
       overflow: 'auto',
       // p: 3,
       position: 'relative',
@@ -60,6 +62,7 @@ const ProtectedLayout = () => {
   window.onload = async () => {
     if (token) {
       await refreshMeData();
+      await refreshMasterData();
     } else {
       window.location.href = `/login`;
     }
@@ -88,7 +91,7 @@ const ProtectedLayout = () => {
               </Box>
             </ClickAwayListener>
             <Box sx={styles.outletContainer}>
-              <Stack sx={{ ':-webkit-scrollbar': { display: 'none' }, height: '100%', overflow: 'auto' }}>
+              <Stack sx={{ ':-webkit-scrollbar': { display: 'none' }, flex: 1, height: '100%', overflow: 'auto' }}>
                 <Box sx={styles.appBarContainer} width="100%">
                   <Appbar
                     openNotification={openNotification}

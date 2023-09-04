@@ -37,7 +37,7 @@ const ForgotPasswordSuccess = () => {
           <DescriptionCard>
             {`Please check your email. Check your spam and promotions folder if it doesn't appear in your main mailbox.`}
           </DescriptionCard>
-          <SendLinkButton color="primary" variant="contained">
+          <SendLinkButton color="primary" variant="contained" onClick={() => navigate('/login', { replace: true })}>
             Ok
           </SendLinkButton>
         </CardContainer>

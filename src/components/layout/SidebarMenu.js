@@ -37,19 +37,19 @@ const useSidebarMenus = () => {
         },
       ],
     },
-    {
-      group: 'management',
-      menus: [
-        {
-          icon: {
-            active: 'SettingActive',
-            inActive: 'SettingNormal',
-          },
-          name: 'User Management',
-          path: 'user-management',
-        },
-      ],
-    },
+    // {
+    //   group: 'management',
+    //   menus: [
+    //     {
+    //       icon: {
+    //         active: 'SettingActive',
+    //         inActive: 'SettingNormal',
+    //       },
+    //       name: 'User Management',
+    //       path: 'user-management',
+    //     },
+    //   ],
+    // },
   ];
 };
 

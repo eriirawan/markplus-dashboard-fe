@@ -46,7 +46,10 @@ const ProfileBarButton = ({
       >
         <Stack alignItems="end">
           <Typography color="white" variant="body1" fontWeight={600} sx={{ mx: 1 }}>
-            {me ? `${me?.firstName} ${me?.lastName}` : ''}
+            {me ? me.username : ''}
+          </Typography>
+          <Typography color="white" variant="body2" sx={{ mx: 1 }}>
+            {me ? me.username : ''}
           </Typography>
         </Stack>
         <AccountCircle sx={{ color: openProfileBar ? 'black' : 'white', fontSize: 25 }} />
