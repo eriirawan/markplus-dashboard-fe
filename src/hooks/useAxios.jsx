@@ -7,7 +7,7 @@ import axios from 'axios';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
-const useAxios = ({ url, method, options = null }) => {
+const useAxios = ({ url, method, options = null, pause = false }) => {
   const token = localStorage.getItem(tokenString);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -27,7 +27,30 @@ const useAxios = ({ url, method, options = null }) => {
 
   const fetchData = (body = null) => {
     setLoading(true);
-    axios[method](url, { headers }, JSON.parse(body))
+    if (method === 'get' || method === 'delete') {
+      return axios[method](url, { headers })
+        .then((res) => {
+          setResponse(res.data);
+          if (res?.data?.error) {
+            enqueueSnackbar(String(res?.data?.error), {
+              variant: 'errorSnackbar',
+            });
+          }
+          return res.data;
+        })
+        .catch((err) => {
+          setError(err);
+          enqueueSnackbar(err?.response?.data?.message, {
+            variant: 'errorSnackbar',
+          });
+          return err;
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+
+    return axios[method](url, body, { headers })
       .then((res) => {
         setResponse(res.data);
         if (res?.data?.error) {
@@ -35,12 +58,14 @@ const useAxios = ({ url, method, options = null }) => {
             variant: 'errorSnackbar',
           });
         }
+        return res.data;
       })
       .catch((err) => {
         setError(err);
         enqueueSnackbar(err?.response?.data?.message, {
           variant: 'errorSnackbar',
         });
+        return err;
       })
       .finally(() => {
         setLoading(false);
@@ -48,10 +73,10 @@ const useAxios = ({ url, method, options = null }) => {
   };
 
   useEffect(() => {
-    if (method?.toLowerCase() !== 'post') {
+    if (method?.toLowerCase() === 'get' && !pause) {
       fetchData();
     }
-  }, [method, url, headers]);
+  }, [method, url, headers, pause]);
 
   return [{ response, error, loading }, fetchData];
 };

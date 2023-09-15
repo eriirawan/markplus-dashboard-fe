@@ -18,7 +18,7 @@ import useAfterLoginStartup from '@/hooks/useAfterLogin';
 
 const ProtectedLayout = () => {
   const { refreshMeData } = useAuth();
-  const { userToken: token } = useContext(AppContext);
+  const { userToken: token, me } = useContext(AppContext);
   const store = useStore();
   const menus = useSidebarMenus();
   const outlet = useOutlet();
@@ -35,20 +35,20 @@ const ProtectedLayout = () => {
   const styles = {
     appBarContainer: {
       alignItems: 'center',
-      bgcolor: 'primary.main',
-      borderBottom: '1px solid #C7D5EA',
+      bgcolor: '#F5F5F5',
       height: appBarHeight,
       layout: 'fixed',
       m: 0,
       overflow: 'hidden',
       pl: 2.5,
       pr: 1.5,
-      py: 1,
+      py: 0.5,
+      mb: 1,
       // width: `calc(100% - ${sideBarContentWidth}px)`,
     },
-    appContainer: { height: '100%', layout: 'fixed' },
+    appContainer: { height: '100%', layout: 'fixed', bgcolor: '#F5F5F5' },
     outletContainer: {
-      height: windowDimensions.height > 1000 ? windowDimensions.height : 1000,
+      height: windowDimensions.height,
       overflow: 'auto',
       // p: 3,
       position: 'relative',
@@ -86,14 +86,15 @@ const ProtectedLayout = () => {
           <Stack direction="row" width="100%">
             <ClickAwayListener onClickAway={() => handleOpenSidebar(false)}>
               <Box position="relative">
-                <Sidebar openSidebar={openSideBar} handleOpenSidebar={handleOpenSidebar} menus={menus} />
+                {/* <Sidebar openSidebar={openSideBar} handleOpenSidebar={handleOpenSidebar} menus={menus} /> */}
                 <SidebarSmall height="100%" handleOpenSidebar={handleOpenSidebar} menus={menus} />
               </Box>
             </ClickAwayListener>
             <Box sx={styles.outletContainer}>
-              <Stack sx={{ ':-webkit-scrollbar': { display: 'none' }, flex: 1, height: '100%', overflow: 'auto' }}>
+              <Stack sx={{ ':-webkit-scrollbar': { display: 'none' } }}>
                 <Box sx={styles.appBarContainer} width="100%">
                   <Appbar
+                    title={me?.company_name ? me?.company_name : 'MARKPLUS DASHBOARD'}
                     openNotification={openNotification}
                     openTaskList={openTaskList}
                     openProfileBar={openProfileBar}
@@ -103,7 +104,7 @@ const ProtectedLayout = () => {
                     setShowDrawerBackground={setShowDrawerBackground}
                   />
                 </Box>
-                {outlet}
+                <Stack sx={{ px: 2, overflow: 'scroll' }}>{outlet}</Stack>
               </Stack>
             </Box>
           </Stack>

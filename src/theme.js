@@ -31,26 +31,26 @@ const theme = createTheme({
         root: ({ ownerState, theme: currentTheme }) => ({
           // size `large`
           ...(ownerState.size === 'large' && {
-            fontSize: currentTheme.typography.h4.fontSize,
-            fontWeight: currentTheme.typography.h4.fontWeight,
+            fontSize: currentTheme.typography.body1.fontSize,
+            fontWeight: currentTheme.typography.body1.fontWeight,
             height: '40px',
-            lineHeight: currentTheme.typography.h4.lineHeight,
+            lineHeight: currentTheme.typography.body1.lineHeight,
           }),
 
           // size `medium`
           ...(ownerState.size === 'medium' && {
-            fontSize: currentTheme.typography.h4.fontSize,
-            fontWeight: currentTheme.typography.h4.fontWeight,
+            fontSize: currentTheme.typography.body1.fontSize,
+            fontWeight: currentTheme.typography.body1.fontWeight,
             height: '32px',
-            lineHeight: currentTheme.typography.h4.lineHeight,
+            lineHeight: currentTheme.typography.body1.lineHeight,
           }),
 
           // size `small`
           ...(ownerState.size === 'small' && {
-            fontSize: currentTheme.typography.h6.fontSize,
-            fontWeight: currentTheme.typography.h6.fontWeight,
+            fontSize: currentTheme.typography.body2.fontSize,
+            fontWeight: currentTheme.typography.body2.fontWeight,
             height: '24px',
-            lineHeight: currentTheme.typography.h6.lineHeight,
+            lineHeight: currentTheme.typography.body2.lineHeight,
           }),
 
           // inherit button custom style
@@ -181,7 +181,7 @@ const theme = createTheme({
     /** Customize typography / font  */
     MuiTypography: {
       defaultProps: {
-        color: '#002245',
+        color: '#006CB7',
       },
     },
   },
@@ -212,7 +212,7 @@ const theme = createTheme({
       600: '#0067E7', // Main Blue | 80%
       700: '#023C9B', // Main Blue | 100%
       light: '#CCE8FA',
-      main: '#2E459A',
+      main: '#006CB7',
     },
     success: {
       100: '#ECFBF5', // Success  10%
@@ -224,7 +224,7 @@ const theme = createTheme({
     text: {
       disabled: '#ABBAD0',
       lightPrimary: '#2E459A',
-      primary: '#002245',
+      primary: '#000',
       secondary: '#5E758D',
     },
     warning: {

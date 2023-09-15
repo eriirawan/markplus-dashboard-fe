@@ -25,42 +25,49 @@ import ModalUserDetail from './components/ModalUserDetail';
 import Loading from '../../components/Loading';
 import UserThemeSettings from './components/UserThemeSettings';
 import { ISODateToLuxon } from '../../helpers/Utils';
+import GeneralDeletePopup from '../../components/DeletePopup';
+import { useUserStore, UserContext } from './UserContext';
 
 const defaultForm = {
   email: '',
-  firstName: '',
-  imgName: '',
-  imgUrl: '',
-  lastName: '',
+  first_name: '',
+  // imgName: '',
+  company_logo_url: '',
+  last_name: '',
   role: '',
   username: '',
 };
 
 const User = () => {
+  const store = useUserStore();
+  const {
+    methods,
+    setUserId,
+    setSortDir,
+    setSortBy,
+    userDetail,
+    loadingUser,
+    userList,
+    loading,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    search,
+    setSearch,
+    metaList,
+  } = store;
   const location = useLocation();
-  const [age, setAge] = useState('test');
-  const [openPopup, setOpenPopup] = useState(false);
-  const [action, setAction] = useState('');
-  const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(10);
-  const [page, setPage] = useState(1);
   const [openPopupTheme, setOpenPopupTheme] = useState(false);
+  const [openPopupDelete, setOpenPopupDelete] = useState(false);
+  const [sort, setSort] = useState('DESC');
 
-  const [{ response, loading }, reFetch] = useAxios({
-    url: `/dashboard/v1/users/list?page=${page}&page_size=${pageSize}&sort_by=id&sort_dir=DESC&search=${
-      search || '%20'
-    }`,
-    method: 'get',
-  });
-
-  const methods = useForm({
-    defaultValues: { ...defaultForm },
-    mode: 'onChange',
-  });
-
-  // useEffect(() => {
-  //   reFetch();
-  // }, [search, pageSize, page])
+  useEffect(() => {
+    if (!loadingUser && userDetail) {
+      methods.reset(userDetail, { keepDirty: false, keepTouched: false });
+      store?.setOpenPopup(store?.action ? true : false);
+    }
+  }, [loadingUser, userDetail]);
 
   const { data } = useDemoData({
     dataSet: 'Commodity',
@@ -76,7 +83,7 @@ const User = () => {
     { field: 'firstName', headerAlign: 'center', sortable: false, headerName: 'First Name', width: 142 },
     { field: 'lastName', headerAlign: 'center', sortable: false, headerName: 'Last Name', width: 141 },
     { field: 'imgName', headerAlign: 'center', sortable: false, headerName: 'Profile Picture', flex: 1 },
-    { field: 'role', headerAlign: 'center', sortable: false, headerName: 'Role', width: 127 },
+    { field: 'role', headerAlign: 'center', sortable: false, headerName: 'Role', width: 127, align: 'center' },
     {
       field: 'created_at',
       headerAlign: 'center',
@@ -95,58 +102,86 @@ const User = () => {
       align: 'center',
       renderCell: (params) => (
         <Stack direction="row" spacing={2.5}>
-          <SettingsOutlined
-            onClick={() => {
-              setOpenPopupTheme(true);
-            }}
-            sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }}
-          />
           <InfoOutlined
             sx={{ cursor: 'pointer', fontSize: 20 }}
             onClick={() => {
-              setAction('detail');
-              setOpenPopup(true);
-              methods.reset({
-                ...params.row,
-                imgUrl:
-                  'https://1.bp.blogspot.com/-tR59_3q2Z2Y/YIJ62ioh6NI/AAAAAAAACkc/W5JTyrlwi7oQGKYb1XWDtZySUbBM_THiQCNcBGAsYHQ/s2048/Pertamina.png',
-              });
+              if (userDetail?.id === params.id) {
+                store?.setAction('detail');
+                store?.setOpenPopup(true);
+              } else {
+                setUserId(params.id);
+                store?.setAction('detail');
+              }
             }}
           />
           <Edit
             sx={{ cursor: 'pointer', fontSize: 20 }}
             onClick={() => {
-              methods.reset(
-                {
-                  ...params?.row,
-                  imgUrl:
-                    'https://1.bp.blogspot.com/-tR59_3q2Z2Y/YIJ62ioh6NI/AAAAAAAACkc/W5JTyrlwi7oQGKYb1XWDtZySUbBM_THiQCNcBGAsYHQ/s2048/Pertamina.png',
-                },
-                { keepDirty: false, keepTouched: false }
-              );
-              setAction('edit');
-              setOpenPopup(true);
+              if (userDetail?.id === params.id) {
+                store?.setAction('edit');
+                store?.setOpenPopup(true);
+              } else {
+                setUserId(params.id);
+                store?.setAction('edit');
+              }
             }}
           />
-          <Delete sx={{ color: '#E56363', fontSize: 20 }} />
+          <SettingsOutlined
+            onClick={() => {
+              setOpenPopupTheme(true);
+              store?.setAction('');
+              setUserId(params.id);
+            }}
+            sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }}
+          />
+          <Delete
+            sx={{ color: '#E56363', fontSize: 20, cursor: 'pointer' }}
+            onClick={() => {
+              setUserId(params.id);
+              setOpenPopupDelete(true);
+            }}
+          />
         </Stack>
       ),
     },
   ];
 
   const handleChange = (event) => {
-    setAge(event.target.value);
+    if (event.target.value === 'ASC' || event.target.value === 'DESC') {
+      setSortDir(event.target.value);
+      setSortBy(null);
+    }
+    if (event.target.value === 'OLDTONEW') {
+      setSortBy('created_at');
+      setSortDir('DESC');
+    }
+    if (event.target.value === 'NEWTOOLD') {
+      setSortBy('created_at');
+      setSortDir('ASC');
+    }
+    if (event.target.value === 'updated_at') {
+      setSortDir('ASC');
+      setSortBy('updated_at');
+    }
+    setSort(event.target.value);
   };
 
   return (
-    <>
-      <ModalUserDetail openPopup={openPopup} setOpenPopup={setOpenPopup} action={action} methods={methods} />
+    <UserContext.Provider value={store}>
+      <ModalUserDetail />
       <UserThemeSettings
         openPopup={openPopupTheme}
         setOpenPopup={setOpenPopupTheme}
         username={methods.getValues('username')}
       />
-      <Loading open={loading} />
+      <GeneralDeletePopup
+        open={openPopupDelete}
+        handleCancel={() => setOpenPopupDelete(false)}
+        handleSave={() => store.handleDelete(setOpenPopupDelete)}
+        title="Confirm Delete?"
+        message="Do you want to delete user"
+      />
+      <Loading open={loading || store?.isLoading} />
       <Paper sx={{ display: 'flex', height: '100%', p: 4 }}>
         <Stack width="100%" height="max-content">
           <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
@@ -169,8 +204,10 @@ const User = () => {
               size="medium"
               sx={{ fontWeight: 500 }}
               onClick={() => {
-                setOpenPopup(true);
+                store?.setAction('create');
+                store?.setOpenPopup(true);
                 methods.reset(defaultForm);
+                setUserId(null);
               }}
             >
               + Add New User
@@ -194,26 +231,26 @@ const User = () => {
                 onChange={(e) => setSearch(e.target.value)}
               />
               <TextField
-                value={age}
+                value={sort}
                 onChange={handleChange}
                 select
                 label="Sort by"
                 InputLabelProps={{ shrink: true }}
                 sx={{ width: 256 }}
               >
-                <MenuItem key={1} value="test">
+                <MenuItem key={1} value="ASC">
                   A to Z
                 </MenuItem>
-                <MenuItem key={2} value="test2">
+                <MenuItem key={2} value="DESC">
                   Z to A
                 </MenuItem>
-                <MenuItem key={3} value="test3">
+                <MenuItem key={3} value="OLDTONEW">
                   Oldest to Newest
                 </MenuItem>
-                <MenuItem key={4} value="test4">
+                <MenuItem key={4} value="NEWTOOLD">
                   Newest to Oldest
                 </MenuItem>
-                <MenuItem key={5} value="test5">
+                <MenuItem key={5} value="updated_at">
                   Recently updated
                 </MenuItem>
               </TextField>
@@ -224,13 +261,14 @@ const User = () => {
               <DataGrid
                 {...data}
                 columns={columns}
-                rows={response?.data ? response?.data?.map((item) => ({ ...item, nanoId: item?.id })) : []}
+                rows={userList ? userList?.map((item) => ({ ...item, nanoId: item?.id })) : []}
                 getRowId={(row) => row.id}
                 sx={{
                   '& .MuiDataGrid-cell': {
                     bgcolor: '#EEF0F5',
                     border: 1,
                     borderColor: 'white',
+                    color: '#000',
                   },
                   '& .MuiDataGrid-columnHeader': {
                     border: 1,
@@ -239,7 +277,7 @@ const User = () => {
                     fontWeight: 'bold',
                   },
                   '& .MuiDataGrid-columnHeaders': {
-                    bgcolor: '#2E459A',
+                    bgcolor: 'primary.main',
                     borderColor: 'white',
                     color: 'white',
                   },
@@ -260,12 +298,12 @@ const User = () => {
           <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', mt: 4 }}>
             <Pagination
               page={page || 1}
-              count={response?.meta?.total_page || 1}
+              count={metaList?.total_page || 1}
               color="primary"
-              sx={{ display: 'flex', flex: 1, justifyContent: 'right' }}
+              sx={{ display: 'flex', flex: 1, justifyContent: 'right', color: '#000' }}
               onChange={(e, val) => setPage(val)}
             />
-            <Box sx={{ alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'right' }}>
+            <Box sx={{ alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'right', color: '#000' }}>
               Show
               <Select
                 size="small"
@@ -274,8 +312,8 @@ const User = () => {
                 onChange={(e) => {
                   setPageSize(e.target.value);
                   setPage(
-                    page > Math.ceil(response?.meta?.total_data / e.target.value)
-                      ? Math.ceil(response?.meta?.total_data / e.target.value)
+                    page > Math.ceil(metaList?.total_data / e.target.value)
+                      ? Math.ceil(metaList?.total_data / e.target.value)
                       : page
                   );
                 }}
@@ -286,12 +324,12 @@ const User = () => {
                   </MenuItem>
                 ))}
               </Select>
-              {`of ${response?.meta?.total_data || 0} entries`}
+              {`of ${metaList?.total_data || 0} entries`}
             </Box>
           </Box>
         </Stack>
       </Paper>
-    </>
+    </UserContext.Provider>
   );
 };
 

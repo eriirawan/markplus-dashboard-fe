@@ -15,10 +15,7 @@ const useSidebarMenus = () => {
       group: 'dashboard',
       menus: [
         {
-          icon: {
-            active: 'ChartActive',
-            inActive: 'ChartNormal',
-          },
+          icon: 'BarChartOutlined',
           name: 'Dashboard',
           path: 'home',
         },
@@ -26,12 +23,10 @@ const useSidebarMenus = () => {
     },
     {
       group: 'users',
+      hidden: me?.role?.toLowerCase() === 'user',
       menus: [
         {
-          icon: {
-            active: 'UserActive',
-            inActive: 'UserNormal',
-          },
+          icon: 'PersonOutlined',
           name: 'Users',
           path: 'users',
         },

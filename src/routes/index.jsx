@@ -56,14 +56,20 @@ const router = createBrowserRouter(
       /> */}
       <Route path="/" element={<ProtectedLayout />} errorElement={<ErrorBoundary />}>
         <Route index element={<Navigate to="/home" />} errorElement={<ErrorBoundary />} />
-        <Route path="home" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
+        <Route path="home" errorElement={<ErrorBoundary />}>
+          <Route path="/home" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
+          <Route
+            path="add-chart"
+            element={<LazyComponent children={<AddChart />} />}
+            errorElement={<ErrorBoundary />}
+          />
+        </Route>
         <Route path="users" element={<LazyComponent children={<User />} />} errorElement={<ErrorBoundary />} />
         <Route
           path="user-management"
           element={<LazyComponent children={<UserManagement />} />}
           errorElement={<ErrorBoundary />}
         />
-        <Route path="add-chart" element={<LazyComponent children={<AddChart />} />} errorElement={<ErrorBoundary />} />
       </Route>
     </>
   )
