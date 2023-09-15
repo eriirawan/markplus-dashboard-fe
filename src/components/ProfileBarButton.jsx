@@ -4,6 +4,7 @@ import { Stack, Box, IconButton, Typography, Menu, MenuItem } from '@mui/materia
 import { alpha } from '@mui/material/styles';
 import { useContext, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileBarButton = ({
   openProfileBar,
@@ -14,6 +15,7 @@ const ProfileBarButton = ({
 }) => {
   const { logout } = useAuth();
   const { me } = useContext(AppContext);
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClose = () => {
     setAnchorEl(null);
@@ -27,6 +29,8 @@ const ProfileBarButton = ({
         backgroundColor: openProfileBar ? alpha(theme.palette.primary.main, 0.08) : 'none',
         borderRadius: 1,
         cursor: 'pointer',
+        px: 2,
+        py: 1,
       })}
     >
       <IconButton
@@ -45,14 +49,14 @@ const ProfileBarButton = ({
         sx={{ m: 0, p: 0 }}
       >
         <Stack alignItems="end">
-          <Typography color="white" variant="body1" fontWeight={600} sx={{ mx: 1 }}>
+          <Typography variant="body1" fontWeight={600} sx={{ mx: 1 }}>
             {me ? me.username : ''}
           </Typography>
-          <Typography color="white" variant="body2" sx={{ mx: 1 }}>
-            {me ? me.username : ''}
+          <Typography variant="body2" sx={{ mx: 1 }}>
+            {me ? me.role : ''}
           </Typography>
         </Stack>
-        <AccountCircle sx={{ color: openProfileBar ? 'black' : 'white', fontSize: 25 }} />
+        <AccountCircle sx={{ color: openProfileBar ? 'black' : 'primary.main', fontSize: 25 }} />
       </IconButton>
       <Menu
         id="basic-menu"
@@ -65,7 +69,7 @@ const ProfileBarButton = ({
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose}>Change Password</MenuItem>
+        <MenuItem onClick={() => navigate('/reset-password', { replace: true })}>Change Password</MenuItem>
         <MenuItem
           onClick={() => {
             logout();

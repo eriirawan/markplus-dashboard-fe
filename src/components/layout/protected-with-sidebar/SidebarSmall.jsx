@@ -1,9 +1,10 @@
 // @ts-nocheck
-import { Box, List, ListItem, ListItemButton, Stack, alpha } from '@mui/material';
+import { Box, List, ListItem, ListItemButton, Stack, Typography, alpha } from '@mui/material';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 // import CustomTooltip from '@/components/CustomTooltip';
 import { MPlusIcon } from '../../Icon';
+import Logo from '@/assets/logo-light.png';
 
 const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
   const location = useLocation();
@@ -18,7 +19,7 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
         borderRight: `1px solid ${theme.palette.neutral.lightGrey}`,
         height,
         overflow: 'hidden',
-        width: 60,
+        width: 80,
       })}
     >
       <List disablePadding>
@@ -27,9 +28,6 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
           <ListItem disablePadding>
             {/* <CustomTooltip title="Open Sidebar" placement="right"> */}
             <ListItemButton
-              onClick={() => {
-                handleOpenSidebar(true);
-              }}
               sx={(theme) => ({
                 '&:hover': {
                   backgroundColor: alpha(theme.palette.neutral.lightGrey, 0.5),
@@ -41,17 +39,7 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
                 px: 1.5,
               })}
             >
-              <Box
-                lineHeight={0}
-                sx={{
-                  '& svg': {
-                    opacity: 1,
-                    width: 'inherit',
-                  },
-                }}
-              >
-                <MPlusIcon sx={{ color: 'neutral.greyScale02' }} name="KeyboardDoubleArrowRight" />
-              </Box>
+              <Box component="img" src={Logo} height={40} my={2} />
             </ListItemButton>
             {/* </CustomTooltip> */}
           </ListItem>
@@ -91,16 +79,15 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
                       display: 'flex',
                       justifyContent: 'center',
                       mx: 'auto',
-                      px: 1.5,
                     })}
                   >
                     {mainMenu.path === paths[1] && (
                       <Box
-                        width="2px"
+                        width="3px"
                         position="absolute"
                         left={0}
                         borderRadius={1.25}
-                        height={22}
+                        height={44}
                         bgcolor="primary.main"
                       />
                     )}
@@ -113,13 +100,24 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
                         },
                       }}
                     >
-                      <Box width={40}>
-                        {hoveredPath === mainMenu.path || mainMenu.path === paths[1] ? (
-                          <MPlusIcon name={mainMenu.icon.active} />
-                        ) : (
-                          <MPlusIcon name={mainMenu.icon.inActive} />
-                        )}
-                      </Box>
+                      <Stack
+                        sx={{
+                          color: hoveredPath === mainMenu.path || mainMenu.path === paths[1] ? 'primary.main' : '#000',
+                        }}
+                      >
+                        <MPlusIcon name={mainMenu.icon} sx={{ fontSize: 28 }} />
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color:
+                              hoveredPath === mainMenu.path || mainMenu.path === paths[1] ? 'primary.main' : '#000',
+                            fontWeight: hoveredPath === mainMenu.path || mainMenu.path === paths[1] ? 'bold' : 'normal',
+                            fontSize: 11,
+                          }}
+                        >
+                          {mainMenu?.name}
+                        </Typography>
+                      </Stack>
                       {/* <MPlusIcon>{mainMenu.icon as BoxProps['children']}</Icon> */}
                     </Box>
                   </ListItemButton>

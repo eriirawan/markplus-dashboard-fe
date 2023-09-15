@@ -611,7 +611,11 @@ const AddChart = () => {
       </Stack>
       <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '105px', mt: 1 }}>
         <Box sx={{ my: 'auto', p: 4, width: '100%' }} display="flex" justifyContent="flex-end" alignItems="center">
-          <Button sx={{ maxWidth: '256px', width: '100%' }} color="inherit">
+          <Button
+            sx={{ maxWidth: '256px', width: '100%' }}
+            color="inherit"
+            onClick={() => navigate('/home', { replace: true })}
+          >
             Cancel
           </Button>
           <Button

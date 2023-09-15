@@ -1,5 +1,5 @@
 import { Stack, Box, Typography, Paper, IconButton, Button, TextField, Autocomplete } from '@mui/material';
-import { useState, createContext, useMemo, useCallback } from 'react';
+import { useState, createContext, useMemo, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BarChart from '../../components/chart/BarChart';
 import LineChart from '../../components/chart/LineChart';
@@ -8,10 +8,12 @@ import { ChevronDownRed, DragIndicator, ExportFiles, Gear } from '../../helpers/
 import { useDashboard } from '../../hooks/useDashboard';
 import DonutChart from '../../components/chart/DonutChart';
 import TableChart from '../../components/chart/TableChart';
+import { AppContext } from '../../context/AppContext';
 
 export const DashboardContext = createContext({});
 
 const Home = () => {
+  const { me } = useContext(AppContext);
   const [lineData, setLineData] = useState({
     datasets: [
       {
@@ -415,7 +417,7 @@ const Home = () => {
         width: '100%',
       }}
     >
-      <Paper sx={{ display: 'flex', maxHeight: '512px', padding: '25px 32px' }}>
+      {/* <Paper sx={{ display: 'flex', maxHeight: '512px', padding: '25px 32px' }}>
         <Stack direction="row" alignItems="center" gap="30px">
           <Typography fontSize="18px" lineHeight="27px" fontWeight="700" color="primary">
             Set dashboard for
@@ -447,7 +449,7 @@ const Home = () => {
             sx={{ width: '528px' }}
           />
         </Stack>
-      </Paper>
+      </Paper> */}
       {renderDashboard}
 
       <Paper
@@ -455,21 +457,20 @@ const Home = () => {
           backgroundColor: 'transparent',
           borderRadius: 1.25,
           display: 'flex',
-          maxHeight: '512px',
-          p: 3,
+          mt: 3,
           width: '100%',
+          height: '100%',
         }}
       >
-        <Box
-          display="flex"
-          gap="16px"
-          justifyContent="center"
-          alignItems="center"
-          sx={{ border: '3px dashed #2E459A', height: '512px', width: '100%' }}
-        >
-          <Button color="primary" onClick={() => navigate('/add-chart')}>
-            Add Chart
-          </Button>
+        <Box display="flex" flexDirection="column" alignItems="center" sx={{ width: '100%', mt: '350px' }}>
+          <Typography color="#000" sx={{ fontSize: '16px' }}>
+            No chart created yet.
+          </Typography>
+          {me?.role?.toLowerCase() !== 'user' && (
+            <Button color="primary" sx={{ width: '256px', mt: 2 }} onClick={() => navigate('/home/add-chart')}>
+              Create Chart
+            </Button>
+          )}
         </Box>
       </Paper>
     </Stack>

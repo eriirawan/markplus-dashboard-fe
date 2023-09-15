@@ -3,6 +3,7 @@ import ProfileBarButton from '@/components/ProfileBarButton';
 // import NotificationButton from './notification/NotificationButton';
 
 const Appbar = ({
+  title,
   openProfileBar,
   setOpenNotification,
   setOpenTaskList,
@@ -11,7 +12,9 @@ const Appbar = ({
 }) => (
   <Stack flexDirection="row" alignItems="center" justifyContent="space-between" sx={{ py: 1, width: '100%' }}>
     <Stack flexDirection="row" justifyContent="flex-start" display="flex">
-      <Typography color="white">MARKPLUS DASHBOARD</Typography>
+      <Typography variant="h2" sx={{ textTransform: 'uppercase' }}>
+        {title}
+      </Typography>
     </Stack>
     <Stack flexDirection="row" justifyContent="flex-start" display="flex">
       <ProfileBarButton

@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,26 +12,35 @@ import {
   Button,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import CheckBox from '@/components/CheckBox';
 import MPTextField from '@/components/TextField';
 import DefaultImg from '@/assets/images/default-image.png';
+import useAxios from '@/hooks/useAxios';
+import MPSelect from '@/components/form/mp-select/MPSelect';
+import { AppContext } from '@/context/AppContext';
+import { UserContext } from '../UserContext';
 
-const ModalUserDetail = ({ openPopup = false, action = 'detail', setOpenPopup, methods }) => {
-  const imgUrl = methods.watch('imgUrl');
+const VisuallyHiddenInput = styled('input')`
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  white-space: nowrap;
+  width: 1px;
+`;
 
-  const handleClose = () => {
-    setOpenPopup(false);
-    setTimeout(() => {
-      setAction('');
-      methods.reset(defaultForm);
-    }, 500);
-  };
+const ModalUserDetail = ({}) => {
+  const { roles } = useContext(AppContext);
+  const { methods, handleFileInputChange, handleClose, handleClick, openPopup, action, isLoading } =
+    useContext(UserContext);
 
-  const handleClick = () => {
-    methods.handleSubmit(() => onSubmit(option, withNotif), onErrorSubmit)();
-  };
+  const imgUrl = methods.watch('company_logo_url');
 
   return (
     <Dialog maxWidth="md" open={openPopup} PaperProps={{ sx: { p: 3 } }} transitionDuration={500}>
@@ -90,7 +100,7 @@ const ModalUserDetail = ({ openPopup = false, action = 'detail', setOpenPopup, m
                     <Typography variant="h4" color="primary.main">
                       First Name
                     </Typography>
-                    <Typography>{methods?.getValues('firstName') || '-'}</Typography>
+                    <Typography>{methods?.getValues('first_name') || '-'}</Typography>
                   </Stack>
                 </Grid>
                 <Grid item xs={6}>
@@ -98,7 +108,7 @@ const ModalUserDetail = ({ openPopup = false, action = 'detail', setOpenPopup, m
                     <Typography variant="h4" color="primary.main">
                       Last Name
                     </Typography>
-                    <Typography>{methods?.getValues('lastName') || '-'}</Typography>
+                    <Typography>{methods?.getValues('last_name') || '-'}</Typography>
                   </Stack>
                 </Grid>
               </Grid>
@@ -108,13 +118,31 @@ const ModalUserDetail = ({ openPopup = false, action = 'detail', setOpenPopup, m
                   User Details
                 </Typography>
                 <Stack direction="row" spacing={2}>
-                  <MPTextField required label="Username" name="username" placeholder="Company Name" size="normal" />
-                  <MPTextField label="Role" name="role" />
+                  <MPTextField
+                    fullWidth
+                    required
+                    label="Username"
+                    name="username"
+                    placeholder="Company Name"
+                    size="normal"
+                  />
+                  <MPSelect
+                    options={roles}
+                    label="Role"
+                    name="role_id"
+                    id="id"
+                    valueKey="id"
+                    labelKey="role"
+                    size="medium"
+                    placeholder="Select Role"
+                    customborderradius="5px 0px 0px 5px"
+                    fullWidth
+                  />
                 </Stack>
                 <MPTextField label="Email" name="email" placeholder="companyemail@emaildomain.com" sx={{ my: 2 }} />
                 <Stack direction="row" spacing={2}>
-                  <MPTextField label="First Name" name="firstName" placeholder="PT AAA" />
-                  <MPTextField label="Last Name" name="lastName" placeholder="Tbk" />
+                  <MPTextField label="First Name" name="first_name" placeholder="PT AAA" />
+                  <MPTextField label="Last Name" name="last_name" placeholder="Tbk" />
                 </Stack>
               </Stack>
             )}
@@ -123,14 +151,29 @@ const ModalUserDetail = ({ openPopup = false, action = 'detail', setOpenPopup, m
               <Typography variant="h3" color="primary.main" sx={{ textAlign: 'center' }}>
                 Company Logo
               </Typography>
-              <Box px={1} component="img" src={imgUrl || DefaultImg} height={169} />
-              {action !== 'detail' && <Button>Select Image</Button>}
+              <Box
+                px={1}
+                component="img"
+                src={imgUrl || DefaultImg}
+                height={169}
+                width={220}
+                onError={({ currentTarget }) => {
+                  currentTarget.onerror = null; // prevents looping
+                  currentTarget.src = DefaultImg;
+                }}
+              />
+              {action !== 'detail' && (
+                <Button component="label" variant="contained" href="#file-upload">
+                  Select
+                  <VisuallyHiddenInput type="file" onChange={handleFileInputChange} />
+                </Button>
+              )}
             </Stack>
           </Stack>
           {!action && <CheckBox name="isSendEmail" label="Send email confirmation" />}
           {action !== 'detail' && (
             <Stack direction="row" spacing={2} width="62%" sx={{ mt: 2 }}>
-              <Button fullWidth onClick={handleClick}>
+              <Button fullWidth onClick={handleClick} disabled={isLoading}>
                 {action === 'edit' ? 'Save Changes' : 'Add User'}
               </Button>
               <Button fullWidth variant="outlined" onClick={handleClose}>

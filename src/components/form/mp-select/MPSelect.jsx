@@ -1,7 +1,7 @@
 import { Check } from '@mui/icons-material';
 import { Box, MenuItem, Typography } from '@mui/material';
 import { Controller } from 'react-hook-form';
-import FR8TextField from '../mp-text-field/MPTextField';
+import FR8TextField from '../../TextField';
 
 const MPSelect = ({
   name,
