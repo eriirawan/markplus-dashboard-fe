@@ -14,7 +14,7 @@ const useAfterLoginStartup = () => {
         headers: { Authorization: token.replaceAll('"', '') },
       })
       .then((res) => setRoles(res?.data?.data || []))
-      .catch((e) => console.log(e));
+      .catch((e) => console.warn(e));
   };
 
   return {

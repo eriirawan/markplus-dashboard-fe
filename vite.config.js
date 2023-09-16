@@ -6,12 +6,11 @@ import svgrPlugin from 'vite-plugin-svgr';
 import VitePluginHtmlEnv from 'vite-plugin-html-env';
 import removeConsole from 'vite-plugin-remove-console';
 import viteCompression from 'vite-plugin-compression';
-// import vsharp from 'vite-plugin-vsharp';
+import vsharp from 'vite-plugin-vsharp';
 import { ViteMinifyPlugin } from 'vite-plugin-minify';
 import terser from '@rollup/plugin-terser';
-// import { obfuscate } from 'javascript-obfuscator';
+import { obfuscate } from 'javascript-obfuscator';
 import cssnano from 'cssnano';
-import { VitePWA } from 'vite-plugin-pwa';
 
 export default ({ mode }) => {
   process.env = Object.assign(process.env, loadEnv(mode, process.cwd(), ''));
@@ -25,23 +24,23 @@ export default ({ mode }) => {
             {
               name: 'obfuscate',
               async transform(code, id) {
-                // if (id.endsWith('.js')) {
-                //   const obfuscatedCode = await obfuscate(code, {
-                //     controlFlowFlattening: true,
-                //     deadCodeInjection: true,
-                //     identifierNamesGenerator: 'mangled',
-                //     renameGlobals: true,
-                //     seed: 'random_seed',
-                //     stringArray: true,
-                //     stringArrayEncoding: ['base64'],
-                //     transformObjectKeys: true,
-                //     transformObjectValues: true,
-                //   });
-                //   return {
-                //     code: obfuscatedCode,
-                //     map: null,
-                //   };
-                // }
+                if (id.endsWith('.js')) {
+                  const obfuscatedCode = await obfuscate(code, {
+                    controlFlowFlattening: true,
+                    deadCodeInjection: true,
+                    identifierNamesGenerator: 'mangled',
+                    renameGlobals: true,
+                    seed: 'random_seed',
+                    stringArray: true,
+                    stringArrayEncoding: ['base64'],
+                    transformObjectKeys: true,
+                    transformObjectValues: true,
+                  });
+                  return {
+                    code: obfuscatedCode,
+                    map: null,
+                  };
+                }
                 if (id.endsWith('.css')) {
                   const minifiedCode = await cssnano.process(code);
                   return {
@@ -98,16 +97,10 @@ export default ({ mode }) => {
           preload: true,
         },
       }),
+      vsharp(),
       ViteMinifyPlugin({}),
       splitVendorChunkPlugin(),
       viteCompression(),
-      VitePWA({
-        registerType: 'autoUpdate',
-        selfDestroying: process.env.VITE_API_MODE === 'dev',
-        workbox: {
-          maximumFileSizeToCacheInBytes: 30000000,
-        },
-      }),
     ],
     resolve: {
       alias: {

@@ -19,8 +19,6 @@ import { useDemoData } from '@mui/x-data-grid-generator';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ISODateToLuxon } from '../../helpers/Utils';
-
-import UserThemeSettings from './components/UserThemeSettings';
 import dummyData from './dummy';
 
 const UserManagement = () => {
@@ -89,9 +87,6 @@ const UserManagement = () => {
 
   return (
     <Paper sx={{ display: 'flex', height: '100%', p: 4 }}>
-      {openPopupTheme && (
-        <UserThemeSettings openPopup={openPopupTheme} setOpenPopup={setOpenPopupTheme} username={username} />
-      )}
       <Stack width="100%">
         <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
           <Link to="/home" style={{ textDecoration: 'none' }}>
@@ -203,14 +198,14 @@ const UserManagement = () => {
             />
             <Box sx={{ alignItems: 'center', display: 'flex', flex: 1, justifyContent: 'right' }}>
               Show
-              <Select size="small" value={10} sx={{ mx: 1 }} onChange={(e) => console.log(e)}>
+              <Select size="small" value={10} sx={{ mx: 1 }} onChange={(e) => console.warn(e)}>
                 {[5, 10, 20, 50, 100].map((item) => (
                   <MenuItem key={item} value={item}>
                     {item}
                   </MenuItem>
                 ))}
               </Select>
-              {`of ${dummyData?.length} entries`}
+              {`of ${dummyData?.length || '0'} entries`}
             </Box>
           </Box>
         </Box>
