@@ -1,8 +1,7 @@
 {
   "name": "markplus",
   "private": true,
-  "version": "0.0.0",
-  "homepage": "https://dagati-tech.github.io/markplus-dashboard-fe",
+  "version": "0.0.1",
   "imports": {
     "@/*": "./src/*"
   },
@@ -90,7 +89,6 @@
     "vite-plugin-fonts": "^0.7.0",
     "vite-plugin-html-env": "^1.2.7",
     "vite-plugin-minify": "^1.5.2",
-    "vite-plugin-pwa": "^0.14.4",
     "vite-plugin-remove-console": "^2.1.0",
     "vite-plugin-vsharp": "^1.4.2"
   }
