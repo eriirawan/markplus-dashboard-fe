@@ -1,8 +1,20 @@
-import { Box } from '@mui/system';
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
-
-const AreaChart = ({ chartData, width, height, maxWidthLegend }) => {
+import { Chart as ChartJS } from 'chart.js/auto';
+import { Box } from '@mui/system';
+import { Stack } from '@mui/material';
+const AreaChart = ({
+  chartData,
+  width,
+  height,
+  maxWidthLegend,
+  labelX,
+  labelY,
+  options,
+  refChart,
+  isAreaChart,
+  legendClassName,
+}) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
 
@@ -11,12 +23,13 @@ const AreaChart = ({ chartData, width, height, maxWidthLegend }) => {
     if (!listContainer) {
       listContainer = document.createElement('ul');
       listContainer.style.display = 'grid';
-      listContainer.style.gridTemplateColumns = 'auto auto auto';
+      listContainer.style.gridTemplateColumns = 'auto auto auto auto';
       listContainer.style.rowGap = '17px';
       listContainer.style.columnGap = '0px';
-
-      listContainer.style.maxWidth = maxWidthLegend;
-      listContainer.style.margin = 0;
+      listContainer.style.width = '100%';
+      // listContainer.style.marginLeft = '50px';
+      // listContainer.style.maxWidth = maxWidthLegend;
+      listContainer.style.margin = '0 0 0 50px';
       listContainer.style.padding = 0;
 
       legendContainer.appendChild(listContainer);
@@ -82,48 +95,57 @@ const AreaChart = ({ chartData, width, height, maxWidthLegend }) => {
       });
     },
   };
-  const options = {
-    responsive: false,
-    maintainAspectRatio: false,
+  const defaultOptions = {
+    responsive: true,
+    maintainAspectRatio: options?.maintainAspectRatio || true,
     plugins: {
       htmlLegend: {
         // ID of the container to put the legend in
-        containerID: 'legend-container-area',
+        containerID: legendClassName,
       },
       legend: {
         display: false,
       },
-      filler: {
-        propagate: true,
-      },
-      'samples-filler-analyser': {
-        target: 'chart-analyser',
-      },
-    },
-    interaction: {
-      intersect: false,
     },
     scales: {
       y: {
-        beginAtZero: true,
+        // beginAtZero: isAreaChart ? false : true,
+        title: {
+          display: true,
+          text: labelY,
+          font: {
+            size: '12px',
+            lineHeight: '18px',
+            weight: 700,
+          },
+          color: '#000000',
+        },
         grid: {
           // lineWidth: function (context) {
           //   return context?.index === 0 ? 0 : 1; // <-- this removes the base line
           // }
           lineWidth: 0,
         },
-        ticks: {
-          crossAlign: 'far',
-        },
       },
       x: {
-        offset: true,
+        title: {
+          display: true,
+          text: labelX,
+          font: {
+            size: '12px',
+            lineHeight: '18px',
+            weight: 700,
+          },
+          color: '#000000',
+        },
+        offset: false,
         display: true,
-        tick: {
-          display: false,
+        ticks: {
+          // padding: 20,
+          // display: false,
         },
         grid: {
-          lineWidth: 1, // <-- this removes vertical lines between bars
+          lineWidth: 0, // <-- this removes vertical lines between bars
         },
       },
     },
@@ -133,19 +155,62 @@ const AreaChart = ({ chartData, width, height, maxWidthLegend }) => {
     // },
     elements: {
       line: {
-        tension: 0.4,
+        // tension: 0.5,
       },
-      //   point: {
-      //     radius: 0,
-      //   },
+      point: {
+        radius: 0,
+      },
     },
+    ...options,
   };
-  return (
-    <Box>
-      <Line data={chartData} width={width} height={height} options={options} plugins={[htmlLegendPlugin]}></Line>
-      <Box display={'flex'} justifyContent={'center'} sx={{ marginTop: '24px' }} id="legend-container-area"></Box>
-    </Box>
-  );
+  // useEffect(() => {
+
+  // })
+  const renderMain = useMemo(() => {
+    return (
+      <Box
+        sx={{
+          height: '100%',
+        }}
+      >
+        <Box
+          sx={{
+            height: '100%',
+            width: '100%',
+            maxHeight: '315px',
+          }}
+        >
+          <Line
+            ref={refChart}
+            // width={'100%'}
+            // height={'100%'}
+            data={{
+              labels: [...chartData.labels],
+              datasets: isAreaChart ? chartData.datasets.map((el) => ({ ...el, fill: true })) : [...chartData.datasets],
+            }}
+            options={defaultOptions}
+            plugins={[htmlLegendPlugin]}
+          />
+        </Box>
+        <Box id={legendClassName} display={'flex'} justifyContent={'center'} sx={{ marginTop: '16px' }} />
+        {/* <Box id="subLabels" /> */}
+      </Box>
+    );
+  }, [chartData, refChart, width, height, labelX, labelY, isAreaChart, options, defaultOptions]);
+  return renderMain;
+  // return (
+  //   <Box sx={{ maxWidth: '1173px' }}>
+  //     <Line
+  //       ref={refChart}
+  //       width={width}
+  //       height={height}
+  //       data={chartData}
+  //       options={defaultOptions}
+  //       plugins={[htmlLegendPlugin]}
+  //     />
+  //     <Box id="legend-container" display={'flex'} justifyContent={'center'} sx={{ marginTop: '24px' }} />
+  //   </Box>
+  // );
 };
 
 export default AreaChart;

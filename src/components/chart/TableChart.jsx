@@ -15,7 +15,7 @@ import {
   tableCellClasses,
 } from '@mui/material';
 
-const TableChart = () => {
+const TableChart = ({ chartData }) => {
   function createData(name, calories, fat, carbs, protein) {
     return { name, calories, fat, carbs, protein };
   }
@@ -30,14 +30,15 @@ const TableChart = () => {
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.primary.main,
       color: theme.palette.common.white,
-      padding: '10px 0 10px 16px',
+      padding: '12px 53px',
       textAlign: 'center',
     },
     [`&.${tableCellClasses.body}`]: {
       fontSize: 14,
       backgroundColor: '#EEF0F5',
       lineHeight: '21px',
-      padding: '10px 0 10px 16px',
+      padding: '12px 53px',
+      textAlign: 'center',
     },
     [`&.${tableCellClasses.root}`]: {
       borderBottom: 'none',
@@ -54,7 +55,7 @@ const TableChart = () => {
     },
   }));
   return (
-    <Box sx={{ height: 768, my: 'auto', p: 2, width: '100%' }}>
+    <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
       <TableContainer component={Paper}>
         <Table
           sx={{
@@ -68,25 +69,32 @@ const TableChart = () => {
         >
           <TableHead>
             <TableRow>
+              {chartData?.labels?.map((el) => {
+                return <StyledTableCell>{el}</StyledTableCell>;
+              })}
+              {/* <StyledTableCell>Title</StyledTableCell>
               <StyledTableCell>Title</StyledTableCell>
               <StyledTableCell>Title</StyledTableCell>
               <StyledTableCell>Title</StyledTableCell>
               <StyledTableCell>Title</StyledTableCell>
-              <StyledTableCell>Title</StyledTableCell>
-              <StyledTableCell>Title</StyledTableCell>
-              <StyledTableCell>Title</StyledTableCell>
+              <StyledTableCell>Title</StyledTableCell> */}
             </TableRow>
           </TableHead>
           <TableBody sx={{ margin: '2px', border: 'none' }}>
-            {rows?.map((row) => (
+            {chartData?.datasets?.map((row) => (
               <StyledTableRow key={row.name}>
-                <StyledTableCell
-                  sx={{
-                    margin: '2px',
-                  }}
-                  component="th"
-                  scope="row"
-                >
+                {row.data.map((data) => (
+                  <StyledTableCell
+                    sx={{
+                      margin: '4px',
+                    }}
+                    component="th"
+                    scope="row"
+                  >
+                    {data}
+                  </StyledTableCell>
+                ))}
+                {/* <StyledTableCell component="th" scope="row">
                   Content
                 </StyledTableCell>
                 <StyledTableCell component="th" scope="row">
@@ -103,18 +111,15 @@ const TableChart = () => {
                 </StyledTableCell>
                 <StyledTableCell component="th" scope="row">
                   Content
-                </StyledTableCell>
-                <StyledTableCell component="th" scope="row">
-                  Content
-                </StyledTableCell>
+                </StyledTableCell> */}
               </StyledTableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <Stack direction={'row'} justifyContent="center" sx={{ marginTop: '40px' }}>
+      {/* <Stack direction={'row'} justifyContent="center" sx={{ marginTop: '40px' }}>
         <Pagination count={10}></Pagination>
-      </Stack>
+      </Stack> */}
     </Box>
   );
 };

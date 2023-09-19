@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS } from 'chart.js/auto';
 import { Box } from '@mui/system';
@@ -23,13 +23,13 @@ const LineChart = ({
     if (!listContainer) {
       listContainer = document.createElement('ul');
       listContainer.style.display = 'grid';
-      listContainer.style.gridTemplateColumns = 'auto auto auto';
+      listContainer.style.gridTemplateColumns = 'auto auto auto auto';
       listContainer.style.rowGap = '17px';
       listContainer.style.columnGap = '0px';
       listContainer.style.width = '100%';
-      listContainer.style.marginLeft = '50px';
+      // listContainer.style.marginLeft = '50px';
       // listContainer.style.maxWidth = maxWidthLegend;
-      listContainer.style.margin = 0;
+      listContainer.style.margin = '0 0 0 50px';
       listContainer.style.padding = 0;
 
       legendContainer.appendChild(listContainer);
@@ -109,7 +109,7 @@ const LineChart = ({
     },
     scales: {
       y: {
-        beginAtZero: isAreaChart ? false : true,
+        beginAtZero: true,
         title: {
           display: true,
           text: labelY,
@@ -138,7 +138,7 @@ const LineChart = ({
           },
           color: '#000000',
         },
-        offset: false,
+        offset: isAreaChart ? false : true,
         display: true,
         ticks: {
           // padding: 20,
@@ -158,11 +158,14 @@ const LineChart = ({
         // tension: 0.5,
       },
       point: {
-        radius: isAreaChart ? 0 : 0.1,
+        radius: 5,
       },
     },
     ...options,
   };
+  // useEffect(() => {
+
+  // })
   const renderMain = useMemo(() => {
     return (
       <Box
@@ -181,7 +184,10 @@ const LineChart = ({
             ref={refChart}
             // width={'100%'}
             // height={'100%'}
-            data={chartData}
+            data={{
+              labels: [...chartData.labels],
+              datasets: isAreaChart ? chartData.datasets.map((el) => ({ ...el, fill: true })) : [...chartData.datasets],
+            }}
             options={defaultOptions}
             plugins={[htmlLegendPlugin]}
           />
@@ -190,7 +196,7 @@ const LineChart = ({
         {/* <Box id="subLabels" /> */}
       </Box>
     );
-  }, [chartData, refChart, width, height, labelX, labelY, isAreaChart, options]);
+  }, [chartData, refChart, width, height, labelX, labelY, isAreaChart, options, defaultOptions]);
   return renderMain;
   // return (
   //   <Box sx={{ maxWidth: '1173px' }}>

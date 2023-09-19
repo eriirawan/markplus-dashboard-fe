@@ -38,7 +38,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDashboard } from '../../hooks/useDashboard';
 import DonutChart from '../../components/chart/DonutChart';
 import PieChart from '../../components/chart/PieChart';
-
+import DefaultImageInformationCard from '@/assets/images/default-image-infomation-card.png';
 import TableChart from '../../components/chart/TableChart';
 import AreaChart from '../../components/chart/AreaChart';
 // import { useDashboard } from '../../hooks/useDashboard';
@@ -228,7 +228,6 @@ const Home = () => {
                     maintainAspectRatio: false,
                   }}
                   isWidth25={data.width === 3 ? true : false}
-
                   // labelX={data}
                   // width={setWidthChart(index, data.chartType)}
                   // height={309}
@@ -659,13 +658,15 @@ const Home = () => {
               <Paper
                 sx={{
                   borderRadius: 1.25,
-                  display: 'flex',
-                  maxHeight: '512px',
-                  mt: 1,
+                  // display: 'flex',
+                  // maxHeight: '512px',
+                  // mt: 1,
+                  height: '100%',
+                  p: 4,
                   width: '100%',
                 }}
               >
-                <Box sx={{ my: 'auto', p: 4, width: '100%' }}>
+                <Box sx={{ my: 'auto', width: '100%' }}>
                   <Stack direction="row" justifyContent={'space-between'} sx={{ marginBottom: '40px' }}>
                     <Box display={'flex'} gap={'16px'} justifyContent="center" marginBottom={'24px'}>
                       <IconButton sx={{ padding: 0 }}>
@@ -692,7 +693,7 @@ const Home = () => {
                       </IconButton>
                     </Box>
                   </Stack>
-                  <TableChart></TableChart>
+                  <TableChart chartData={data?.chartData}></TableChart>
                 </Box>
               </Paper>
             );
@@ -751,50 +752,67 @@ const Home = () => {
               <Paper
                 sx={{
                   borderRadius: 1.25,
-                  display: 'flex',
-                  maxHeight: '512px',
-                  maxWidth: '400px',
-                  width: '100%',
-                  mt: 1,
+                  marginTop: '87px',
                 }}
               >
-                <Box sx={{ my: 'auto', p: 4 }}>
-                  <Stack direction="row" justifyContent={'space-between'} sx={{ marginBottom: '16px' }}>
-                    <Box display={'flex'} gap={'16px'} justifyContent="center">
-                      <IconButton sx={{ padding: 0 }}>
-                        <DragIndicator />
-                      </IconButton>
-                      <Typography
-                        // sx={(theme) => ({
-                        //   color: theme.palette.text.primary,
-                        // })}
-                        color={'primary'}
-                        fontSize={24}
-                        fontWeight="700"
-                        lineHeight="31px"
-                      >
-                        {data.chartLabel}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <IconButton>
-                        <ExportFiles />
-                      </IconButton>
-                      <IconButton>
-                        <Gear />
-                      </IconButton>
-                    </Box>
-                  </Stack>
-                  <Box>
-                    <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
-                      10.638
+                <Box sx={{ height: '100%' }} display="flex" justifyContent="center">
+                  <Box
+                    display={'flex'}
+                    sx={{
+                      my: 'auto',
+                      p: 3,
+                      boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+                      minWidth: '311px',
+                      minHeight: '211px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(229, 229, 229, 1)',
+                    }}
+                  >
+                    <Stack
+                      direction="column"
+                      // justifyContent={'space-between'}
+                      // sx={{ marginBottom: '16px' }}
+                      gap="61px"
+                      // sx={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}
+                    >
+                      <Box>
+                        <Typography
+                          // sx={(theme) => ({
+                          //   color: theme.palette.text.primary,
+                          // })}
+                          color={'primary'}
+                          fontSize={24}
+                          fontWeight="700"
+                          lineHeight="31px"
+                        >
+                          {data.chartLabel}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
+                          10.638
+                        </Typography>
+                        <Box display="flex" alignItems={'center'}>
+                          <ChevronDownRed />
+                          <Typography fontSize={'24px'} fontWeight={400} lineHeight="31px">
+                            {' '}
+                            1045
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Stack>
+                    <Box sx={{ width: '100%' }} display={'flex'} justifyContent={'flex-end'} alignItems={'flex-end'}>
+                      <img src={DefaultImageInformationCard} />
+                      {/* <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
+                    10.638
+                  </Typography>
+                  <Box display="flex" alignItems={'center'}>
+                    <ChevronDownRed />
+                    <Typography fontSize={'24px'} fontWeight={400} lineHeight="31px">
+                      {' '}
+                      1045
                     </Typography>
-                    <Box display="flex" alignItems={'center'}>
-                      <ChevronDownRed />
-                      <Typography fontSize={'24px'} fontWeight={400} lineHeight="31px">
-                        {' '}
-                        1045
-                      </Typography>
+                  </Box> */}
                     </Box>
                   </Box>
                 </Box>
@@ -816,7 +834,7 @@ const Home = () => {
                       xl={typeof el === 'number' ? el : el?.width}
                       lg={typeof el === 'number' ? el : el?.width}
                       sx={{
-                        border: typeof el === 'number' ? '3px dashed #7E3399' : 0,
+                        border: (theme) => (typeof el === 'number' ? `3px dashed ${theme.palette.primary.main}` : 0),
                         width: getTextLayout(el),
                         ...(typeof el === 'number'
                           ? {
@@ -946,9 +964,9 @@ const Home = () => {
                 onClick={(e) => setSelectedLayout(index)}
                 sx={{
                   cursor: 'pointer',
-                  backgroundColor: index === selectedLayout ? '#F9F5FA' : '#fff',
+                  backgroundColor: (theme) => (index === selectedLayout ? theme.palette.primary.light : '#fff'),
                   '&:hover': {
-                    background: '#F9F5FA',
+                    background: (theme) => theme.palette.primary.light,
                   },
                 }}
               >
@@ -984,7 +1002,7 @@ const Home = () => {
                         justifyContent={'center'}
                         alignItems={'center'}
                         sx={{
-                          border: '1px #7E3399 solid',
+                          border: (theme) => `1px ${theme.palette.primary.main} solid`,
                           borderRadius: '10px',
                           width: '100%',
                           minHeight: '72px',
@@ -1035,7 +1053,7 @@ const Home = () => {
     <Stack
       direction={'column'}
       sx={{
-        height: '100%',
+        height: '100vh',
         // overflow: 'auto',
         // position: 'fixed',
         width: '100%',
@@ -1103,11 +1121,11 @@ const Home = () => {
             gap={'16px'}
             justifyContent="center"
             alignItems={'center'}
-            sx={{ height: '434px', width: '100%', border: '3px dashed #2E459A' }}
+            sx={{ height: '434px', width: '100%', border: (theme) => `3px dashed ${theme.palette.primary.main}` }}
           >
             <Button
               variant="outlined"
-              sx={{ borderColor: '#7E3399', color: '#7E3399', '&:hover': { borderColor: '#7E3399' } }}
+              // sx={{ borderColor: '#7E3399', color: '#7E3399', '&:hover': { borderColor: '#7E3399' } }}
               onClick={() => setIsLayoutModalOpen((prev) => !prev)}
             >
               Add New Section

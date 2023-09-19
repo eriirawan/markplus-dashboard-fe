@@ -88,6 +88,7 @@ const CustomColorPicker = ({ codeColor, onChange }) => {
             direction="vertical"
             // pointer={CustomPointer}
             onChange={onChange}
+            color={codeColor}
           />
         </Box>
       </div>

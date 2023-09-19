@@ -26,12 +26,14 @@ const BarChart = ({
       // listContainer.style.display = 'flex';
       // listContainer.style.flexDirection = 'row';
       listContainer.style.display = 'grid';
-      listContainer.style.gridTemplateColumns = 'auto auto auto';
+      listContainer.style.gridTemplateColumns = 'auto auto auto auto';
       listContainer.style.rowGap = '17px';
       listContainer.style.columnGap = '0px';
-      listContainer.style.margin = 0;
+      listContainer.style.width = '100%';
+      listContainer.style.margin = '0 0 0 50px';
+
       listContainer.style.padding = 0;
-      listContainer.style.maxWidth = maxWidthLegend;
+      // listContainer.style.maxWidth = maxWidthLegend;
 
       legendContainer.appendChild(listContainer);
     }
@@ -142,6 +144,7 @@ const BarChart = ({
           font: {
             size: '12px',
             lineHeight: '18px',
+            weight: 700,
           },
           color: '#000000',
         },
@@ -164,6 +167,7 @@ const BarChart = ({
           font: {
             size: '12px',
             lineHeight: '18px',
+            weight: 700,
           },
           color: '#000000',
         },

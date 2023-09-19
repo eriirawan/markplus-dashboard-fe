@@ -116,7 +116,7 @@ const DialogColorPicker = ({ dataSets, onCancel, onSaveChanges, openDialog }) =>
                     }}
                     onChange={(e) => {
                       dataSets[i].backgroundColor = e.hex;
-                      console.info(dataSets[i], e, '<<< apa dia');
+                      dataSets[i].borderColor = e.hex;
                     }}
                   ></CustomColorPicker>
                 )}
