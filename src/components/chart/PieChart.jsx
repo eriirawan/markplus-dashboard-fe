@@ -1,16 +1,16 @@
 import { Box } from '@mui/system';
 import React from 'react';
-import { Doughnut } from 'react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
 import PropTypes from 'prop-types';
 
-const DonutChart = ({ chartData, width, height, maxWidthLegend, options, refChart, legendClassName, isWidth25 }) => {
+const PieChart = ({ chartData, width, height, maxWidthLegend, options, refChart, legendClassName, isWidth25 }) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
 
-    let listContainer = legendContainer?.querySelector('div');
+    let listContainer = legendContainer?.querySelector('ul');
 
     if (!listContainer) {
-      listContainer = document.createElement('div');
+      listContainer = document.createElement('ul');
       listContainer.style.display = 'flex';
       // listContainer.style.gridTemplateColumns = 'auto';
       listContainer.style.justifyContent = 'center';
@@ -20,9 +20,7 @@ const DonutChart = ({ chartData, width, height, maxWidthLegend, options, refChar
       } else {
         listContainer.style.flexDirection = 'column';
       }
-
-      listContainer.style.gap = '16px';
-      // listContainer.style.rowGap = '17px';
+      listContainer.style.gap = '17px';
       // listContainer.style.columnGap = '0px';
 
       // listContainer.style.maxWidth = maxWidthLegend;
@@ -49,7 +47,7 @@ const DonutChart = ({ chartData, width, height, maxWidthLegend, options, refChar
       const items = chart.options.plugins.legend.labels.generateLabels(chart);
 
       items.forEach((item) => {
-        const li = document.createElement('div');
+        const li = document.createElement('li');
         li.style.alignItems = 'center';
         li.style.cursor = 'pointer';
         li.style.display = 'flex';
@@ -94,7 +92,7 @@ const DonutChart = ({ chartData, width, height, maxWidthLegend, options, refChar
   };
   const defaultOptions = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     plugins: {
       htmlLegend: {
         // ID of the container to put the legend in
@@ -128,9 +126,9 @@ const DonutChart = ({ chartData, width, height, maxWidthLegend, options, refChar
     // },
   };
   return (
-    <Box display={'flex'} justifyContent={'center'} flexWrap={isWidth25 ? 'wrap' : 'nowrap'} gap={'40px'}>
-      <Box sx={{ height: '100vh', maxHeight: '315px' }} display="flex" alignItems="center">
-        <Doughnut
+    <Box display={'flex'} justifyContent={'center'} flexWrap={isWidth25 ? 'wrap' : 'nowrap'} gap={'48px'}>
+      <Box sx={{ height: '100vh', maxHeight: '315px' }}>
+        <Pie
           ref={refChart}
           width={width}
           height={height}
@@ -144,4 +142,4 @@ const DonutChart = ({ chartData, width, height, maxWidthLegend, options, refChar
   );
 };
 
-export default DonutChart;
+export default PieChart;

@@ -2,7 +2,19 @@ import React, { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS } from 'chart.js/auto';
 import { Box } from '@mui/system';
-const LineChart = ({ chartData, width, height, maxWidthLegend, labelX, labelY, options, refChart }) => {
+import { Stack } from '@mui/material';
+const LineChart = ({
+  chartData,
+  width,
+  height,
+  maxWidthLegend,
+  labelX,
+  labelY,
+  options,
+  refChart,
+  isAreaChart,
+  legendClassName,
+}) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
 
@@ -14,8 +26,9 @@ const LineChart = ({ chartData, width, height, maxWidthLegend, labelX, labelY, o
       listContainer.style.gridTemplateColumns = 'auto auto auto';
       listContainer.style.rowGap = '17px';
       listContainer.style.columnGap = '0px';
-
-      listContainer.style.maxWidth = maxWidthLegend;
+      listContainer.style.width = '100%';
+      listContainer.style.marginLeft = '50px';
+      // listContainer.style.maxWidth = maxWidthLegend;
       listContainer.style.margin = 0;
       listContainer.style.padding = 0;
 
@@ -84,11 +97,11 @@ const LineChart = ({ chartData, width, height, maxWidthLegend, labelX, labelY, o
   };
   const defaultOptions = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: options?.maintainAspectRatio || true,
     plugins: {
       htmlLegend: {
         // ID of the container to put the legend in
-        containerID: 'legend-container-line',
+        containerID: legendClassName,
       },
       legend: {
         display: false,
@@ -96,13 +109,14 @@ const LineChart = ({ chartData, width, height, maxWidthLegend, labelX, labelY, o
     },
     scales: {
       y: {
-        beginAtZero: true,
+        beginAtZero: isAreaChart ? false : true,
         title: {
           display: true,
           text: labelY,
           font: {
             size: '12px',
             lineHeight: '18px',
+            weight: 700,
           },
           color: '#000000',
         },
@@ -120,16 +134,18 @@ const LineChart = ({ chartData, width, height, maxWidthLegend, labelX, labelY, o
           font: {
             size: '12px',
             lineHeight: '18px',
+            weight: 700,
           },
           color: '#000000',
         },
-        // offset: true,
+        offset: false,
         display: true,
-        tick: {
-          display: false,
+        ticks: {
+          // padding: 20,
+          // display: false,
         },
         grid: {
-          lineWidth: 1, // <-- this removes vertical lines between bars
+          lineWidth: 0, // <-- this removes vertical lines between bars
         },
       },
     },
@@ -139,30 +155,42 @@ const LineChart = ({ chartData, width, height, maxWidthLegend, labelX, labelY, o
     // },
     elements: {
       line: {
-        tension: 0.5,
+        // tension: 0.5,
       },
       point: {
-        radius: 0.1,
+        radius: isAreaChart ? 0 : 0.1,
       },
     },
     ...options,
   };
   const renderMain = useMemo(() => {
     return (
-      <Box sx={{ maxWidth: '1173px' }}>
-        <Line
-          ref={refChart}
-          width={width}
-          height={height}
-          data={chartData}
-          options={defaultOptions}
-          plugins={[htmlLegendPlugin]}
-        />
-        <Box id="legend-container-line" display={'flex'} justifyContent={'center'} sx={{ marginTop: '24px' }} />
-        <Box id="subLabels" />
+      <Box
+        sx={{
+          height: '100%',
+        }}
+      >
+        <Box
+          sx={{
+            height: '100%',
+            width: '100%',
+            maxHeight: '315px',
+          }}
+        >
+          <Line
+            ref={refChart}
+            // width={'100%'}
+            // height={'100%'}
+            data={chartData}
+            options={defaultOptions}
+            plugins={[htmlLegendPlugin]}
+          />
+        </Box>
+        <Box id={legendClassName} display={'flex'} justifyContent={'center'} sx={{ marginTop: '16px' }} />
+        {/* <Box id="subLabels" /> */}
       </Box>
     );
-  }, [chartData, refChart, width, height, width]);
+  }, [chartData, refChart, width, height, labelX, labelY, isAreaChart, options]);
   return renderMain;
   // return (
   //   <Box sx={{ maxWidth: '1173px' }}>
