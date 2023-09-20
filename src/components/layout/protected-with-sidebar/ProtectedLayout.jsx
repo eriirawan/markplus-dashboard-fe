@@ -104,7 +104,7 @@ const ProtectedLayout = () => {
                     setShowDrawerBackground={setShowDrawerBackground}
                   />
                 </Box>
-                <Stack sx={{ px: 2 }}>{outlet}</Stack>
+                <Stack sx={{ px: 2, overflow: 'auto' }}>{outlet}</Stack>
               </Stack>
             </Box>
           </Stack>

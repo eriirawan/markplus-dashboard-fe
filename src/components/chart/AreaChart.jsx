@@ -184,10 +184,7 @@ const AreaChart = ({
             ref={refChart}
             // width={'100%'}
             // height={'100%'}
-            data={{
-              labels: [...chartData.labels],
-              datasets: isAreaChart ? chartData.datasets.map((el) => ({ ...el, fill: true })) : [...chartData.datasets],
-            }}
+            data={chartData}
             options={defaultOptions}
             plugins={[htmlLegendPlugin]}
           />

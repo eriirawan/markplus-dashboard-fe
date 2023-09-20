@@ -77,7 +77,7 @@ const User = () => {
   });
 
   const columns = [
-    { field: 'nanoId', headerAlign: 'center', sortable: false, headerName: 'ID', width: 100, align: 'center' },
+    { field: 'nanoId', headerAlign: 'center', sortable: false, headerName: 'ID', width: 50, align: 'center' },
     { field: 'username', headerAlign: 'center', sortable: false, headerName: 'Username', flex: 1 },
     { field: 'email', headerAlign: 'center', sortable: false, headerName: 'Email', flex: 1 },
     { field: 'firstName', headerAlign: 'center', sortable: false, headerName: 'First Name', width: 142 },
@@ -101,7 +101,7 @@ const User = () => {
       headerName: 'Action',
       align: 'center',
       renderCell: (params) => (
-        <Stack direction="row" spacing={2.5}>
+        <Stack direction="row" spacing={1.5}>
           <InfoOutlined
             sx={{ cursor: 'pointer', fontSize: 20 }}
             onClick={() => {

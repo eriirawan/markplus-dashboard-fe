@@ -253,9 +253,15 @@ const AddChart = (props) => {
         } else {
           indexColor = 0;
         }
-        return { ...el, borderColor: defaultColor[indexColor], backgroundColor: defaultColor[indexColor] };
+        return {
+          ...el,
+          borderColor: defaultColor[indexColor],
+          backgroundColor: defaultColor[indexColor],
+          ...(formData.chartType === 'Area Chart' ? { fill: true } : {}),
+        };
       }),
     };
+    // console.info(changeToneColorDefault, '<<<< apa sih');
     const newValue = {
       ...formData,
       chartData:
