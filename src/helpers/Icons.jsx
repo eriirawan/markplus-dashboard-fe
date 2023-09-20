@@ -13,6 +13,10 @@ import { ReactComponent as DragIndicatorSvg } from '../assets/icons/graphics/Dra
 import { ReactComponent as ExportFilesSvg } from '../assets/icons/graphics/Export-Files.svg';
 import { ReactComponent as GearSvg } from '../assets/icons/graphics/Gear.svg';
 import { ReactComponent as ChevronDownRedSvg } from '../assets/icons/graphics/ChevronDownRed.svg';
+import { ReactComponent as PickerColorSmallSvg } from '../assets/icons/graphics/Picker-Color-Small.svg';
+import { ReactComponent as CloseSvg } from '../assets/icons/graphics/Close.svg';
+import { ReactComponent as BarChartSvg } from '../assets/icons/graphics/Bar-Chart.svg';
+import { ReactComponent as DeleteFillSvg } from '../assets/icons/graphics/Bar-Chart.svg';
 
 export const UserActive = (props) => <SvgIcon component={UserActiveSvg} {...props} sx={{ fontSize: 18 }} />;
 export const UserNormal = (props) => <SvgIcon component={UserNormalSvg} {...props} sx={{ fontSize: 18 }} />;
@@ -26,3 +30,7 @@ export const DragIndicator = (props) => <SvgIcon component={DragIndicatorSvg} {.
 export const ExportFiles = (props) => <SvgIcon component={ExportFilesSvg} {...props} sx={{ fontSize: 18 }} />;
 export const Gear = (props) => <SvgIcon component={GearSvg} {...props} sx={{ fontSize: 18 }} />;
 export const ChevronDownRed = (props) => <SvgIcon component={ChevronDownRedSvg} {...props} sx={{ fontSize: 18 }} />;
+export const PickerColorSmall = (props) => <SvgIcon component={PickerColorSmallSvg} {...props} sx={{ fontSize: 18 }} />;
+export const Close = (props) => <SvgIcon component={CloseSvg} viewBox="0 0 30 24" {...props} />;
+export const BarChartIcon = (props) => <SvgIcon component={BarChartSvg} viewBox="0 0 28 19" {...props} />;
+export const DeleteFill = (props) => <SvgIcon component={DeleteFillSvg} {...props} />;

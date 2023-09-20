@@ -2,7 +2,20 @@ import React, { useMemo } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS } from 'chart.js/auto';
 import { Box } from '@mui/system';
-const BarChart = ({ chartData, width, height, maxWidthLegend, indexAxis, options, labelX, labelY, refChart }) => {
+const BarChart = ({
+  chartData,
+  width,
+  height,
+  maxWidthLegend,
+  indexAxis,
+  options,
+  labelX,
+  labelY,
+  refChart,
+  isStackedChart,
+  isFullStackedChart,
+  legendClassName,
+}) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
 
@@ -13,12 +26,14 @@ const BarChart = ({ chartData, width, height, maxWidthLegend, indexAxis, options
       // listContainer.style.display = 'flex';
       // listContainer.style.flexDirection = 'row';
       listContainer.style.display = 'grid';
-      listContainer.style.gridTemplateColumns = 'auto auto auto';
+      listContainer.style.gridTemplateColumns = 'auto auto auto auto';
       listContainer.style.rowGap = '17px';
       listContainer.style.columnGap = '0px';
-      listContainer.style.margin = 0;
+      listContainer.style.width = '100%';
+      listContainer.style.margin = '0 0 0 50px';
+
       listContainer.style.padding = 0;
-      listContainer.style.maxWidth = maxWidthLegend;
+      // listContainer.style.maxWidth = maxWidthLegend;
 
       legendContainer.appendChild(listContainer);
     }
@@ -102,12 +117,12 @@ const BarChart = ({ chartData, width, height, maxWidthLegend, indexAxis, options
   //   },
   // };
   const defaultOptions = {
-    responsive: false,
-    maintainAspectRatio: false,
+    responsive: true,
+    maintainAspectRatio: options?.maintainAspectRatio ?? true,
     plugins: {
       htmlLegend: {
         // ID of the container to put the legend in
-        containerID: 'legend-container-bar',
+        containerID: legendClassName,
       },
       legend: {
         display: false,
@@ -129,15 +144,20 @@ const BarChart = ({ chartData, width, height, maxWidthLegend, indexAxis, options
           font: {
             size: '12px',
             lineHeight: '18px',
+            weight: 700,
           },
           color: '#000000',
         },
         grid: {
+          ...(isFullStackedChart ? { display: false } : {}),
+
           // lineWidth: function (context) {
           //   return context?.index === 0 ? 0 : 1; // <-- this removes the base line
           // }
           lineWidth: 0,
         },
+        stacked: isStackedChart ? true : false,
+        ...(isFullStackedChart ? { max: 1000 } : {}),
       },
       x: {
         // offset: true,
@@ -147,36 +167,47 @@ const BarChart = ({ chartData, width, height, maxWidthLegend, indexAxis, options
           font: {
             size: '12px',
             lineHeight: '18px',
+            weight: 700,
           },
           color: '#000000',
         },
-        display: true,
+        // display: isFullStackedChart ? false : true,
         tick: {
           display: false,
         },
+        stacked: isStackedChart ? true : false,
         grid: {
+          ...(isFullStackedChart ? { display: false } : {}),
           lineWidth: 0, // <-- this removes vertical lines between bars
         },
+        ...(isFullStackedChart ? { max: 1000 } : {}),
       },
     },
     ...options,
   };
   const renderMain = useMemo(() => {
     return (
-      <Box sx={{ maxWidth: '1173px' }}>
-        <Bar
-          data={chartData}
-          options={defaultOptions}
-          width={width}
-          height={height}
-          plugins={[htmlLegendPlugin]}
-          ref={refChart}
-        ></Bar>
-        <Box id="legend-container-bar" display={'flex'} justifyContent={'center'} sx={{ marginTop: '24px' }} />
-        <Box id="subLabels" />
+      <Box sx={{ height: '100%' }}>
+        <Box
+          sx={{
+            height: '100%',
+            width: '100%',
+            maxHeight: '315px',
+          }}
+        >
+          <Bar
+            data={chartData}
+            options={defaultOptions}
+            // width={width}
+            // height={height}
+            plugins={[htmlLegendPlugin]}
+            ref={refChart}
+          ></Bar>
+        </Box>
+        <Box id={legendClassName} display={'flex'} justifyContent={'center'} sx={{ marginTop: '24px' }} />
       </Box>
     );
-  }, [chartData, refChart, width, height, width]);
+  }, [chartData, refChart, width, height, width, defaultOptions, htmlLegendPlugin, isStackedChart, isFullStackedChart]);
   return renderMain;
 };
 
