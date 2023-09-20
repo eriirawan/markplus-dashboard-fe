@@ -127,12 +127,14 @@ const DialogColorPicker = ({ dataSets, onCancel, onSaveChanges, openDialog }) =>
         <DialogActions>
           <Grid container gap={'16px'} padding={'0px 64px 64px 64px'} flexWrap={'nowrap'}>
             <Grid item xl={6} lg={6} sm={12} md={6}>
-              <Button variant="outlined" fullWidth>
+              <Button variant="outlined" fullWidth onClick={onCancel}>
                 Cancel
               </Button>
             </Grid>
             <Grid item xl={6} lg={6} sm={12} md={6}>
-              <Button fullWidth>Save Changes</Button>
+              <Button fullWidth onClick={onCancel}>
+                Save Changes
+              </Button>
             </Grid>
           </Grid>
           {/* <Stack direction={'row'} gap="16px" padding={'0px 64px'}> */}

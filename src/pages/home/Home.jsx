@@ -703,48 +703,100 @@ const Home = () => {
               <Paper
                 sx={{
                   borderRadius: 1.25,
-                  display: 'flex',
-                  maxHeight: '512px',
-                  mt: 1,
+                  p: 4,
+                  height: '100%',
                 }}
               >
-                <Box sx={{ my: 'auto', p: 4 }}>
-                  <Stack direction="row" justifyContent={'space-between'} sx={{ marginBottom: '40px' }}>
-                    <Box display={'flex'} gap={'16px'} justifyContent="center">
-                      <IconButton sx={{ padding: 0 }}>
-                        <DragIndicator />
-                      </IconButton>
-                      <Typography
-                        // sx={(theme) => ({
-                        //   color: theme.palette.text.primary,
-                        // })}
-                        color={'primary'}
-                        fontSize={24}
-                        fontWeight="700"
-                        lineHeight="31px"
-                      >
-                        {data.chartLabel}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <IconButton>
-                        <ExportFiles />
-                      </IconButton>
-                      <IconButton>
-                        <Gear />
-                      </IconButton>
-                    </Box>
-                  </Stack>
+                <Box display={'flex'} gap={'16px'} justifyContent="space-between" marginBottom={'24px'}>
+                  {/* <IconButton sx={{ padding: 0 }}>
+                      <DragIndicator />
+                    </IconButton> */}
+                  <Typography
+                    // sx={(theme) => ({
+                    //   color: theme.palette.text.primary,
+                    // })}
+                    color={'primary'}
+                    fontSize={24}
+                    fontWeight="700"
+                    lineHeight="31px"
+                  >
+                    {data.chartLabel}
+                  </Typography>
+                  {/* </Box> */}
                   <Box>
-                    <LineChart
-                      legendClassName={`legend-container-area-chart-${indexParent}${indexChild}`}
-                      chartData={{ datasets: '' }}
-                      width={1173}
-                      height={309}
-                    ></LineChart>
+                    <IconButton>
+                      <ExportFiles />
+                    </IconButton>
+                    <IconButton>
+                      <Gear />
+                    </IconButton>
                   </Box>
+                  {/* </Grid> */}
                 </Box>
+                {/* <Box sx={{ width: '100%', height: '100%' }}> */}
+                {/* <Grid item lg={12}> */}
+                <AreaChart
+                  chartData={data.chartData}
+                  labelX={data.verticalAxisLabel}
+                  labelY={data.horizontalAxisLabel}
+                  legendClassName={`legend-container-area-${indexParent}${indexChild}`}
+                  options={{
+                    maintainAspectRatio: false,
+                  }}
+                  // labelX={data}
+                  // width={setWidthChart(index, data.chartType)}
+                  // height={309}
+                ></AreaChart>
+                {/* </Grid> */}
+                {/* </Box> */}
+                {/* </Box> */}
+                {/* </Grid> */}
               </Paper>
+              // <Paper
+              //   sx={{
+              //     borderRadius: 1.25,
+              //     display: 'flex',
+              //     maxHeight: '512px',
+              //     mt: 1,
+              //   }}
+              // >
+              //   <Box sx={{ my: 'auto', p: 4 }}>
+              //     <Stack direction="row" justifyContent={'space-between'} sx={{ marginBottom: '40px' }}>
+              //       <Box display={'flex'} gap={'16px'} justifyContent="center">
+              //         <IconButton sx={{ padding: 0 }}>
+              //           <DragIndicator />
+              //         </IconButton>
+              //         <Typography
+              //           // sx={(theme) => ({
+              //           //   color: theme.palette.text.primary,
+              //           // })}
+              //           color={'primary'}
+              //           fontSize={24}
+              //           fontWeight="700"
+              //           lineHeight="31px"
+              //         >
+              //           {data.chartLabel}
+              //         </Typography>
+              //       </Box>
+              //       <Box>
+              //         <IconButton>
+              //           <ExportFiles />
+              //         </IconButton>
+              //         <IconButton>
+              //           <Gear />
+              //         </IconButton>
+              //       </Box>
+              //     </Stack>
+              //     <Box>
+              //       <AreaChart
+              //         legendClassName={`legend-container-area-chart-${indexParent}${indexChild}`}
+              //         chartData={data.chartData}
+              //         width={1173}
+              //         height={309}
+              //       ></AreaChart>
+              //     </Box>
+              //   </Box>
+              // </Paper>
             );
           }
           case 'Information Card': {
@@ -838,8 +890,8 @@ const Home = () => {
                         width: getTextLayout(el),
                         ...(typeof el === 'number'
                           ? {
-                              maxHeight: '434px',
-                              height: '100vh',
+                              minHeight: '434px',
+                              height: '100%',
                             }
                           : {}),
                       }}
@@ -1005,6 +1057,7 @@ const Home = () => {
                           border: (theme) => `1px ${theme.palette.primary.main} solid`,
                           borderRadius: '10px',
                           width: '100%',
+                          maxWidth: getTextLayout(data),
                           minHeight: '72px',
                           padding: '16px',
                         }}
