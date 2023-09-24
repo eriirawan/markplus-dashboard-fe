@@ -193,6 +193,7 @@ const theme = createTheme({
       300: '#F75D4F', // Danger | 80%
       400: '#D13F31', // Danger | 100%
       main: '#F75D4F', // Danger | 80%
+      light: '#E56363',
     },
     neutral: {
       disabledGrey: '#FBFBFC',

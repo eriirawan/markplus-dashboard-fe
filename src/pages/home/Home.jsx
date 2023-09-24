@@ -33,7 +33,7 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import BarChart from '../../components/chart/BarChart';
 import LineChart from '../../components/chart/LineChart';
 import { BarData, LineData } from '../../helpers/DummyDataChart';
-import { BarChartIcon, ChevronDownRed, DragIndicator, ExportFiles, Gear } from '../../helpers/Icons';
+import { BarChartIcon, ChevronDownRed, DragIndicator, EditIcon, ExportFiles, Gear } from '../../helpers/Icons';
 import { useNavigate } from 'react-router-dom';
 import { useDashboard } from '../../hooks/useDashboard';
 import DonutChart from '../../components/chart/DonutChart';
@@ -212,7 +212,7 @@ const Home = () => {
                       <ExportFiles />
                     </IconButton>
                     <IconButton>
-                      <Gear />
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -313,7 +313,7 @@ const Home = () => {
                       <ExportFiles />
                     </IconButton>
                     <IconButton>
-                      <Gear />
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -413,8 +413,8 @@ const Home = () => {
                     <IconButton>
                       <ExportFiles />
                     </IconButton>
-                    <IconButton>
-                      <Gear />
+                    <IconButton onClick={() => navigate(`/home/edit-chart/${indexChild}`)}>
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -475,7 +475,7 @@ const Home = () => {
                       <ExportFiles />
                     </IconButton>
                     <IconButton>
-                      <Gear />
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -528,7 +528,7 @@ const Home = () => {
                       <ExportFiles />
                     </IconButton>
                     <IconButton>
-                      <Gear />
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -581,7 +581,7 @@ const Home = () => {
                       <ExportFiles />
                     </IconButton>
                     <IconButton>
-                      <Gear />
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -634,7 +634,7 @@ const Home = () => {
                       <ExportFiles />
                     </IconButton>
                     <IconButton>
-                      <Gear />
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -689,7 +689,7 @@ const Home = () => {
                         <ExportFiles />
                       </IconButton>
                       <IconButton>
-                        <Gear />
+                        <EditIcon />
                       </IconButton>
                     </Box>
                   </Stack>
@@ -728,7 +728,8 @@ const Home = () => {
                       <ExportFiles />
                     </IconButton>
                     <IconButton>
-                      <Gear />
+                      {/* <Gear /> */}
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}

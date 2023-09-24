@@ -30,7 +30,7 @@ import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Saturation } from 'react-color/lib/components/common';
 import { CustomPicker, SketchPicker } from 'react-color';
 import { Box } from '@mui/system';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import LineChart from '../../components/chart/LineChart';
 import { defaultColorChart, defaultDataChartBar, defaultDataChartLine } from '../../helpers/DummyDataChart';
 import BarChart from '../../components/chart/BarChart';
@@ -47,7 +47,7 @@ import tinycolor from 'tinycolor2';
 import CustomColorPicker from '@/components/Dialog/CustomColorPicker.jsx';
 import DialogColorPicker from '@/components/Dialog/DialogColorPicker.jsx';
 import TableChart from '../../components/chart/TableChart';
-import { BarChartIcon, ChevronDownRed, DragIndicator, ExportFiles, Gear } from '../../helpers/Icons';
+import { BarChartIcon, ChevronDownRed, DeleteFill, DragIndicator, ExportFiles, Gear } from '../../helpers/Icons';
 import DefaultImageInformationCard from '@/assets/images/default-image-infomation-card.png';
 const optionData = [
   {
@@ -110,12 +110,10 @@ const AddChart = (props) => {
     { label: 'Information Card', value: 'Information Card' },
   ]);
   const { setDashboardContent, dashboardContent } = useDashboard();
-  const [selected, setSelected] = useState(null);
   const [displayInputLabel, setDisplayInputLabel] = useState(true);
   const [colorSelected, setColorSelected] = useState('#FFFFFF');
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const chartRef = useRef();
-  const [colors] = ['#FF0000', '#FFB800', '#52FF00', '#00F0FF', '#000AFF', '#FF00F5'];
   const [codeColor, setCodeColor] = useState({
     hsv: {
       h: 0,
@@ -129,6 +127,7 @@ const AddChart = (props) => {
     },
   });
   const navigate = useNavigate();
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     chartType: '',
     chartLabel: '',
@@ -328,14 +327,16 @@ const AddChart = (props) => {
     setDashboardContent(content);
     navigate('/home');
   };
-  const breadcrumbs = [
-    <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/home')} sx={{ cursor: 'pointer' }}>
-      Dashboard
-    </Link>,
-    <Typography key="2" color="text.lightPrimary">
-      Add Chart
-    </Typography>,
-  ];
+  const breadcrumbs = useMemo(() => {
+    return [
+      <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/home')} sx={{ cursor: 'pointer' }}>
+        Dashboard
+      </Link>,
+      <Typography key="2" color="text.lightPrimary">
+        {id ? 'Edit Chart' : 'Add Chart'}
+      </Typography>,
+    ];
+  }, [id]);
   const SettingContent = useMemo(() => {
     if (formData.chartType && formData.chartData.length) {
       switch (formData.chartType) {
@@ -355,23 +356,25 @@ const AddChart = (props) => {
                 // legendClassName={'legend-container-bar-chart'}
                 labelY={formData.horizontalAxisLabel}
                 legendClassName={'legend-container-line'}
-                options={{
-                  onClick: (evt, elements, chart) => {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setCodeColor((prev) => ({
-                        ...prev,
-                        hsl: tinycolor(elements[0]?.element?.options.backgroundColor).toHsl(),
-                      }));
-                      setCodeColor((prev) => ({
-                        ...prev,
-                        hsv: tinycolor(elements[0]?.element?.options.backgroundColor).toHsv(),
-                      }));
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={
+                  {
+                    // onClick: (evt, elements, chart) => {
+                    //   if (elements.length) {
+                    //     setSelected(elements);
+                    //     setColorSelected(elements[0]?.element?.options.backgroundColor);
+                    //     setCodeColor((prev) => ({
+                    //       ...prev,
+                    //       hsl: tinycolor(elements[0]?.element?.options.backgroundColor).toHsl(),
+                    //     }));
+                    //     setCodeColor((prev) => ({
+                    //       ...prev,
+                    //       hsv: tinycolor(elements[0]?.element?.options.backgroundColor).toHsv(),
+                    //     }));
+                    //     setDisplayColorPicker(true);
+                    //   }
+                    // },
+                  }
+                }
                 chartData={dataChart}
               ></LineChart>
             </Box>
@@ -394,16 +397,18 @@ const AddChart = (props) => {
                 labelY={formData.horizontalAxisLabel}
                 // indexAxis={'y'}
                 legendClassName={'legend-container-column-chart'}
-                options={{
-                  // maintainAspectRatio: false,
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={
+                  {
+                    // maintainAspectRatio: false,
+                    // onClick(evt, elements, chart) {
+                    //   if (elements.length) {
+                    //     setSelected(elements);
+                    //     setColorSelected(elements[0]?.element?.options.backgroundColor);
+                    //     setDisplayColorPicker(true);
+                    //   }
+                    // },
+                  }
+                }
               />
             </Box>
           );
@@ -428,17 +433,18 @@ const AddChart = (props) => {
                   axis: 'y',
                   ...dataChart,
                 }}
-                options={{
-                  // maintainAspectRatio: false,
-
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={
+                  {
+                    // maintainAspectRatio: false,
+                    // onClick(evt, elements, chart) {
+                    //   if (elements.length) {
+                    //     setSelected(elements);
+                    //     setColorSelected(elements[0]?.element?.options.backgroundColor);
+                    //     setDisplayColorPicker(true);
+                    //   }
+                    // },
+                  }
+                }
               />
             </Box>
           );
@@ -457,15 +463,17 @@ const AddChart = (props) => {
                 // maxWidthLegend={'369px'}
                 chartData={dataChartDonutOrPie}
                 legendClassName={'legend-container-donut-chart'}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={
+                  {
+                    // onClick(evt, elements, chart) {
+                    //   if (elements.length) {
+                    //     setSelected(elements);
+                    //     setColorSelected(elements[0]?.element?.options.backgroundColor);
+                    //     setDisplayColorPicker(true);
+                    //   }
+                    // },
+                  }
+                }
               />
             </Box>
           );
@@ -484,15 +492,17 @@ const AddChart = (props) => {
                 // maxWidthLegend={'369px'}
                 legendClassName={'legend-container-pie-chart'}
                 chartData={dataChartDonutOrPie}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={
+                  {
+                    // onClick(evt, elements, chart) {
+                    //   if (elements.length) {
+                    //     setSelected(elements);
+                    //     setColorSelected(elements[0]?.element?.options.backgroundColor);
+                    //     setDisplayColorPicker(true);
+                    //   }
+                    // },
+                  }
+                }
               />
             </Box>
           );
@@ -517,15 +527,17 @@ const AddChart = (props) => {
                   datasets: { ...dataChart }.datasets.map((el) => ({ ...el, fill: true })),
                 }}
                 isAreaChart={true}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={
+                  {
+                    // onClick(evt, elements, chart) {
+                    //   if (elements.length) {
+                    //     setSelected(elements);
+                    //     setColorSelected(elements[0]?.element?.options.backgroundColor);
+                    //     setDisplayColorPicker(true);
+                    //   }
+                    // },
+                  }
+                }
               ></AreaChart>
             </Box>
           );
@@ -544,15 +556,17 @@ const AddChart = (props) => {
                 labelX={formData.verticalAxisLabel}
                 labelY={formData.horizontalAxisLabel}
                 isStackedChart={true}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={
+                  {
+                    // onClick(evt, elements, chart) {
+                    //   if (elements.length) {
+                    //     setSelected(elements);
+                    //     setColorSelected(elements[0]?.element?.options.backgroundColor);
+                    //     setDisplayColorPicker(true);
+                    //   }
+                    // },
+                  }
+                }
               />
             </Box>
           );
@@ -572,15 +586,17 @@ const AddChart = (props) => {
                 labelY={formData.horizontalAxisLabel}
                 isFullStackedChart={true}
                 isStackedChart={true}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={
+                  {
+                    // onClick(evt, elements, chart) {
+                    //   if (elements.length) {
+                    //     setSelected(elements);
+                    //     setColorSelected(elements[0]?.element?.options.backgroundColor);
+                    //     setDisplayColorPicker(true);
+                    //   }
+                    // },
+                  }
+                }
               />
             </Box>
           );
@@ -820,7 +836,7 @@ const AddChart = (props) => {
         labels: [],
         datasets: [],
       };
-      const color = ['#006CB7', '#ADC32B', '#ED1B2F', '#FFD53D'];
+      const color = ['rgba(0, 108, 183, 1)', 'rgba(173, 195, 43, 1)', 'rgba(237, 27, 47, 1)', 'rgba(255, 213, 61, 1)'];
       let indexColor = 0;
       // setDataParseFile(jsonData)
       // if (localStorage.optionChart === '25%' || localStorage) {
@@ -915,7 +931,7 @@ const AddChart = (props) => {
                 color="primary"
                 sx={{ marginTop: '16px' }}
               >
-                Add Chart
+                {id ? 'Edit Chart' : 'Add Chart'}
               </Typography>
               {/* <Typography
                 fontWeight={700}
@@ -1191,7 +1207,10 @@ const AddChart = (props) => {
       <DialogColorPicker
         dataSets={dataChart?.datasets || []}
         openDialog={openDialogColorPicker}
-        onSaveChanges={() => {}}
+        onSaveChanges={(data) => {
+          setDataChart((prev) => ({ ...prev, datasets: [...data] }));
+          setOpenDialogColorPicker((prev) => !prev);
+        }}
         onCancel={() => setOpenDialogColorPicker((prev) => !prev)}
       ></DialogColorPicker>
       <DialogStatusImport
@@ -1214,7 +1233,25 @@ const AddChart = (props) => {
         typeDialog="notifDialogImport"
       /> */}
 
-      <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '105px', mt: 1 }}>
+      <Paper sx={{ borderRadius: 1.25, display: 'flex', justifyContent: 'space-between', maxHeight: '105px', mt: 1 }}>
+        {id && (
+          <Box sx={{ width: '100%', my: 'auto', p: 4 }}>
+            <Button
+              variant={'outlined'}
+              color="error"
+              sx={{
+                maxWidth: '286px',
+                width: '100%',
+                backgroundColor: '#E563630D',
+              }}
+            >
+              <Box display={'flex'}>
+                <DeleteFill />
+                <Typography sx={(theme) => ({ color: theme.palette.error.light })}>Delete Chart</Typography>
+              </Box>
+            </Button>
+          </Box>
+        )}
         <Box
           sx={{ width: '100%', my: 'auto', p: 4 }}
           display="flex"
@@ -1225,6 +1262,7 @@ const AddChart = (props) => {
           {/* <Typography fontWeight={700} fontSize="18px" lineHeight="27px" color="primary">
             Create column?
           </Typography> */}
+
           <Button sx={{ maxWidth: '256px', width: '100%' }} variant="outlined">
             Cancel
           </Button>

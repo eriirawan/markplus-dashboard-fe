@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -18,24 +18,41 @@ import tinycolor from 'tinycolor2';
 
 const DialogColorPicker = ({ dataSets, onCancel, onSaveChanges, openDialog }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
-  // const [codeColor, setCodeColor] = useState({
-  //   hsl: {
-  //     h: 0,
-  //     s:0,
-  //     l:0
-  //   },
-  //   hsv: {
-  //     h: 0,
-  //     s: 0,
-  //     v: 0
-  //   },
-  //   rgb: {
-  //     r: 0,
-  //     g:0,
-  //     b: 0
+  const [dataChart, setDataChart] = useState([]);
+  // console.info(dataChart, '<<<< dataChart');
+  const [codeColor, setCodeColor] = useState({
+    hsl: {
+      h: 0,
+      s: 0,
+      l: 0,
+    },
+    hsv: {
+      h: 0,
+      s: 0,
+      v: 0,
+    },
+    rgb: {
+      r: 0,
+      g: 0,
+      b: 0,
+    },
+  });
+  // // return
+  // // })
+  // useEffect(() => {
+  //   if (selectedCategory) {
+  //     console.info(selectedCategory, '<<<< useEffect');
   //   }
-  // })
+  //   // console.info('jalan useEffect');
+  // }, [selectedCategory]);
+  useEffect(() => {
+    if (dataSets?.length) {
+      setDataChart([...dataSets]);
+    }
+  }, [dataSets]);
   const renderMain = useMemo(() => {
+    // console.info(dataSets, dataSets, '<<<< dataSets');
+
     return (
       <Dialog
         open={openDialog}
@@ -72,7 +89,7 @@ const DialogColorPicker = ({ dataSets, onCancel, onSaveChanges, openDialog }) =>
           </IconButton>
         </Stack>
         <DialogContent sx={{ padding: 0, marginBottom: '40px' }}>
-          {dataSets?.map((el, i) => {
+          {dataChart?.map((el, i) => {
             return (
               <Stack display={'flex'} direction="column" padding={'0px 64px'}>
                 <Typography fontWeight={700} fontSize={'16px'} lineHeight={'24px'}>
@@ -90,6 +107,12 @@ const DialogColorPicker = ({ dataSets, onCancel, onSaveChanges, openDialog }) =>
                     onClick={() => {
                       // setOpenDialog()
                       setSelectedCategory((prev) => (prev === el ? '' : el));
+                      // console.info(el, 'coba dia apa');
+                      setCodeColor({
+                        hsl: tinycolor(el.backgroundColor).toHsl(),
+                        hsv: tinycolor(el.backgroundColor).toHsv(),
+                        rgb: tinycolor(el.backgroundColor).toRgb(),
+                      });
                     }}
                   >
                     <Box sx={{ position: 'relative', top: '-5px', left: '32px' }}>
@@ -103,20 +126,29 @@ const DialogColorPicker = ({ dataSets, onCancel, onSaveChanges, openDialog }) =>
                     InputLabelProps={{ shrink: true }}
                     onChange={() => {}}
                     fullWidth
+                    // onChange={(e) => {
+
+                    // }}
                     // onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
                     sx={{}}
+                    defaultValue={tinycolor(el?.backgroundColor).toHex()}
                   ></TextField>
                 </Box>
                 {selectedCategory && selectedCategory === el && (
                   <CustomColorPicker
-                    codeColor={{
-                      hsl: tinycolor(selectedCategory.backgroundColor).toHsl(),
-                      hsv: tinycolor(selectedCategory.backgroundColor).toHsv(),
-                      rgb: tinycolor(selectedCategory.backgroundColor).toRgb(),
-                    }}
-                    onChange={(e) => {
-                      dataSets[i].backgroundColor = e.hex;
-                      dataSets[i].borderColor = e.hex;
+                    codeColor={codeColor}
+                    onChange={(e, r) => {
+                      // console.info('event', e, r, dataChart[i]);
+
+                      setCodeColor({
+                        hsl: e.hsl,
+                        hsv: e.hsv,
+                        rgb: e.rgb,
+                      });
+                      const tempDataChart = [...dataChart];
+                      tempDataChart[i].backgroundColor = `rgba(${e.rgb.r}, ${e.rgb.g}, ${e.rgb.b}, ${e.rgb.a})`;
+                      tempDataChart[i].borderColor = `rgba(${e.rgb.r}, ${e.rgb.g}, ${e.rgb.b}, ${e.rgb.a})`;
+                      setDataChart(tempDataChart);
                     }}
                   ></CustomColorPicker>
                 )}
@@ -132,7 +164,7 @@ const DialogColorPicker = ({ dataSets, onCancel, onSaveChanges, openDialog }) =>
               </Button>
             </Grid>
             <Grid item xl={6} lg={6} sm={12} md={6}>
-              <Button fullWidth onClick={onCancel}>
+              <Button fullWidth onClick={() => onSaveChanges(dataChart)}>
                 Save Changes
               </Button>
             </Grid>
@@ -142,7 +174,7 @@ const DialogColorPicker = ({ dataSets, onCancel, onSaveChanges, openDialog }) =>
         </DialogActions>
       </Dialog>
     );
-  }, [dataSets, openDialog, selectedCategory]);
+  }, [dataSets, openDialog, selectedCategory, dataChart, codeColor]);
   return renderMain;
 };
 export default DialogColorPicker;
