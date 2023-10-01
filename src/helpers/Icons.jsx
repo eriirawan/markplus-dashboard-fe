@@ -34,5 +34,5 @@ export const ChevronDownRed = (props) => <SvgIcon component={ChevronDownRedSvg} 
 export const PickerColorSmall = (props) => <SvgIcon component={PickerColorSmallSvg} {...props} sx={{ fontSize: 18 }} />;
 export const Close = (props) => <SvgIcon component={CloseSvg} viewBox="0 0 30 24" {...props} />;
 export const BarChartIcon = (props) => <SvgIcon component={BarChartSvg} viewBox="0 0 28 19" {...props} />;
-export const DeleteFill = (props) => <SvgIcon component={DeleteFillSvg} {...props} />;
+export const DeleteFill = (props) => <SvgIcon component={DeleteFillSvg} {...props} viewBox="0 0 18 19" />;
 export const EditIcon = (props) => <SvgIcon component={EditSvg} {...props} sx={{ fontSize: 18 }} />;
