@@ -23,6 +23,7 @@ import {
   IconButton,
   CircularProgress,
   Divider,
+  Switch,
 } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
@@ -38,7 +39,7 @@ import DonutChart from '../../components/chart/DonutChart';
 import PieChart from '@/components/chart/PieChart.jsx';
 import AreaChart from '../../components/chart/AreaChart';
 import { useDashboard } from '../../hooks/useDashboard';
-import { LinkOffTwoTone, WarningOutlined } from '@mui/icons-material';
+import { ConnectingAirportsOutlined, LinkOffTwoTone, WarningOutlined } from '@mui/icons-material';
 import MPlusIcon from '@/components/Icon';
 import SuccessImage from '@/assets/images/success-image.png';
 import ErrorImage from '@/assets/images/error-image.png';
@@ -112,13 +113,16 @@ const AddChart = (props) => {
   const handleChangeForm = (key, value) => {
     setFormData({ ...formData, [key]: value });
   };
+  const [showAxisValue, setShowAxisValue] = useState(true);
   const submitChart = () => {
     let content = [...dashboardContent];
     let jsonStr = localStorage.indexChart.replace(/(\w+:)|(\w+ :)/g, function (matchedStr) {
       return '"' + matchedStr.substring(0, matchedStr.length - 1) + '":';
     });
     const indexChart = JSON.parse(jsonStr);
-    const widthSectionChart = JSON.parse(JSON.stringify(content[+indexChart.parent]))[+indexChart.child];
+    const widthSectionChart = id
+      ? JSON.parse(JSON.stringify(content[+indexChart.parent]))[+indexChart.child].width
+      : JSON.parse(JSON.stringify(content[+indexChart.parent]))[+indexChart.child];
     let indexColor = 0;
     const defaultColor = ['#F54D3D', '#E95670', '#B34270', '#713770'];
     const changeToneColorDefault = {
@@ -189,6 +193,7 @@ const AddChart = (props) => {
                 legendClassName={'legend-container-line'}
                 options={{}}
                 chartData={dataChart}
+                showAxisValue={showAxisValue}
               ></LineChart>
             </Box>
           );
@@ -208,6 +213,7 @@ const AddChart = (props) => {
                 labelY={formData.horizontalAxisLabel}
                 legendClassName={'legend-container-column-chart'}
                 options={{}}
+                showAxisValue={showAxisValue}
               />
             </Box>
           );
@@ -231,6 +237,7 @@ const AddChart = (props) => {
                   ...dataChart,
                 }}
                 options={{}}
+                showAxisValue={showAxisValue}
               />
             </Box>
           );
@@ -287,10 +294,18 @@ const AddChart = (props) => {
                 labelY={formData.horizontalAxisLabel}
                 chartData={{
                   ...dataChart,
-                  datasets: { ...dataChart }.datasets.map((el) => ({ ...el, fill: true })),
+                  datasets: { ...dataChart }.datasets.map((el) => ({
+                    ...el,
+                    // data: [0, ...el.data],
+                    fill: {
+                      target: 'origin', // 3. Set the fill options
+                      above: el.backgroundColor.replace('1)', '0.3)'),
+                    },
+                  })),
                 }}
                 isAreaChart={true}
                 options={{}}
+                showAxisValue={showAxisValue}
               ></AreaChart>
             </Box>
           );
@@ -310,6 +325,7 @@ const AddChart = (props) => {
                 labelY={formData.horizontalAxisLabel}
                 isStackedChart={true}
                 options={{}}
+                showAxisValue={showAxisValue}
               />
             </Box>
           );
@@ -330,6 +346,7 @@ const AddChart = (props) => {
                 isFullStackedChart={true}
                 isStackedChart={true}
                 options={{}}
+                showAxisValue={showAxisValue}
               />
             </Box>
           );
@@ -457,7 +474,7 @@ const AddChart = (props) => {
     }
 
     // }
-  }, [formData, dataChart, displayColorPicker, colorSelected]);
+  }, [formData, dataChart, displayColorPicker, colorSelected, showAxisValue]);
   useEffect(() => {
     if (localStorage.optionChart) {
       if (localStorage.optionChart === '100%' || localStorage.optionChart === '75%') {
@@ -488,10 +505,8 @@ const AddChart = (props) => {
       const indexChart = JSON.parse(jsonStr);
       // console.info(indexChart, '<<<< indexChart');
       const content = dashboardContent[+indexChart?.parent][+indexChart?.child];
-      console.info(content, '<<< content');
       // parseFile(content?.file);
       setFileImport(content?.file);
-      console.info(fileImport, '<<<< importsss');
       setDataChart(content?.chartData);
       setFormData((prev) => ({
         ...prev,
@@ -699,8 +714,7 @@ const AddChart = (props) => {
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
-      console.info(data, workbook, worksheet, jsonData, '<<<< workbook');
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { blankrows: false });
       const temp = {
         labels: [],
         datasets: [],
@@ -711,50 +725,127 @@ const AddChart = (props) => {
       };
       const color = ['rgba(0, 108, 183, 1)', 'rgba(173, 195, 43, 1)', 'rgba(237, 27, 47, 1)', 'rgba(255, 213, 61, 1)'];
       let indexColor = 0;
-      // setDataParseFile(jsonData)
-      // if (localStorage.optionChart === '25%' || localStorage) {
-      // if (typeof jsonData[0].data === 'number') {
-      //   jsonData.forEach((el, i) => {
-      //     // if (i === 0) {
-      //     tempDonut.labels.push(el.category);
-      //     // }
-      //     tempDonut.datasets[0].backgroundColor.push(color[indexColor]);
-      //     tempDonut.datasets[0].borderColor.push(el.data);
-      //     tempDonut.datasets[0].data.push(el.data);
-      //     indexColor += 1;
-      //   });
-      //   setDataChartDonutOrPie(tempDonut);
-      //   handleChangeForm('chartData', tempDonut.datasets);
-      // }
-      // }
-      // else {
-      // if (typeof jsonData[0].data === 'string') {
+      const tempEachData = {};
+      const tempEachLabels = [];
       jsonData.forEach((el, i) => {
-        temp.labels.push(el.label);
-        if (el?.category) {
-          temp.datasets.push({
-            label: el.category,
-            data: el?.data?.split(',').map((data) => +data),
-            backgroundColor: color[indexColor],
-            borderColor: color[indexColor],
-          });
-        }
+        const tempData = {
+          label: '',
+          data: [],
+          backgroundColor: '',
+          borderColor: '',
+        };
+        const tempLabels = [];
+        // el.forEach((data, index) => {
+        //   if (index > 0 && i === 0) {
+        //     temp.labels.push(data);
+        //   } else {
+        //     if (tempEachData[el[0]]) {
+        //       tempEachData[el[0]].push(data);
+        //     } else {
+        //       tempEachData[el[0]] = [data];
+        //     }
+        //   }
+        // });
+        Object.entries(el).forEach((data, index) => {
+          if (index > 0) {
+            if (tempEachData[data[0]]) {
+              tempEachData[data[0]].push(data[1]);
+            } else {
+              tempEachData[data[0]] = [data[1]];
+            }
+          } else {
+            tempEachLabels.push(data[1]);
+          }
+        });
+        // if (i === 0) {
+        //   temp.labels.push(el.slice(0));
+        // } else {
+        //   el.forEach((data, index) => {
+        //     if (index === 0) {
+        //       tempData.label = data;
+        //     } else {
+        //       tempData.data.push(data);
+        //       tempData.backgroundColor = color[indexColor];
+        //       tempData.borderColor = color[index];
+        //     }
+        //   });
+        // }
+        // console.info(tempData, '<<< tempData');
+
+        // console.info(key, '<<< entries');
+
+        // if (i === 0) {
+        //   temp.labels.push(el);
+        //   temp.datasets.push({
+        //     label: el[0],
+        //     data: tempData,
+        //     backgroundColor: color[indexColor],
+        //     borderColor: color[indexColor],
+        //   });
+        // }
+        // console.info
+        // tempData.data.
+        // if (i !== 1) {
+        //   if (index !== 0) {
+        //     tempData.push(data);
+        //   } else {
+        //   }
+        // }
+        // console.info(temp, '<<< temp');
+        // temp.labels.push(el.label);
+        // if (el?.category) {
+        //   temp.datasets.push({
+        //     label: el.category,
+        //     data: el?.data?.split(',').map((data) => +data),
+        //     backgroundColor: color[indexColor],
+        //     borderColor: color[indexColor],
+        //   });
+        // }
+        // indexColor += 1;
+        // if (indexColor > color.length - 1) {
+        //   indexColor = 0;
+        // }
+        // if (i === 0) {
+        //   tempDonut.datasets.push({
+        //     data: el.data.split(',').map((data) => +data),
+        //     label: el.label,
+        //     borderColor: [],
+        //     backgroundColor: [],
+        //   });
+        // }
+        // tempDonut.labels.push(el.label);
+        // tempDonut.datasets[0].borderColor.push(color[indexColor]);
+        // tempDonut.datasets[0].backgroundColor.push(color[indexColor]);
+      });
+      // console.info(tempEachData, temp, '<<< temp ');
+      Object.entries(tempEachData).forEach((data, index) => {
+        const datasetValue = {
+          label: tempEachLabels[index],
+          data: data[1],
+          backgroundColor: color[indexColor],
+          borderColor: color[indexColor],
+        };
         indexColor += 1;
-        if (indexColor > color.length - 1) {
+        if (index === color.length - 1) {
           indexColor = 0;
         }
-        if (i === 0) {
+        if (index === 0) {
           tempDonut.datasets.push({
-            data: el.data.split(',').map((data) => +data),
-            label: el.label,
-            borderColor: [],
+            label: tempEachLabels[index],
+            data: data[1],
             backgroundColor: [],
+            borderColor: [],
           });
         }
-        tempDonut.labels.push(el.label);
         tempDonut.datasets[0].borderColor.push(color[indexColor]);
         tempDonut.datasets[0].backgroundColor.push(color[indexColor]);
+        tempDonut.labels.push(data[0]);
+
+        temp.datasets.push({ ...datasetValue });
+        temp.labels.push(data[0]);
       });
+      // temp.labels = [...tempEachLabels];
+      // console.info(temp, '<<<< temp');
       setDataChartDonutOrPie(tempDonut);
       setDataChart(temp);
       handleChangeForm('chartData', temp.datasets);
@@ -762,6 +853,10 @@ const AddChart = (props) => {
       // }
       // setDataChart(temp);
       // handleChangeForm('chartData', temp.datasets);
+
+      // // }
+      // // setDataChart(temp);
+      // // handleChangeForm('chartData', temp.datasets);
       setOpenDialogStatusImport((prev) => ({ ...prev, loading: false }));
       setTypeDialog('success');
       setOpenDialogStatusImport((prev) => ({ ...prev, success: true }));
@@ -938,26 +1033,44 @@ const AddChart = (props) => {
                     sx={{ padding: '9px 0px 19px 0px' }}
                   ></TextField>
                   {displayInputLabel && (
-                    <Stack direction={'row'} gap="16px">
-                      <TextField
-                        label="Vertical Axis Label"
-                        placeholder="Vertical Axis Label"
-                        InputProps={{ style: { height: '44px' } }}
-                        InputLabelProps={{ shrink: true }}
-                        value={formData?.verticalAxisLabel}
-                        onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
-                        sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                      ></TextField>
-                      <TextField
-                        label="Horizontal Axis Label"
-                        placeholder="Horizontal Axis Label"
-                        InputProps={{ style: { height: '44px' } }}
-                        InputLabelProps={{ shrink: true }}
-                        value={formData?.horizontalAxisLabel}
-                        onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
-                        sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                      ></TextField>
-                    </Stack>
+                    <>
+                      <Box
+                        display={'flex'}
+                        justifyContent={'space-between'}
+                        alignItems={'center'}
+                        sx={{ marginBottom: '16px' }}
+                      >
+                        <Box>
+                          <Typography fontWeight={400} size="14px" lineHeight={'21px'} color={'#000000'}>
+                            Hide or Show Axis Value
+                          </Typography>
+                          <Typography fontWeight={400} size="12px" lineHeight={'16px'} color={'#808080'}>
+                            Switch OFF to make the axis X and Y value hide, and Switch ON to show the axis
+                          </Typography>
+                        </Box>
+                        <Switch checked={showAxisValue} onChange={() => setShowAxisValue((prev) => !prev)} />
+                      </Box>
+                      <Stack direction={'row'} gap="16px">
+                        <TextField
+                          label="Vertical Axis Label"
+                          placeholder="Vertical Axis Label"
+                          InputProps={{ style: { height: '44px' } }}
+                          InputLabelProps={{ shrink: true }}
+                          value={formData?.verticalAxisLabel}
+                          onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
+                          sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
+                        ></TextField>
+                        <TextField
+                          label="Horizontal Axis Label"
+                          placeholder="Horizontal Axis Label"
+                          InputProps={{ style: { height: '44px' } }}
+                          InputLabelProps={{ shrink: true }}
+                          value={formData?.horizontalAxisLabel}
+                          onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
+                          sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
+                        ></TextField>
+                      </Stack>
+                    </>
                   )}
                 </Box>
               </Box>
@@ -1083,7 +1196,7 @@ const AddChart = (props) => {
               submitChart();
             }}
           >
-            Add Chart
+            {id ? 'Save Changes' : 'Add Chart'}
           </Button>
         </Box>
       </Paper>

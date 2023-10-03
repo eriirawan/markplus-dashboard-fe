@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS } from 'chart.js/auto';
 import { Box } from '@mui/system';
 import { Stack } from '@mui/material';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 const LineChart = ({
   chartData,
   width,
@@ -14,6 +15,7 @@ const LineChart = ({
   refChart,
   isAreaChart,
   legendClassName,
+  showAxisValue = true,
 }) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
@@ -106,6 +108,23 @@ const LineChart = ({
       legend: {
         display: false,
       },
+      datalabels: {
+        display: true,
+        // formatter:  function (value, context) {
+        //     return context.chart.data.labels[context.dataIndex];
+        // },
+        anchor: 'end',
+        align: 'end',
+        offset: showAxisValue ? -2 : -8,
+        color: 'rgba(0, 0, 0, 1.0)',
+        backgroundColor: null,
+        font: {
+          size: 10,
+          weight: '700',
+          lineHeight: '15px',
+          // family: 'Poppins',
+        },
+      },
     },
     scales: {
       y: {
@@ -126,6 +145,10 @@ const LineChart = ({
           // }
           lineWidth: 0,
         },
+        ticks: {
+          display: showAxisValue,
+          color: '#000000',
+        },
       },
       x: {
         title: {
@@ -142,7 +165,9 @@ const LineChart = ({
         display: true,
         ticks: {
           // padding: 20,
-          // display: false,
+          display: showAxisValue,
+          // borderColor: '1px solid #000000',
+          color: '#000000',
         },
         grid: {
           lineWidth: 0, // <-- this removes vertical lines between bars
@@ -158,7 +183,7 @@ const LineChart = ({
         // tension: 0.5,
       },
       point: {
-        radius: 5,
+        radius: 4,
       },
     },
     ...options,
@@ -189,7 +214,7 @@ const LineChart = ({
               datasets: isAreaChart ? chartData.datasets.map((el) => ({ ...el, fill: true })) : [...chartData.datasets],
             }}
             options={defaultOptions}
-            plugins={[htmlLegendPlugin]}
+            plugins={[htmlLegendPlugin, ChartDataLabels]}
           />
         </Box>
         <Box id={legendClassName} display={'flex'} justifyContent={'center'} sx={{ marginTop: '16px' }} />

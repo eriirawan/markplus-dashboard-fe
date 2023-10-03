@@ -2,7 +2,7 @@ import { Box } from '@mui/system';
 import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import PropTypes from 'prop-types';
-
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 const PieChart = ({ chartData, width, height, maxWidthLegend, options, refChart, legendClassName, isWidth25 }) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
@@ -101,6 +101,19 @@ const PieChart = ({ chartData, width, height, maxWidthLegend, options, refChart,
       legend: {
         display: false,
       },
+      datalabels: {
+        display: true,
+        anchor: 'center',
+        align: 'center',
+        color: 'rgba(0, 0, 0, 1.0)',
+        backgroundColor: null,
+        font: {
+          size: 10,
+          weight: '700',
+          lineHeight: '15px',
+          // family: 'Poppins',
+        },
+      },
     },
     ...options,
     // scales: {
@@ -134,7 +147,7 @@ const PieChart = ({ chartData, width, height, maxWidthLegend, options, refChart,
           height={height}
           data={chartData}
           options={defaultOptions}
-          plugins={[htmlLegendPlugin]}
+          plugins={[htmlLegendPlugin, ChartDataLabels]}
         />
       </Box>
       <Box display={'flex'} justifyContent={'center'} id={legendClassName}></Box>
