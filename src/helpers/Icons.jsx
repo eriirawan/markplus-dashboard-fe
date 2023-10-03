@@ -8,7 +8,16 @@ import { ReactComponent as SettingNormalSvg } from '../assets/icons/graphics/Set
 import { ReactComponent as SettingActiveSvg } from '../assets/icons/graphics/Setting-Active.svg';
 import { ReactComponent as EyeShowSvg } from '../assets/icons/graphics/Eye-Show.svg';
 import { ReactComponent as EyeHideSvg } from '../assets/icons/graphics/Eye-Hide.svg';
+import { ReactComponent as HomeActiveSvg } from '../assets/icons/graphics/Home-Active.svg';
+import { ReactComponent as HomeNormalSvg } from '../assets/icons/graphics/Home-Normal.svg';
+import { ReactComponent as ResultActiveSvg } from '../assets/icons/graphics/Result-Active.svg';
+import { ReactComponent as ResultNormalSvg } from '../assets/icons/graphics/Result-Normal.svg';
+import { ReactComponent as FieldWorkActiveSvg } from '../assets/icons/graphics/FieldWork-Active.svg';
+import { ReactComponent as FieldWorkNormalSvg } from '../assets/icons/graphics/FieldWork-Normal.svg';
+import { ReactComponent as EvidenceActiveSvg } from '../assets/icons/graphics/Evidence-Active.svg';
+import { ReactComponent as EvidenceNormalSvg } from '../assets/icons/graphics/Evidence-Normal.svg';
 
+import { ReactComponent as UploadSvg } from '../assets/icons/graphics/Upload.svg';
 import { ReactComponent as DragIndicatorSvg } from '../assets/icons/graphics/Drag-Indicator.svg';
 import { ReactComponent as ExportFilesSvg } from '../assets/icons/graphics/Export-Files.svg';
 import { ReactComponent as GearSvg } from '../assets/icons/graphics/Gear.svg';
@@ -19,8 +28,27 @@ import { ReactComponent as BarChartSvg } from '../assets/icons/graphics/Bar-Char
 import { ReactComponent as DeleteFillSvg } from '../assets/icons/graphics/Delete-Fill.svg';
 import { ReactComponent as EditSvg } from '../assets/icons/graphics/Edit.svg';
 
-export const UserActive = (props) => <SvgIcon component={UserActiveSvg} {...props} sx={{ fontSize: 18 }} />;
-export const UserNormal = (props) => <SvgIcon component={UserNormalSvg} {...props} sx={{ fontSize: 18 }} />;
+export const HomeActive = (props) => (
+  <SvgIcon component={HomeActiveSvg} viewBox="10 0 20 40" style={{ fill: 'primary.main' }} {...props} />
+);
+export const HomeNormal = (props) => <SvgIcon component={HomeNormalSvg} viewBox="10 0 20 40" {...props} />;
+export const ResultActive = (props) => (
+  <SvgIcon component={ResultActiveSvg} viewBox="10 0 20 40" style={{ fill: 'primary.main' }} {...props} />
+);
+export const ResultNormal = (props) => <SvgIcon component={ResultNormalSvg} viewBox="10 0 20 40" {...props} />;
+export const FieldWorkActive = (props) => (
+  <SvgIcon component={FieldWorkActiveSvg} viewBox="4 0 30 35" style={{ fill: 'primary.main' }} {...props} />
+);
+export const FieldWorkNormal = (props) => <SvgIcon component={FieldWorkNormalSvg} viewBox="4 0 30 35" {...props} />;
+export const EvidenceActive = (props) => (
+  <SvgIcon component={EvidenceActiveSvg} viewBox="4 0 30 35" style={{ fill: 'primary.main' }} {...props} />
+);
+export const EvidenceNormal = (props) => <SvgIcon component={EvidenceNormalSvg} viewBox="4 0 30 35" {...props} />;
+export const UserActive = (props) => (
+  <SvgIcon component={UserActiveSvg} viewBox="8 0 10 30" style={{ fill: 'primary.main' }} {...props} />
+);
+export const UserNormal = (props) => <SvgIcon component={UserNormalSvg} viewBox="8 0 10 30" {...props} />;
+export const Upload = (props) => <SvgIcon component={UploadSvg} style={{ fill: 'primary.main' }} {...props} />;
 export const ChartNormal = (props) => <SvgIcon component={ChartNormalSvg} {...props} sx={{ fontSize: 18 }} />;
 export const ChartActive = (props) => <SvgIcon component={ChartActiveSvg} {...props} sx={{ fontSize: 18 }} />;
 export const SettingNormal = (props) => <SvgIcon component={SettingNormalSvg} {...props} sx={{ fontSize: 18 }} />;
