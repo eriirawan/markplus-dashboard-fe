@@ -12,12 +12,54 @@ const useSidebarMenus = () => {
 
   return [
     {
-      group: 'dashboard',
+      group: 'home',
       menus: [
         {
-          icon: 'BarChartOutlined',
-          name: 'Dashboard',
+          icon: {
+            active: 'HomeActive',
+            inActive: 'HomeNormal',
+          },
+          name: 'Home',
           path: 'home',
+        },
+      ],
+    },
+    {
+      group: 'result',
+      menus: [
+        {
+          icon: {
+            active: 'ResultActive',
+            inActive: 'ResultNormal',
+          },
+          name: 'Result',
+          path: 'result',
+        },
+      ],
+    },
+    {
+      group: 'fieldwork',
+      menus: [
+        {
+          icon: {
+            active: 'FieldWorkActive',
+            inActive: 'FieldWorkNormal',
+          },
+          name: 'Fieldwork',
+          path: 'fieldwork',
+        },
+      ],
+    },
+    {
+      group: 'evidence',
+      menus: [
+        {
+          icon: {
+            active: 'EvidenceActive',
+            inActive: 'EvidenceNormal',
+          },
+          name: 'Evidence',
+          path: 'evidence',
         },
       ],
     },
@@ -26,7 +68,10 @@ const useSidebarMenus = () => {
       hidden: me?.role?.toLowerCase() === 'user',
       menus: [
         {
-          icon: 'PersonOutlined',
+          icon: {
+            active: 'UserActive',
+            inActive: 'UserNormal',
+          },
           name: 'Users',
           path: 'users',
         },

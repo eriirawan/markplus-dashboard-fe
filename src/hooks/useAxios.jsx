@@ -43,6 +43,10 @@ const useAxios = ({ url, method, options = null, pause = false }) => {
           enqueueSnackbar(err?.response?.data?.message, {
             variant: 'errorSnackbar',
           });
+          if (err?.response?.data?.status === 401) {
+            localStorage.clear();
+            window.location.href = `/login`;
+          }
           return err;
         })
         .finally(() => {
@@ -65,6 +69,10 @@ const useAxios = ({ url, method, options = null, pause = false }) => {
         enqueueSnackbar(err?.response?.data?.message, {
           variant: 'errorSnackbar',
         });
+        if (err?.response?.data?.status === 401) {
+          localStorage.clear();
+          window.location.href = `/login`;
+        }
         return err;
       })
       .finally(() => {

@@ -53,14 +53,15 @@ const User = () => {
     setPage,
     pageSize,
     setPageSize,
-    search,
-    setSearch,
+    search: searchCtx,
+    setSearch: setSearchCtx,
     metaList,
   } = store;
   const location = useLocation();
   const [openPopupTheme, setOpenPopupTheme] = useState(false);
   const [openPopupDelete, setOpenPopupDelete] = useState(false);
   const [sort, setSort] = useState('DESC');
+  const [search, setSearch] = useState(undefined);
 
   useEffect(() => {
     if (!loadingUser && userDetail) {
@@ -229,6 +230,11 @@ const User = () => {
                 variant="outlined"
                 size="small"
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setSearchCtx(search);
+                  }
+                }}
               />
               <TextField
                 value={sort}
