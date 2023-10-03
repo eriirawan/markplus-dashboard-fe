@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS } from 'chart.js/auto';
 import { Box } from '@mui/system';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 const BarChart = ({
   chartData,
   width,
@@ -15,6 +17,7 @@ const BarChart = ({
   isStackedChart,
   isFullStackedChart,
   legendClassName,
+  showAxisValue = true,
 }) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
@@ -118,7 +121,7 @@ const BarChart = ({
   // };
   const defaultOptions = {
     responsive: true,
-    maintainAspectRatio: options?.maintainAspectRatio ?? true,
+    maintainAspectRatio: options?.maintainAspectRatio || true,
     plugins: {
       htmlLegend: {
         // ID of the container to put the legend in
@@ -127,13 +130,29 @@ const BarChart = ({
       legend: {
         display: false,
       },
+      datalabels: {
+        display: true,
+
+        ...(isStackedChart ? { anchor: 'center', align: 'center' } : { anchor: 'end', align: 'end', offset: -2 }),
+        color: 'rgba(0, 0, 0, 1.0)',
+        backgroundColor: null,
+        font: {
+          size: 10,
+          weight: '700',
+          lineHeight: '15px',
+          // family: 'Poppins',
+        },
+      },
     },
     indexAxis: indexAxis ? indexAxis : 'x',
     layout: {
-      // padding: {
-      //   top: 30,
-      //   right: 30,
-      // },
+      // borderColor: '#000000',
+      //  borderColor: ''
+      padding: {
+        // top: 100,
+        // right: 30,
+        // borderColor: '#000000',
+      },
     },
     scales: {
       y: {
@@ -156,8 +175,12 @@ const BarChart = ({
           // }
           lineWidth: 0,
         },
+        ticks: {
+          display: showAxisValue,
+          color: '#000000',
+        },
         stacked: isStackedChart ? true : false,
-        ...(isFullStackedChart ? { max: 1000 } : {}),
+        ...(isFullStackedChart ? { max: 1500 } : {}),
       },
       x: {
         // offset: true,
@@ -172,8 +195,9 @@ const BarChart = ({
           color: '#000000',
         },
         // display: isFullStackedChart ? false : true,
-        tick: {
-          display: false,
+        ticks: {
+          display: showAxisValue,
+          color: '#000000',
         },
         stacked: isStackedChart ? true : false,
         grid: {
@@ -200,7 +224,7 @@ const BarChart = ({
             options={defaultOptions}
             // width={width}
             // height={height}
-            plugins={[htmlLegendPlugin]}
+            plugins={[htmlLegendPlugin, ChartDataLabels]}
             ref={refChart}
           ></Bar>
         </Box>

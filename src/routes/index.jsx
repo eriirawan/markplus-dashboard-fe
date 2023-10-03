@@ -64,6 +64,11 @@ const router = createBrowserRouter(
             element={<LazyComponent children={<AddChart />} />}
             errorElement={<ErrorBoundary />}
           />
+          <Route
+            path="edit-chart/:id"
+            element={<LazyComponent children={<AddChart />} />}
+            errorElement={<ErrorBoundary />}
+          ></Route>
         </Route>
         <Route path="result" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
         <Route path="fieldwork" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />

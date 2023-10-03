@@ -23,6 +23,7 @@ import {
   IconButton,
   CircularProgress,
   Divider,
+  Switch,
 } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
@@ -30,7 +31,7 @@ import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Saturation } from 'react-color/lib/components/common';
 import { CustomPicker, SketchPicker } from 'react-color';
 import { Box } from '@mui/system';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import LineChart from '../../components/chart/LineChart';
 import { defaultColorChart, defaultDataChartBar, defaultDataChartLine } from '../../helpers/DummyDataChart';
 import BarChart from '../../components/chart/BarChart';
@@ -38,7 +39,7 @@ import DonutChart from '../../components/chart/DonutChart';
 import PieChart from '@/components/chart/PieChart.jsx';
 import AreaChart from '../../components/chart/AreaChart';
 import { useDashboard } from '../../hooks/useDashboard';
-import { LinkOffTwoTone } from '@mui/icons-material';
+import { ConnectingAirportsOutlined, LinkOffTwoTone, WarningOutlined } from '@mui/icons-material';
 import MPlusIcon from '@/components/Icon';
 import SuccessImage from '@/assets/images/success-image.png';
 import ErrorImage from '@/assets/images/error-image.png';
@@ -47,55 +48,10 @@ import tinycolor from 'tinycolor2';
 import CustomColorPicker from '@/components/Dialog/CustomColorPicker.jsx';
 import DialogColorPicker from '@/components/Dialog/DialogColorPicker.jsx';
 import TableChart from '../../components/chart/TableChart';
-import { BarChartIcon, ChevronDownRed, DragIndicator, ExportFiles, Gear } from '../../helpers/Icons';
+import { BarChartIcon, ChevronDownRed, DeleteFill, DragIndicator, ExportFiles, Gear } from '../../helpers/Icons';
 import DefaultImageInformationCard from '@/assets/images/default-image-infomation-card.png';
-const optionData = [
-  {
-    id: 3,
-    name: 'Technology',
-  },
-  {
-    id: 1,
-    name: 'Finance',
-  },
-  {
-    id: 2,
-    name: 'Product',
-  },
-  {
-    id: 12,
-    name: 'Marketing',
-  },
-  {
-    id: 11,
-    name: 'Human Resource',
-  },
-  {
-    id: 14,
-    name: 'Design',
-  },
-  {
-    id: 13,
-    name: 'Software',
-  },
-];
-// const optionDataChartType = [
-//   { label: 'Area Chart', value: 'Area' },
-//   { label: 'Bar Chart', value: 'Bar Chart' },
-//   { label: 'Column Bar', value: 'Column Bar' },
-//   { label: 'Line', value: 'Line' },
-//   { label: 'Stacked Chart', value: 'Stacked Chart' },
-//   { label: '100% Stacked Chart', value: '100% Stacked Chart' },
-//   { label: 'Table', value: 'Table' },
-//   { label: 'Donut Chart', value: 'Donut' },
-//   { label: 'Pie Chart', value: 'Pie' },
-//   { label: 'Information Card', value: 'Information Card' },
-// ];
-// const optionDataChartType25 = [
-//   { label: 'Donut Chart', value: 'Donut' },
-//   { label: 'Pie Chart', value: 'Pie' },
-//   { label: 'Information Card', value: 'Information Card' },
-// ];
+import ExampleFileEdit from '@/assets/file_example_XLS_10.xlsx';
+
 const AddChart = (props) => {
   const [optionDataChartType, setOptionDataChartType] = useState([
     { label: 'Area Chart', value: 'Area Chart' },
@@ -110,12 +66,10 @@ const AddChart = (props) => {
     { label: 'Information Card', value: 'Information Card' },
   ]);
   const { setDashboardContent, dashboardContent } = useDashboard();
-  const [selected, setSelected] = useState(null);
   const [displayInputLabel, setDisplayInputLabel] = useState(true);
   const [colorSelected, setColorSelected] = useState('#FFFFFF');
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const chartRef = useRef();
-  const [colors] = ['#FF0000', '#FFB800', '#52FF00', '#00F0FF', '#000AFF', '#FF00F5'];
   const [codeColor, setCodeColor] = useState({
     hsv: {
       h: 0,
@@ -129,6 +83,7 @@ const AddChart = (props) => {
     },
   });
   const navigate = useNavigate();
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     chartType: '',
     chartLabel: '',
@@ -140,6 +95,8 @@ const AddChart = (props) => {
     loading: false,
     success: false,
     error: false,
+    confrimDeleteImportData: false,
+    confrimDeleteChartData: false,
   });
   const [typeDialog, setTypeDialog] = useState('loading');
   const refInputFileImport = useRef(null);
@@ -149,100 +106,23 @@ const AddChart = (props) => {
   });
   const [dataChart, setDataChart] = useState({});
   const [openDialogColorPicker, setOpenDialogColorPicker] = useState(false);
-  //   const [chartData, setChartData] = useState({
-  //     labels: ['Jan'],
-  //     datasets: []
-  //   })
-  //   useEffect(() =>{
-  //     setChartData({ })
-  //   },[formData])
-  // const [dataParseFile, setDataParseFile] = useState([])
   const [dataChartDonutOrPie, setDataChartDonutOrPie] = useState({});
-  const dataChartDonut = useMemo(
-    () => ({
-      labels: formData.chartData.map((el) => el.name),
-      datasets: [
-        {
-          data: formData.chartData.map((el, index) => defaultDataChartBar[index]),
-          //   borderColor: defaultColorChart[index],
-          backgroundColor: formData.chartData.map((el, index) => defaultColorChart[index]),
-        },
-      ],
-    }),
-    [formData]
-  );
-  // const dataChart = useMemo(
-  //   () => ({
-  //     labels: ['Jan'],
-  //     datasets: formData.chartData.map((data, index) => ({
-  //       label: data.name,
-  //       data: [defaultDataChartBar[index]],
-  //       borderColor: defaultColorChart[index],
-  //       backgroundColor: defaultColorChart[index],
-  //     })),
-  //   }),
-  //   [formData]
-  // );
-  const dataChartLine = useMemo(
-    () => ({
-      labels: formData.chartData.map((el) => el.name),
-      datasets: formData.chartData.map((data, index) => ({
-        label: data.name,
-        data: formData.chartData.map((_, idx) => defaultDataChartLine[index][idx]),
-        borderColor: defaultColorChart[index],
-        backgroundColor: defaultColorChart[index],
-      })),
-    }),
-    [formData]
-  );
   const handleClickCover = () => {
     setDisplayColorPicker(!displayColorPicker);
   };
   const handleChangeForm = (key, value) => {
-    // if (key === 'chartType' && fileImport) {
-    //   parseFile(fileImport);
-    // }
-    // if (key === 'chartData') {
-    //   let duplicateRemoved = [];
-
-    //   value.forEach((item) => {
-    //     if (duplicateRemoved.findIndex((o) => o.id === item.id) >= 0) {
-    //       duplicateRemoved = duplicateRemoved.filter((x) => x.id === item.id);
-    //     } else {
-    //       duplicateRemoved.push(item);
-    //     }
-    //   });
-    // if(key === 'chartType'){
-    //   setFormData({...formData, [key]: {...value}})
-    // }
     setFormData({ ...formData, [key]: value });
-    // } else {
-    // setFormData({ ...formData, [key]: value });
-    // }
   };
-  // useEffect(() => {
-  //   console.info('useEffect');
-  //   return function cleanUp() {
-  //     console.info('useEffect return');
-  //     localStorage?.removeItem('indexChart');
-  //   };
-  // }, [localStorage]);
+  const [showAxisValue, setShowAxisValue] = useState(true);
   const submitChart = () => {
     let content = [...dashboardContent];
-    // const temp = []
-    // content.forEach(el => {
-    //   const temp = []
-    //   if(el.chartType){
-
-    //   } else if(el.chartType) {
-
-    //   }
-    // })
     let jsonStr = localStorage.indexChart.replace(/(\w+:)|(\w+ :)/g, function (matchedStr) {
       return '"' + matchedStr.substring(0, matchedStr.length - 1) + '":';
     });
     const indexChart = JSON.parse(jsonStr);
-    const widthSectionChart = JSON.parse(JSON.stringify(content[+indexChart.parent]))[+indexChart.child];
+    const widthSectionChart = id
+      ? JSON.parse(JSON.stringify(content[+indexChart.parent]))[+indexChart.child].width
+      : JSON.parse(JSON.stringify(content[+indexChart.parent]))[+indexChart.child];
     let indexColor = 0;
     const defaultColor = ['#F54D3D', '#E95670', '#B34270', '#713770'];
     const changeToneColorDefault = {
@@ -261,7 +141,6 @@ const AddChart = (props) => {
         };
       }),
     };
-    // console.info(changeToneColorDefault, '<<<< apa sih');
     const newValue = {
       ...formData,
       chartData:
@@ -269,6 +148,7 @@ const AddChart = (props) => {
           ? dataChartDonutOrPie
           : changeToneColorDefault,
       width: widthSectionChart,
+      file: fileImport,
     };
     if (formData.chartType === 'Bar Chart') {
       newValue.chartData = {
@@ -279,65 +159,21 @@ const AddChart = (props) => {
     content[+indexChart.parent][+indexChart.child] = {
       ...newValue,
     };
-    // switch (formData.chartType) {
-    //   case 'Line Chart':
-    //     content[+indexChart.parent][+indexChart.child] = {
-    //       ...newValue,
-    //     };
-    //     break;
-    //   case 'Donut Chart':
-    //     content[+indexChart.parent][+indexChart.child] = {
-    //       ...newValue,
-    //     };
-    //     // content.push({ ...formData, chartData: dataChartDonut, width: '400px' });
-    //     break;
-    //   case 'Pie Chart':
-    //     content[+indexChart.parent][+indexChart.child] = {
-    //       ...newValue,
-    //     };
-    //     // content.push({ ...formData, chartData: dataChartDonut, width: '400px' });
-    //     break;
-    //   case 'Bar Chart':
-    //     content[+indexChart.parent][+indexChart.child] = {
-    //       ...newValue,
-    //     };
-    //     break;
-    //   case 'Column Bar':
-    //     content[+indexChart.parent][+indexChart.child] = {
-    //       ...newValue,
-    //     };
-    //     break;
-    //   case 'Table Chart': {
-    //     content.push({ ...formData });
-    //     break;
-    //   }
-    //   case 'Area Chart': {
-    //     content[+indexChart.parent][+indexChart.child] = {
-    //       ...newValue,
-    //     };
-    //     break;
-    //   }
-    //   case 'Information Card': {
-    //     content[+indexChart.parent][+indexChart.child] = {
-    //       ...newValue,
-    //     };
-    //     break;
-    //   }
-    //   default:
-    // }
     setDashboardContent(content);
     navigate('/home');
   };
-  const breadcrumbs = [
-    <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/home')} sx={{ cursor: 'pointer' }}>
-      Dashboard
-    </Link>,
-    <Typography key="2" color="text.lightPrimary">
-      Add Chart
-    </Typography>,
-  ];
+  const breadcrumbs = useMemo(() => {
+    return [
+      <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/home')} sx={{ cursor: 'pointer' }}>
+        Dashboard
+      </Link>,
+      <Typography key="2" color="text.lightPrimary">
+        {id ? 'Edit Chart' : 'Add Chart'}
+      </Typography>,
+    ];
+  }, [id]);
   const SettingContent = useMemo(() => {
-    if (formData.chartType && formData.chartData.length) {
+    if (formData.chartType && JSON.stringify(dataChart) !== '{}') {
       switch (formData.chartType) {
         case 'Line Chart': {
           setDisplayInputLabel(true);
@@ -355,24 +191,9 @@ const AddChart = (props) => {
                 // legendClassName={'legend-container-bar-chart'}
                 labelY={formData.horizontalAxisLabel}
                 legendClassName={'legend-container-line'}
-                options={{
-                  onClick: (evt, elements, chart) => {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setCodeColor((prev) => ({
-                        ...prev,
-                        hsl: tinycolor(elements[0]?.element?.options.backgroundColor).toHsl(),
-                      }));
-                      setCodeColor((prev) => ({
-                        ...prev,
-                        hsv: tinycolor(elements[0]?.element?.options.backgroundColor).toHsv(),
-                      }));
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={{}}
                 chartData={dataChart}
+                showAxisValue={showAxisValue}
               ></LineChart>
             </Box>
           );
@@ -386,24 +207,13 @@ const AddChart = (props) => {
               </Typography>
               <BarChart
                 refChart={chartRef}
-                // width={'549px'}
-                // height={'335px'}
                 maxWidthLegend={'369px'}
                 chartData={dataChart}
                 labelX={formData.verticalAxisLabel}
                 labelY={formData.horizontalAxisLabel}
-                // indexAxis={'y'}
                 legendClassName={'legend-container-column-chart'}
-                options={{
-                  // maintainAspectRatio: false,
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={{}}
+                showAxisValue={showAxisValue}
               />
             </Box>
           );
@@ -417,8 +227,6 @@ const AddChart = (props) => {
               </Typography>
               <BarChart
                 refChart={chartRef}
-                // width={'549px'}
-                // height={'335px'}
                 maxWidthLegend={'369px'}
                 legendClassName={'legend-container-bar-chart'}
                 indexAxis={'y'}
@@ -428,17 +236,8 @@ const AddChart = (props) => {
                   axis: 'y',
                   ...dataChart,
                 }}
-                options={{
-                  // maintainAspectRatio: false,
-
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={{}}
+                showAxisValue={showAxisValue}
               />
             </Box>
           );
@@ -454,18 +253,9 @@ const AddChart = (props) => {
                 refChart={chartRef}
                 width={'240px'}
                 height={'240px'}
-                // maxWidthLegend={'369px'}
                 chartData={dataChartDonutOrPie}
                 legendClassName={'legend-container-donut-chart'}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={{}}
               />
             </Box>
           );
@@ -481,18 +271,9 @@ const AddChart = (props) => {
                 refChart={chartRef}
                 width={'240px'}
                 height={'240px'}
-                // maxWidthLegend={'369px'}
                 legendClassName={'legend-container-pie-chart'}
                 chartData={dataChartDonutOrPie}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={{}}
               />
             </Box>
           );
@@ -508,24 +289,23 @@ const AddChart = (props) => {
                 refChart={chartRef}
                 width={'549px'}
                 height={'335px'}
-                // maxWidthLegend={'369px'}
                 legendClassName={'legend-container-area-chart'}
                 labelX={formData.verticalAxisLabel}
                 labelY={formData.horizontalAxisLabel}
                 chartData={{
                   ...dataChart,
-                  datasets: { ...dataChart }.datasets.map((el) => ({ ...el, fill: true })),
+                  datasets: { ...dataChart }.datasets.map((el) => ({
+                    ...el,
+                    // data: [0, ...el.data],
+                    fill: {
+                      target: 'origin', // 3. Set the fill options
+                      above: el.backgroundColor.replace('1)', '0.3)'),
+                    },
+                  })),
                 }}
                 isAreaChart={true}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={{}}
+                showAxisValue={showAxisValue}
               ></AreaChart>
             </Box>
           );
@@ -544,15 +324,8 @@ const AddChart = (props) => {
                 labelX={formData.verticalAxisLabel}
                 labelY={formData.horizontalAxisLabel}
                 isStackedChart={true}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={{}}
+                showAxisValue={showAxisValue}
               />
             </Box>
           );
@@ -572,15 +345,8 @@ const AddChart = (props) => {
                 labelY={formData.horizontalAxisLabel}
                 isFullStackedChart={true}
                 isStackedChart={true}
-                options={{
-                  onClick(evt, elements, chart) {
-                    if (elements.length) {
-                      setSelected(elements);
-                      setColorSelected(elements[0]?.element?.options.backgroundColor);
-                      setDisplayColorPicker(true);
-                    }
-                  },
-                }}
+                options={{}}
+                showAxisValue={showAxisValue}
               />
             </Box>
           );
@@ -708,7 +474,7 @@ const AddChart = (props) => {
     }
 
     // }
-  }, [formData, dataChart, displayColorPicker, colorSelected]);
+  }, [formData, dataChart, displayColorPicker, colorSelected, showAxisValue]);
   useEffect(() => {
     if (localStorage.optionChart) {
       if (localStorage.optionChart === '100%' || localStorage.optionChart === '75%') {
@@ -729,9 +495,100 @@ const AddChart = (props) => {
         });
       }
       // if(localStorage.)
-      setDisplayInputLabel(false);
+      // setDisplayInputLabel(false);
+    }
+    if (id) {
+      // console.info(dashboardContent, '<<< dashboardContent');
+      let jsonStr = localStorage.indexChart.replace(/(\w+:)|(\w+ :)/g, function (matchedStr) {
+        return '"' + matchedStr.substring(0, matchedStr.length - 1) + '":';
+      });
+      const indexChart = JSON.parse(jsonStr);
+      // console.info(indexChart, '<<<< indexChart');
+      const content = dashboardContent[+indexChart?.parent][+indexChart?.child];
+      // parseFile(content?.file);
+      setFileImport(content?.file);
+      setDataChart(content?.chartData);
+      setFormData((prev) => ({
+        ...prev,
+        chartType: content?.chartType,
+        chartLabel: content?.chartLabel,
+        horizontalAxisLabel: content?.horizontalAxisLabel,
+        verticalAxisLabel: content?.verticalAxisLabel,
+        chartData: content?.chartData,
+      }));
+      // setFile()
+      // console.info(new File([ExampleFileEdit], 'fileExample.xlsx'), ExampleFileEdit, '<<< apa dianya');
+      // const reader = new FileReader();
+      // reader.onload = (evnt) => {
+      //   console.info(evnt.target.result, '<<<< apa dia');
+      // };
+      // parseFile(
+      //   new File([ExampleFileEdit], 'fileExample.xlsx', {
+      //     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      //   })
+      // );
+      // console.info(new File(ExampleFileEdit, ), '<<<< example');
+      // window.req(
+      //   window.TEMPORARY,
+      //   5 * 1024 * 1024,
+      //   function (fs) {
+      //     fs.root.getFile(
+      //       ExampleFileEdit,
+      //       { create: true, exclusive: false },
+      //       function (fileEntry) {
+      //         fileEntry.file(function (file) {
+      //           console.log(file);
+      //         });
+      //       },
+      //       (err) => {
+      //         console.log(err);
+      //       }
+      //     );
+      //   },
+      //   (err) => {
+      //     console.log(err);
+      //   }
+      // );
+      // parseFile(ExampleFileEdit);
+      // const fileExample = await import()
+      // console.info(ExampleFileEdit.arrayBuffer(), '<<<< cinsada');
     }
   }, []);
+  // useEffect(() => {
+  //   if (!refInputFileImport?.current?.value && id) {
+  //     // refInputFileImport.current.value = ExampleFileEdit;
+  //     // var GetFileBlobUsingURL = function (url, convertBlob) {
+  //     //   var xhr = new XMLHttpRequest();
+  //     //   xhr.open('GET', url);
+  //     //   xhr.responseType = 'blob';
+  //     //   xhr.addEventListener('load', function () {
+  //     //     convertBlob(xhr.response);
+  //     //   });
+  //     //   xhr.send();
+  //     // };
+
+  //     // var blobToFile = function (blob, name) {
+  //     //   blob.lastModifiedDate = new Date();
+  //     //   blob.name = name;
+  //     //   return blob;
+  //     // };
+
+  //     // var GetFileObjectFromURL = function (filePathOrUrl, convertBlob) {
+  //     //   GetFileBlobUsingURL(filePathOrUrl, function (blob) {
+  //     //     convertBlob(blobToFile(blob, 'fileExample.xlsx'));
+  //     //   });
+  //     // };
+  //     // var FileURL = ExampleFileEdit;
+  //     // GetFileObjectFromURL(FileURL, function (fileObject) {
+  //     //   console.log(fileObject);
+  //     //   parseFile(fileObject);
+  //     // });
+  //     // console.info(refInputFileImport?.current?.change());
+  //     refInputFileImport.current.dispatchEvent(new Event('change', ExampleFileEdit));
+
+  //     // console.info(ExampleFileEdit, '<<< apa dah');
+  //   }
+  // }, [id, refInputFileImport?.current]);
   const DialogStatusImport = ({ openDialogImport, setOpenDialogImport, typeDialog = 'loading' }) => {
     const getLayoutContentText = () => {
       switch (typeDialog) {
@@ -739,8 +596,52 @@ const AddChart = (props) => {
           return 'Please wait, your file is being processed...';
         case 'success':
           return 'Import completed successfully';
+        case 'deleteChart':
+          return 'Are you sure you want to delete this chart?';
+        case 'deleteImportData':
+          return 'Are you sure you want to delete the imported data?';
         default:
           return 'Import failed. Please try again.';
+      }
+    };
+    const getLayoutContentAction = () => {
+      switch (typeDialog) {
+        case 'loading':
+          return (
+            <Box display={'flex'} gap={'10px'} flexDirection={'column'} sx={{ maxWidth: '512px', width: '100%' }}>
+              <CircularProgress />
+            </Box>
+          );
+        case 'success':
+          return (
+            <Box display={'flex'} flexDirection={'column'} gap={'16px'}>
+              <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
+                <img src={SuccessImage} />
+              </Stack>
+              <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, success: false }))}>OK</Button>
+            </Box>
+          );
+        case 'deleteChart':
+          return (
+            <Box display={'flex'} flexDirection={'column'} gap={'16px'}>
+              <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, success: false }))}>
+                <WarningOutlined />
+                <Typography>Delete</Typography>
+              </Button>
+              <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, success: false }))}>Cancel</Button>
+            </Box>
+          );
+        case 'deleteImportData':
+          return <></>;
+        default:
+          return (
+            <Box display={'flex'} flexDirection={'column'}>
+              <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
+                <img src={ErrorImage} />
+              </Stack>
+              <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, error: false }))}>OK</Button>
+            </Box>
+          );
       }
     };
     return (
@@ -780,7 +681,8 @@ const AddChart = (props) => {
         <DialogContent sx={{ padding: 0 }}>
           <Stack display={'flex'} direction="column" gap={'16px'}>
             <Typography>{getLayoutContentText(typeDialog)}</Typography>
-            {typeDialog === 'loading' ? (
+            {getLayoutContentAction()}
+            {/* {typeDialog === 'loading' ? (
               <Box display={'flex'} gap={'10px'} flexDirection={'column'} sx={{ maxWidth: '512px', width: '100%' }}>
                 <CircularProgress />
               </Box>
@@ -798,7 +700,7 @@ const AddChart = (props) => {
                 </Stack>
                 <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, error: false }))}>OK</Button>
               </Box>
-            )}
+            )} */}
           </Stack>
         </DialogContent>
       </Dialog>
@@ -808,10 +710,11 @@ const AddChart = (props) => {
   // }, [window.innerWidth]);
   const parseFile = async (file) => {
     try {
+      // console.info(file, '<<<< file');
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { blankrows: false });
       const temp = {
         labels: [],
         datasets: [],
@@ -820,52 +723,129 @@ const AddChart = (props) => {
         labels: [],
         datasets: [],
       };
-      const color = ['#006CB7', '#ADC32B', '#ED1B2F', '#FFD53D'];
+      const color = ['rgba(0, 108, 183, 1)', 'rgba(173, 195, 43, 1)', 'rgba(237, 27, 47, 1)', 'rgba(255, 213, 61, 1)'];
       let indexColor = 0;
-      // setDataParseFile(jsonData)
-      // if (localStorage.optionChart === '25%' || localStorage) {
-      // if (typeof jsonData[0].data === 'number') {
-      //   jsonData.forEach((el, i) => {
-      //     // if (i === 0) {
-      //     tempDonut.labels.push(el.category);
-      //     // }
-      //     tempDonut.datasets[0].backgroundColor.push(color[indexColor]);
-      //     tempDonut.datasets[0].borderColor.push(el.data);
-      //     tempDonut.datasets[0].data.push(el.data);
-      //     indexColor += 1;
-      //   });
-      //   setDataChartDonutOrPie(tempDonut);
-      //   handleChangeForm('chartData', tempDonut.datasets);
-      // }
-      // }
-      // else {
-      // if (typeof jsonData[0].data === 'string') {
+      const tempEachData = {};
+      const tempEachLabels = [];
       jsonData.forEach((el, i) => {
-        temp.labels.push(el.label);
-        if (el?.category) {
-          temp.datasets.push({
-            label: el.category,
-            data: el?.data?.split(',').map((data) => +data),
-            backgroundColor: color[indexColor],
-            borderColor: color[indexColor],
-          });
-        }
+        const tempData = {
+          label: '',
+          data: [],
+          backgroundColor: '',
+          borderColor: '',
+        };
+        const tempLabels = [];
+        // el.forEach((data, index) => {
+        //   if (index > 0 && i === 0) {
+        //     temp.labels.push(data);
+        //   } else {
+        //     if (tempEachData[el[0]]) {
+        //       tempEachData[el[0]].push(data);
+        //     } else {
+        //       tempEachData[el[0]] = [data];
+        //     }
+        //   }
+        // });
+        Object.entries(el).forEach((data, index) => {
+          if (index > 0) {
+            if (tempEachData[data[0]]) {
+              tempEachData[data[0]].push(data[1]);
+            } else {
+              tempEachData[data[0]] = [data[1]];
+            }
+          } else {
+            tempEachLabels.push(data[1]);
+          }
+        });
+        // if (i === 0) {
+        //   temp.labels.push(el.slice(0));
+        // } else {
+        //   el.forEach((data, index) => {
+        //     if (index === 0) {
+        //       tempData.label = data;
+        //     } else {
+        //       tempData.data.push(data);
+        //       tempData.backgroundColor = color[indexColor];
+        //       tempData.borderColor = color[index];
+        //     }
+        //   });
+        // }
+        // console.info(tempData, '<<< tempData');
+
+        // console.info(key, '<<< entries');
+
+        // if (i === 0) {
+        //   temp.labels.push(el);
+        //   temp.datasets.push({
+        //     label: el[0],
+        //     data: tempData,
+        //     backgroundColor: color[indexColor],
+        //     borderColor: color[indexColor],
+        //   });
+        // }
+        // console.info
+        // tempData.data.
+        // if (i !== 1) {
+        //   if (index !== 0) {
+        //     tempData.push(data);
+        //   } else {
+        //   }
+        // }
+        // console.info(temp, '<<< temp');
+        // temp.labels.push(el.label);
+        // if (el?.category) {
+        //   temp.datasets.push({
+        //     label: el.category,
+        //     data: el?.data?.split(',').map((data) => +data),
+        //     backgroundColor: color[indexColor],
+        //     borderColor: color[indexColor],
+        //   });
+        // }
+        // indexColor += 1;
+        // if (indexColor > color.length - 1) {
+        //   indexColor = 0;
+        // }
+        // if (i === 0) {
+        //   tempDonut.datasets.push({
+        //     data: el.data.split(',').map((data) => +data),
+        //     label: el.label,
+        //     borderColor: [],
+        //     backgroundColor: [],
+        //   });
+        // }
+        // tempDonut.labels.push(el.label);
+        // tempDonut.datasets[0].borderColor.push(color[indexColor]);
+        // tempDonut.datasets[0].backgroundColor.push(color[indexColor]);
+      });
+      // console.info(tempEachData, temp, '<<< temp ');
+      Object.entries(tempEachData).forEach((data, index) => {
+        const datasetValue = {
+          label: tempEachLabels[index],
+          data: data[1],
+          backgroundColor: color[indexColor],
+          borderColor: color[indexColor],
+        };
         indexColor += 1;
-        if (indexColor > color.length - 1) {
+        if (index === color.length - 1) {
           indexColor = 0;
         }
-        if (i === 0) {
+        if (index === 0) {
           tempDonut.datasets.push({
-            data: el.data.split(',').map((data) => +data),
-            label: el.label,
-            borderColor: [],
+            label: tempEachLabels[index],
+            data: data[1],
             backgroundColor: [],
+            borderColor: [],
           });
         }
-        tempDonut.labels.push(el.label);
         tempDonut.datasets[0].borderColor.push(color[indexColor]);
         tempDonut.datasets[0].backgroundColor.push(color[indexColor]);
+        tempDonut.labels.push(data[0]);
+
+        temp.datasets.push({ ...datasetValue });
+        temp.labels.push(data[0]);
       });
+      // temp.labels = [...tempEachLabels];
+      // console.info(temp, '<<<< temp');
       setDataChartDonutOrPie(tempDonut);
       setDataChart(temp);
       handleChangeForm('chartData', temp.datasets);
@@ -873,6 +853,10 @@ const AddChart = (props) => {
       // }
       // setDataChart(temp);
       // handleChangeForm('chartData', temp.datasets);
+
+      // // }
+      // // setDataChart(temp);
+      // // handleChangeForm('chartData', temp.datasets);
       setOpenDialogStatusImport((prev) => ({ ...prev, loading: false }));
       setTypeDialog('success');
       setOpenDialogStatusImport((prev) => ({ ...prev, success: true }));
@@ -915,7 +899,7 @@ const AddChart = (props) => {
                 color="primary"
                 sx={{ marginTop: '16px' }}
               >
-                Add Chart
+                {id ? 'Edit Chart' : 'Add Chart'}
               </Typography>
               {/* <Typography
                 fontWeight={700}
@@ -933,6 +917,7 @@ const AddChart = (props) => {
                     color="primary"
                     sx={{ minWidth: '200px' }}
                     onClick={() => refInputFileImport.current.click()}
+                    disabled={fileImport}
                   >
                     <FileOpenOutlinedIcon color="white" />
                     <Typography
@@ -946,7 +931,19 @@ const AddChart = (props) => {
                     </Typography>
                   </Button>
                   {fileImport ? (
-                    <Typography>{fileImport?.name}</Typography>
+                    <Box display={'flex'} alignItems={'center'}>
+                      <Typography textAlign={'center'} maxWidth={'350px'}>
+                        {fileImport?.name}
+                      </Typography>
+                      <IconButton
+                        onClick={() => {
+                          setFileImport(null);
+                          setDataChart({});
+                        }}
+                      >
+                        <DeleteFill />
+                      </IconButton>
+                    </Box>
                   ) : (
                     <Typography>No data imported yet.</Typography>
                   )}
@@ -1029,30 +1026,51 @@ const AddChart = (props) => {
                         ? 'Type information label'
                         : 'Type chart label'
                     }
+                    value={formData?.chartLabel}
                     InputProps={{ style: { height: '44px' } }}
                     InputLabelProps={{ shrink: true }}
                     onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
                     sx={{ padding: '9px 0px 19px 0px' }}
                   ></TextField>
                   {displayInputLabel && (
-                    <Stack direction={'row'} gap="16px">
-                      <TextField
-                        label="Vertical Axis Label"
-                        placeholder="Vertical Axis Label"
-                        InputProps={{ style: { height: '44px' } }}
-                        InputLabelProps={{ shrink: true }}
-                        onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
-                        sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                      ></TextField>
-                      <TextField
-                        label="Horizontal Axis Label"
-                        placeholder="Horizontal Axis Label"
-                        InputProps={{ style: { height: '44px' } }}
-                        InputLabelProps={{ shrink: true }}
-                        onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
-                        sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                      ></TextField>
-                    </Stack>
+                    <>
+                      <Box
+                        display={'flex'}
+                        justifyContent={'space-between'}
+                        alignItems={'center'}
+                        sx={{ marginBottom: '16px' }}
+                      >
+                        <Box>
+                          <Typography fontWeight={400} size="14px" lineHeight={'21px'} color={'#000000'}>
+                            Hide or Show Axis Value
+                          </Typography>
+                          <Typography fontWeight={400} size="12px" lineHeight={'16px'} color={'#808080'}>
+                            Switch OFF to make the axis X and Y value hide, and Switch ON to show the axis
+                          </Typography>
+                        </Box>
+                        <Switch checked={showAxisValue} onChange={() => setShowAxisValue((prev) => !prev)} />
+                      </Box>
+                      <Stack direction={'row'} gap="16px">
+                        <TextField
+                          label="Vertical Axis Label"
+                          placeholder="Vertical Axis Label"
+                          InputProps={{ style: { height: '44px' } }}
+                          InputLabelProps={{ shrink: true }}
+                          value={formData?.verticalAxisLabel}
+                          onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
+                          sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
+                        ></TextField>
+                        <TextField
+                          label="Horizontal Axis Label"
+                          placeholder="Horizontal Axis Label"
+                          InputProps={{ style: { height: '44px' } }}
+                          InputLabelProps={{ shrink: true }}
+                          value={formData?.horizontalAxisLabel}
+                          onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
+                          sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
+                        ></TextField>
+                      </Stack>
+                    </>
                   )}
                 </Box>
               </Box>
@@ -1103,71 +1121,6 @@ const AddChart = (props) => {
                     onClick={handleClickCover}
                   ></Box>
                   <CustomColorPicker codeColor={codeColor} onChange={() => {}}></CustomColorPicker>
-                  {/* <SketchPicker
-                    color={colorSelected}
-                    disableAlpha={true}
-                    styles={{
-                      '.flexbox-fix': {
-                        display: 'none',
-                      },
-                    }}
-                    onChangeComplete={(color) => {
-                      //   chartRef.current.update();
-                      setColorSelected(color);
-                    }}
-                    onChange={(color) => {
-                      selected.forEach((el) => {
-                        const { datasetIndex, index } = el;
-                        const dataSet = dataChart.datasets;
-                        const dataSetDonut = dataChartDonut.datasets;
-                        const dataSetLine = dataChartLine.datasets;
-                        if (formData.chartType === 'Vertical Bar' || formData.chartType === 'Horizontal Bar') {
-                          dataSet[datasetIndex].backgroundColor = `rgba(${Object.values(color.rgb)})`;
-                          dataSet[datasetIndex].borderColor = `rgba(${Object.values(color.rgb)})`;
-                          defaultColorChart[datasetIndex] = `rgba(${Object.values(color.rgb)})`;
-                          chartRef.current.data.datasets[datasetIndex].backgroundColor = `rgba(${[
-                            ...Object.values(color.rgb).slice(0, 2),
-                            0.1,
-                          ]})`;
-                          chartRef.current.update();
-                        } else if (formData.chartType === 'Donut') {
-                          dataSetDonut[datasetIndex].backgroundColor[index] = `rgba(${Object.values(color.rgb)})`;
-                          defaultColorChart[index] = `rgba(${Object.values(color.rgb)})`;
-                          chartRef.current.data.datasets[datasetIndex].backgroundColor[index] = `rgba(${[
-                            ...Object.values(color.rgb).slice(0, 2),
-                            0.1,
-                          ]})`;
-                          chartRef.current.update();
-                        } else if (formData.chartType === 'Line') {
-                          dataSetLine[datasetIndex].backgroundColor = `rgba(${Object.values(color.rgb)})`;
-                          dataSetLine[datasetIndex].borderColor = `rgba(${Object.values(color.rgb)})`;
-                          defaultColorChart[datasetIndex] = `rgba(${Object.values(color.rgb)})`;
-                          chartRef.current.data.datasets[datasetIndex].backgroundColor = `rgba(${[
-                            ...Object.values(color.rgb).slice(0, 2),
-                            0.1,
-                          ]})`;
-                          chartRef.current.data.datasets[datasetIndex].borderColor = `rgba(${[
-                            ...Object.values(color.rgb).slice(0, 2),
-                            0.1,
-                          ]})`;
-                          chartRef.current.update();
-                        } else {
-                          dataSetLine[datasetIndex].backgroundColor = `rgba(${Object.values(color.rgb)})`;
-                          dataSetLine[datasetIndex].borderColor = `rgba(${Object.values(color.rgb)})`;
-                          defaultColorChart[datasetIndex] = `rgba(${Object.values(color.rgb)})`;
-                          chartRef.current.data.datasets[datasetIndex].backgroundColor = `rgba(${[
-                            ...Object.values(color.rgb).slice(0, 2),
-                            0.1,
-                          ]})`;
-                          chartRef.current.data.datasets[datasetIndex].borderColor = `rgba(${[
-                            ...Object.values(color.rgb).slice(0, 2),
-                            0.1,
-                          ]})`;
-                          chartRef.current.update();
-                        }
-                      });
-                    }}
-                  /> */}
                 </Box>
               )}
             </Box>
@@ -1180,6 +1133,7 @@ const AddChart = (props) => {
         style={{ display: 'none' }}
         ref={refInputFileImport}
         accept=".xlsx, .xls, .csv"
+        // value={fileImport}
         onChange={(e) => {
           setTypeDialog('loading');
           setOpenDialogStatusImport((prev) => ({ ...prev, loading: true }));
@@ -1191,7 +1145,10 @@ const AddChart = (props) => {
       <DialogColorPicker
         dataSets={dataChart?.datasets || []}
         openDialog={openDialogColorPicker}
-        onSaveChanges={() => {}}
+        onSaveChanges={(data) => {
+          setDataChart((prev) => ({ ...prev, datasets: [...data] }));
+          setOpenDialogColorPicker((prev) => !prev);
+        }}
         onCancel={() => setOpenDialogColorPicker((prev) => !prev)}
       ></DialogColorPicker>
       <DialogStatusImport
@@ -1200,21 +1157,25 @@ const AddChart = (props) => {
         // contentText={'Choose your data import method:'
         typeDialog={typeDialog}
       />
-      {/* <DialogImport
-        openDialogImport={openDialogImport.linkImport}
-        setOpenDialogImport={setOpenDialogImport}
-        contentText={'Please paste your file link here'}
-        typeDialog="linkImport"
-      />
-
-      <DialogImport
-        openDialogImport={openDialogImport.notifDialogImport}
-        setOpenDialogImport={setOpenDialogImport}
-        contentText={'Please wait, your file is being processed...'}
-        typeDialog="notifDialogImport"
-      /> */}
-
-      <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '105px', mt: 1 }}>
+      <Paper sx={{ borderRadius: 1.25, display: 'flex', justifyContent: 'space-between', maxHeight: '105px', mt: 1 }}>
+        {id && (
+          <Box sx={{ width: '100%', my: 'auto', p: 4 }}>
+            <Button
+              variant={'outlined'}
+              color="error"
+              sx={{
+                maxWidth: '286px',
+                width: '100%',
+                backgroundColor: '#E563630D',
+              }}
+            >
+              <Box display={'flex'} gap={'8px'} alignItems={'center'}>
+                <DeleteFill />
+                <Typography sx={(theme) => ({ color: theme.palette.error.light })}>Delete Chart</Typography>
+              </Box>
+            </Button>
+          </Box>
+        )}
         <Box
           sx={{ width: '100%', my: 'auto', p: 4 }}
           display="flex"
@@ -1225,6 +1186,7 @@ const AddChart = (props) => {
           {/* <Typography fontWeight={700} fontSize="18px" lineHeight="27px" color="primary">
             Create column?
           </Typography> */}
+
           <Button sx={{ maxWidth: '256px', width: '100%' }} variant="outlined">
             Cancel
           </Button>
@@ -1234,7 +1196,7 @@ const AddChart = (props) => {
               submitChart();
             }}
           >
-            Add Chart
+            {id ? 'Save Changes' : 'Add Chart'}
           </Button>
         </Box>
       </Paper>

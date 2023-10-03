@@ -33,7 +33,7 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import BarChart from '../../components/chart/BarChart';
 import LineChart from '../../components/chart/LineChart';
 import { BarData, LineData } from '../../helpers/DummyDataChart';
-import { BarChartIcon, ChevronDownRed, DragIndicator, ExportFiles, Gear } from '../../helpers/Icons';
+import { BarChartIcon, ChevronDownRed, DragIndicator, EditIcon, ExportFiles, Gear } from '../../helpers/Icons';
 import { useNavigate } from 'react-router-dom';
 import { useDashboard } from '../../hooks/useDashboard';
 import DonutChart from '../../components/chart/DonutChart';
@@ -212,7 +212,7 @@ const Home = () => {
                       <ExportFiles />
                     </IconButton>
                     <IconButton>
-                      <Gear />
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -313,7 +313,7 @@ const Home = () => {
                       <ExportFiles />
                     </IconButton>
                     <IconButton>
-                      <Gear />
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -394,27 +394,29 @@ const Home = () => {
                 }}
               >
                 <Box display={'flex'} gap={'16px'} justifyContent="space-between" marginBottom={'24px'}>
-                  {/* <IconButton sx={{ padding: 0 }}>
-                        <DragIndicator />
-                      </IconButton> */}
-                  <Typography
-                    // sx={(theme) => ({
-                    //   color: theme.palette.text.primary,
-                    // })}
-                    color={'primary'}
-                    fontSize={24}
-                    fontWeight="700"
-                    lineHeight="31px"
-                  >
+                  <Typography color={'primary'} fontSize={24} fontWeight="700" lineHeight="31px">
                     {data.chartLabel}
                   </Typography>
-                  {/* </Box> */}
-                  <Box>
-                    <IconButton>
+                  <Box display={'flex'} gap="16px">
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                    >
                       <ExportFiles />
                     </IconButton>
-                    <IconButton>
-                      <Gear />
+                    <IconButton
+                      onClick={() => {
+                        localStorage.setItem('indexChart', `{parent: "${indexParent}", child: "${indexChild}"}`);
+                        navigate(`/home/edit-chart/${indexChild}`);
+                      }}
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                    >
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -470,12 +472,26 @@ const Home = () => {
                     {data.chartLabel}
                   </Typography>
                   {/* </Box> */}
-                  <Box>
-                    <IconButton>
+                  <Box display={'flex'} gap="16px">
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                    >
                       <ExportFiles />
                     </IconButton>
-                    <IconButton>
-                      <Gear />
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                      onClick={() => {
+                        localStorage.setItem('indexChart', `{parent: "${indexParent}", child: "${indexChild}"}`);
+                        navigate(`/home/edit-chart/${indexChild}`);
+                      }}
+                    >
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -523,12 +539,26 @@ const Home = () => {
                     {data.chartLabel}
                   </Typography>
                   {/* </Box> */}
-                  <Box>
-                    <IconButton>
+                  <Box display={'flex'} gap="16px">
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                      onClick={() => {
+                        localStorage.setItem('indexChart', `{parent: "${indexParent}", child: "${indexChild}"}`);
+                        navigate(`/home/edit-chart/${indexChild}`);
+                      }}
+                    >
                       <ExportFiles />
                     </IconButton>
-                    <IconButton>
-                      <Gear />
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                    >
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -576,12 +606,26 @@ const Home = () => {
                     {data.chartLabel}
                   </Typography>
                   {/* </Box> */}
-                  <Box>
-                    <IconButton>
+                  <Box display={'flex'} gap="16px">
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                    >
                       <ExportFiles />
                     </IconButton>
-                    <IconButton>
-                      <Gear />
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                      onClick={() => {
+                        localStorage.setItem('indexChart', `{parent: "${indexParent}", child: "${indexChild}"}`);
+                        navigate(`/home/edit-chart/${indexChild}`);
+                      }}
+                    >
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -629,12 +673,26 @@ const Home = () => {
                     {data.chartLabel}
                   </Typography>
                   {/* </Box> */}
-                  <Box>
-                    <IconButton>
+                  <Box display={'flex'} gap="16px">
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                    >
                       <ExportFiles />
                     </IconButton>
-                    <IconButton>
-                      <Gear />
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                      onClick={() => {
+                        localStorage.setItem('indexChart', `{parent: "${indexParent}", child: "${indexChild}"}`);
+                        navigate(`/home/edit-chart/${indexChild}`);
+                      }}
+                    >
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}
@@ -684,12 +742,26 @@ const Home = () => {
                         {data.chartLabel}
                       </Typography>
                     </Box>
-                    <Box>
-                      <IconButton>
+                    <Box display={'flex'} gap="16px">
+                      <IconButton
+                        sx={(theme) => ({
+                          border: `1px solid ${theme.palette.primary.main}`,
+                          borderRadius: '4px',
+                        })}
+                      >
                         <ExportFiles />
                       </IconButton>
-                      <IconButton>
-                        <Gear />
+                      <IconButton
+                        sx={(theme) => ({
+                          border: `1px solid ${theme.palette.primary.main}`,
+                          borderRadius: '4px',
+                        })}
+                        onClick={() => {
+                          localStorage.setItem('indexChart', `{parent: "${indexParent}", child: "${indexChild}"}`);
+                          navigate(`/home/edit-chart/${indexChild}`);
+                        }}
+                      >
+                        <EditIcon />
                       </IconButton>
                     </Box>
                   </Stack>
@@ -723,12 +795,26 @@ const Home = () => {
                     {data.chartLabel}
                   </Typography>
                   {/* </Box> */}
-                  <Box>
-                    <IconButton>
+                  <Box display={'flex'} gap="16px">
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                    >
                       <ExportFiles />
                     </IconButton>
-                    <IconButton>
-                      <Gear />
+                    <IconButton
+                      sx={(theme) => ({
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '4px',
+                      })}
+                      onClick={() => {
+                        localStorage.setItem('indexChart', `{parent: "${indexParent}", child: "${indexChild}"}`);
+                        navigate(`/home/edit-chart/${indexChild}`);
+                      }}
+                    >
+                      <EditIcon />
                     </IconButton>
                   </Box>
                   {/* </Grid> */}

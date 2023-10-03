@@ -25,7 +25,8 @@ import { ReactComponent as ChevronDownRedSvg } from '../assets/icons/graphics/Ch
 import { ReactComponent as PickerColorSmallSvg } from '../assets/icons/graphics/Picker-Color-Small.svg';
 import { ReactComponent as CloseSvg } from '../assets/icons/graphics/Close.svg';
 import { ReactComponent as BarChartSvg } from '../assets/icons/graphics/Bar-Chart.svg';
-import { ReactComponent as DeleteFillSvg } from '../assets/icons/graphics/Bar-Chart.svg';
+import { ReactComponent as DeleteFillSvg } from '../assets/icons/graphics/Delete-Fill.svg';
+import { ReactComponent as EditSvg } from '../assets/icons/graphics/Edit.svg';
 
 export const HomeActive = (props) => (
   <SvgIcon component={HomeActiveSvg} viewBox="10 0 20 40" style={{ fill: 'primary.main' }} {...props} />
@@ -61,4 +62,5 @@ export const ChevronDownRed = (props) => <SvgIcon component={ChevronDownRedSvg} 
 export const PickerColorSmall = (props) => <SvgIcon component={PickerColorSmallSvg} {...props} sx={{ fontSize: 18 }} />;
 export const Close = (props) => <SvgIcon component={CloseSvg} viewBox="0 0 30 24" {...props} />;
 export const BarChartIcon = (props) => <SvgIcon component={BarChartSvg} viewBox="0 0 28 19" {...props} />;
-export const DeleteFill = (props) => <SvgIcon component={DeleteFillSvg} {...props} />;
+export const DeleteFill = (props) => <SvgIcon component={DeleteFillSvg} {...props} viewBox="0 0 18 19" />;
+export const EditIcon = (props) => <SvgIcon component={EditSvg} {...props} sx={{ fontSize: 18 }} />;

@@ -115,5 +115,6 @@ export default ({ mode }) => {
       outputFile: 'sonar-report.xml',
       reporters: 'vitest-sonar-reporter',
     },
+    assetsInclude: ['**/*.xlsx'],
   });
 };

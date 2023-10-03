@@ -3,6 +3,8 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS } from 'chart.js/auto';
 import { Box } from '@mui/system';
 import { Stack } from '@mui/material';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 const AreaChart = ({
   chartData,
   width,
@@ -14,6 +16,7 @@ const AreaChart = ({
   refChart,
   isAreaChart,
   legendClassName,
+  showAxisValue = true,
 }) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
@@ -41,6 +44,15 @@ const AreaChart = ({
   const htmlLegendPlugin = {
     id: 'htmlLegend',
     afterUpdate(chart, args, options) {
+      // var dataset = chart.config.data.datasets[0];
+      // var offset = 0;
+
+      // for (var i = 0; i < dataset._meta[0].data.length; i++) {
+      //   var model = dataset._meta[0].data[i]._model;
+      //   model.x += offset;
+      //   model.controlPointNextX += offset;
+      //   model.controlPointPreviousX += offset;
+      // }
       const ul = getOrCreateLegendList(chart, options.containerID);
 
       // Remove old legend items
@@ -106,10 +118,28 @@ const AreaChart = ({
       legend: {
         display: false,
       },
+      datalabels: {
+        display: true,
+        // formatter:  function (value, context) {
+        //     return context.chart.data.labels[context.dataIndex];
+        // },
+        anchor: 'end',
+        align: 'end',
+        offset: -2,
+        color: 'rgba(0, 0, 0, 1.0)',
+        backgroundColor: null,
+        font: {
+          size: 10,
+          weight: '700',
+          lineHeight: '15px',
+          // family: 'Poppins',
+        },
+      },
     },
+
     scales: {
       y: {
-        // beginAtZero: isAreaChart ? false : true,
+        beginAtZero: true,
         title: {
           display: true,
           text: labelY,
@@ -125,6 +155,13 @@ const AreaChart = ({
           //   return context?.index === 0 ? 0 : 1; // <-- this removes the base line
           // }
           lineWidth: 0,
+          // borderDash: [8, 4],
+        },
+        ticks: {
+          color: '#000000',
+          display: showAxisValue,
+
+          // display: false,
         },
       },
       x: {
@@ -138,14 +175,23 @@ const AreaChart = ({
           },
           color: '#000000',
         },
-        offset: false,
+        offset: true,
         display: true,
         ticks: {
           // padding: 20,
+          beginAtZero: true,
+          // display: false,
+          display: showAxisValue,
+          color: '#000000',
+          font: {
+            weight: 400,
+            size: '14px',
+          },
           // display: false,
         },
         grid: {
-          lineWidth: 0, // <-- this removes vertical lines between bars
+          borderDash: [8, 4],
+          // lineWidth: 0, // <-- this removes vertical lines between bars
         },
       },
     },
@@ -158,7 +204,7 @@ const AreaChart = ({
         // tension: 0.5,
       },
       point: {
-        radius: 0,
+        radius: 4,
       },
     },
     ...options,
@@ -186,7 +232,7 @@ const AreaChart = ({
             // height={'100%'}
             data={chartData}
             options={defaultOptions}
-            plugins={[htmlLegendPlugin]}
+            plugins={[htmlLegendPlugin, ChartDataLabels]}
           />
         </Box>
         <Box id={legendClassName} display={'flex'} justifyContent={'center'} sx={{ marginTop: '16px' }} />

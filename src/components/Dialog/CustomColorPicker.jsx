@@ -62,10 +62,11 @@ const CustomColorPicker = ({ codeColor, onChange }) => {
   const renderMain = useMemo(() => {
     return (
       <div style={inlineStyles.container}>
-        <Box sx={{ width: '38px', height: '200px', position: 'relative', transform: 'rotate(-180deg)' }}>
+        <Box sx={{ width: '38px', height: '200px', position: 'relative' }}>
           <Alpha
-            rgb={codeColor.rgb}
+            rgb={codeColor?.rgb}
             // hsv={codeColor.hsv}
+            hsl={codeColor?.hsl}
             pointer={CustomSliderAlpha}
             direction="vertical"
             // pointer={CustomPointer}
@@ -80,7 +81,7 @@ const CustomColorPicker = ({ codeColor, onChange }) => {
             onChange={onChange}
           />
         </div>
-        <Box sx={{ width: '38px', height: '200px', position: 'relative', transform: 'rotate(-180deg)' }}>
+        <Box sx={{ width: '38px', height: '200px', position: 'relative' }}>
           <Hue
             hsl={codeColor.hsl}
             // hsv={codeColor.hsv}
