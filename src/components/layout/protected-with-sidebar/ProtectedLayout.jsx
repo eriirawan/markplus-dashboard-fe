@@ -1,4 +1,14 @@
-import { Box, ClickAwayListener, Grid, Stack } from '@mui/material';
+import {
+  Box,
+  ClickAwayListener,
+  Grid,
+  Stack,
+  FormControl,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
+  Typography,
+} from '@mui/material';
 // import { alpha } from '@mui/material/styles';
 import { useContext, useState } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom';
@@ -15,6 +25,7 @@ import useSidebarMenus from '../SidebarMenu';
 import Sidebar from './Sidebar';
 import SidebarSmall from './SidebarSmall';
 import useAfterLoginStartup from '@/hooks/useAfterLogin';
+import Dialog from '../../Dialog/Dialog';
 
 const ProtectedLayout = () => {
   const { refreshMeData } = useAuth();
@@ -29,9 +40,48 @@ const ProtectedLayout = () => {
   const [openTaskList, setOpenTaskList] = useState(false);
   const [openProfileBar, setOpenProfileBar] = useState(false);
   const [showDrawerBackground, setShowDrawerBackground] = useState(false);
+  const [showDialogClient, setShowDialogClient] = useState(false);
   const windowDimensions = getWindowDimensions();
   const { refreshMasterData } = useAfterLoginStartup();
-
+  const [clientValue, setClientValue] = useState(null);
+  const dummyDataClient = [
+    {
+      label: 'PT XL Axiata Tbk (AXIS)',
+      value: 1,
+    },
+    {
+      label: 'PT Pertamina Persero',
+      value: 9,
+    },
+    {
+      label: 'PT Your Company Name 1',
+      value: 2,
+    },
+    {
+      label: 'PT Your Company Name 2',
+      value: 3,
+    },
+    {
+      label: 'PT Your Company Name 3',
+      value: 4,
+    },
+    {
+      label: 'PT Your Company Name 4',
+      value: 5,
+    },
+    {
+      label: 'PT Your Company Name 5)',
+      value: 6,
+    },
+    {
+      label: 'PT Your Company Name 6',
+      value: 7,
+    },
+    {
+      label: 'PT Your Company Name 7',
+      value: 8,
+    },
+  ];
   const styles = {
     appBarContainer: {
       alignItems: 'center',
@@ -94,7 +144,7 @@ const ProtectedLayout = () => {
               <Stack sx={{ ':-webkit-scrollbar': { display: 'none' } }}>
                 <Box sx={styles.appBarContainer} width="100%">
                   <Appbar
-                    title={me?.company_name ? me?.company_name : 'MARKPLUS DASHBOARD'}
+                    title={me?.company_name ? me?.company_name : 'Choose a Client'}
                     openNotification={openNotification}
                     openTaskList={openTaskList}
                     openProfileBar={openProfileBar}
@@ -102,12 +152,34 @@ const ProtectedLayout = () => {
                     setOpenTaskList={setOpenTaskList}
                     setOpenProfileBar={setOpenProfileBar}
                     setShowDrawerBackground={setShowDrawerBackground}
+                    setShowDialogClient={setShowDialogClient}
                   />
                 </Box>
                 <Stack sx={{ px: 2, overflow: 'auto' }}>{outlet}</Stack>
               </Stack>
             </Box>
           </Stack>
+          <Dialog open={showDialogClient} setOpen={setShowDialogClient} option={dummyDataClient}>
+            <FormControl variant="standard">
+              <RadioGroup
+                aria-labelledby="demo-error-radios"
+                name="quiz"
+                value={clientValue}
+                onChange={(e, value) => {
+                  setClientValue(value);
+                  // console.info(e.target.value, value, '<<< target');
+                }}
+              >
+                {dummyDataClient?.map((el) => (
+                  <FormControlLabel
+                    value={el.value}
+                    control={<Radio sx={{ p: 2 }} />}
+                    label={<Typography sx={{}}>{el.label} </Typography>}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+          </Dialog>
         </Grid>
         {/* <Box
           justifyContent="flex-end"

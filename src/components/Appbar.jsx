@@ -1,5 +1,6 @@
-import { Stack, Typography } from '@mui/material';
+import { MenuItem, Select, Stack, Typography, Paper } from '@mui/material';
 import ProfileBarButton from '@/components/ProfileBarButton';
+import { ExpandMore } from '@mui/icons-material';
 // import NotificationButton from './notification/NotificationButton';
 
 const Appbar = ({
@@ -9,12 +10,30 @@ const Appbar = ({
   setOpenTaskList,
   setOpenProfileBar,
   setShowDrawerBackground,
+  setShowDialogClient,
 }) => (
   <Stack flexDirection="row" alignItems="center" justifyContent="space-between" sx={{ py: 1, width: '100%' }}>
-    <Stack flexDirection="row" justifyContent="flex-start" display="flex">
-      <Typography variant="h2" sx={{ textTransform: 'uppercase' }}>
-        {title}
-      </Typography>
+    <Stack flexDirection="row" justifyContent="flex-start" display="flex" maxWidth={'403px'}>
+      {/* <Select>
+        <MenuItem disabled value=""></MenuItem>
+      </Select> */}
+      <Paper
+        sx={{
+          width: '100%',
+          maxWidth: '403px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '12px 24px',
+          cursor: 'pointer',
+        }}
+        onClick={(e) => setShowDialogClient((prev) => !prev)}
+      >
+        <Typography variant="h2" sx={{ textTransform: 'uppercase' }}>
+          {title}
+        </Typography>
+        <ExpandMore />
+      </Paper>
     </Stack>
     <Stack flexDirection="row" justifyContent="flex-start" display="flex">
       <ProfileBarButton

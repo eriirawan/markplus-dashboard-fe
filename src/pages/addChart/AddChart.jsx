@@ -149,6 +149,7 @@ const AddChart = (props) => {
           : changeToneColorDefault,
       width: widthSectionChart,
       file: fileImport,
+      showAxisValue,
     };
     if (formData.chartType === 'Bar Chart') {
       newValue.chartData = {
