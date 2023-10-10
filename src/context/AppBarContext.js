@@ -1,4 +1,4 @@
-import { useState, createContext } from 'react';
+import { useState, createContext, useEffect } from 'react';
 import useAxios from '@/hooks/useAxios';
 
 export const useStore = () => {
@@ -6,13 +6,7 @@ export const useStore = () => {
   const [unseenUpdateNumber, setUnseenUpdateNumber] = useState(0);
   const [unseenTaskListNumber, setUnseenTaskListNumber] = useState(0);
   const [clientSelected, setClientSelected] = useState(null);
-  const [listClient, setListClient] = useState();
-  const [{ response, loading }, reFetch] = useAxios({
-    url: `/dashboard/v1/users/list?page=${page}&page_size=${pageSize}&sort_by=${
-      sortBy || 'id'
-    }&sort_dir=${sortDir}&search=${search || '%20'}`,
-    method: 'get',
-  });
+
   return {
     hasNotification,
     setHasNotification,
@@ -22,8 +16,7 @@ export const useStore = () => {
     unseenTaskListNumber,
     unseenUpdateNumber,
     clientSelected,
-    listClient,
-    loading,
+    // loading,
   };
 };
 export const AppBarContext = createContext({});

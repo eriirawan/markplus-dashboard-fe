@@ -13,7 +13,7 @@ const Appbar = ({
   setShowDialogClient,
 }) => (
   <Stack flexDirection="row" alignItems="center" justifyContent="space-between" sx={{ py: 1, width: '100%' }}>
-    <Stack flexDirection="row" justifyContent="flex-start" display="flex" maxWidth={'403px'}>
+    <Stack flexDirection="row" justifyContent="flex-start" display="flex" maxWidth={'403px'} width={'100%'}>
       {/* <Select>
         <MenuItem disabled value=""></MenuItem>
       </Select> */}
