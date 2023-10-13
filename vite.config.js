@@ -11,11 +11,26 @@ import { ViteMinifyPlugin } from 'vite-plugin-minify';
 import terser from '@rollup/plugin-terser';
 import { obfuscate } from 'javascript-obfuscator';
 import cssnano from 'cssnano';
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
 export default ({ mode }) => {
   process.env = Object.assign(process.env, loadEnv(mode, process.cwd(), ''));
   return defineConfig({
     base: '/',
+    optimizeDeps: {
+      esbuildOptions: {
+        // Node.js global to browser globalThis
+        define: {
+          global: 'globalThis',
+        },
+        // Enable esbuild polyfill plugins
+        plugins: [
+          NodeGlobalsPolyfillPlugin({
+            buffer: true,
+          }),
+        ],
+      },
+    },
     build: {
       rollupOptions: {
         output: {

@@ -1,6 +1,16 @@
-import { Box, ClickAwayListener, Grid, Stack } from '@mui/material';
+import {
+  Box,
+  ClickAwayListener,
+  Grid,
+  Stack,
+  FormControl,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
+  Typography,
+} from '@mui/material';
 // import { alpha } from '@mui/material/styles';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom';
 // import TaskListDrawer from '@/components/TaskListDrawer';
 // import ProfileBarDrawer from '@/components/ProfileBarDrawer';
@@ -15,7 +25,9 @@ import useSidebarMenus from '../SidebarMenu';
 import Sidebar from './Sidebar';
 import SidebarSmall from './SidebarSmall';
 import useAfterLoginStartup from '@/hooks/useAfterLogin';
-
+import Dialog from '../../Dialog/Dialog';
+import useAxios from '@/hooks/useAxios';
+import { useUserStore } from '../../../pages/user/UserContext';
 const ProtectedLayout = () => {
   const { refreshMeData } = useAuth();
   const { userToken: token, me } = useContext(AppContext);
@@ -29,9 +41,11 @@ const ProtectedLayout = () => {
   const [openTaskList, setOpenTaskList] = useState(false);
   const [openProfileBar, setOpenProfileBar] = useState(false);
   const [showDrawerBackground, setShowDrawerBackground] = useState(false);
+  const [showDialogClient, setShowDialogClient] = useState(false);
   const windowDimensions = getWindowDimensions();
   const { refreshMasterData } = useAfterLoginStartup();
-
+  const [clientValue, setClientValue] = useState(null);
+  const [pageClientList, setPageClientList] = useState(1);
   const styles = {
     appBarContainer: {
       alignItems: 'center',
@@ -58,7 +72,13 @@ const ProtectedLayout = () => {
   };
 
   const handleOpenSidebar = (state) => setOpenSidebar(state);
-
+  const [{ response, loading }, reFetch] = useAxios({
+    url: `/dashboard/v1/users/list?page=${pageClientList}&page_size=${10}&sort_by=${'id'}&sort_dir=${'ASC'}`,
+    method: 'get',
+  });
+  useEffect(() => {
+    if (response?.meta?.totalData > 10) setPageClientList(response?.meta?.totalData);
+  }, [response]);
   window.onload = async () => {
     if (token) {
       await refreshMeData();
@@ -67,7 +87,10 @@ const ProtectedLayout = () => {
       window.location.href = `/login`;
     }
   };
-
+  const onSaveClient = () => {
+    store.setClientSelected(clientValue);
+    store.setOpenPopupClient(false);
+  };
   return (
     <AppBarContext.Provider value={store}>
       <Grid container>
@@ -94,7 +117,7 @@ const ProtectedLayout = () => {
               <Stack sx={{ ':-webkit-scrollbar': { display: 'none' } }}>
                 <Box sx={styles.appBarContainer} width="100%">
                   <Appbar
-                    title={me?.company_name ? me?.company_name : 'MARKPLUS DASHBOARD'}
+                    title={store.clientSelected?.company_name ? store.clientSelected?.company_name : 'Choose a Client'}
                     openNotification={openNotification}
                     openTaskList={openTaskList}
                     openProfileBar={openProfileBar}
@@ -102,12 +125,38 @@ const ProtectedLayout = () => {
                     setOpenTaskList={setOpenTaskList}
                     setOpenProfileBar={setOpenProfileBar}
                     setShowDrawerBackground={setShowDrawerBackground}
+                    setShowDialogClient={store.setOpenPopupClient}
                   />
                 </Box>
                 <Stack sx={{ px: 2, overflow: 'auto' }}>{outlet}</Stack>
               </Stack>
             </Box>
           </Stack>
+          <Dialog
+            open={store.openPopupClient}
+            setOpen={store.setOpenPopupClient}
+            option={response?.data}
+            onSave={onSaveClient}
+          >
+            <FormControl variant="standard">
+              <RadioGroup
+                aria-labelledby="demo-error-radios"
+                name="client"
+                value={clientValue?.id || null}
+                onChange={(e, value) => {
+                  setClientValue(response?.data?.find((el) => el.id === +value));
+                }}
+              >
+                {response?.data?.map((el) => (
+                  <FormControlLabel
+                    value={el.id}
+                    control={<Radio sx={{ p: 2 }} />}
+                    label={<Typography sx={{}}>{el.company_name} </Typography>}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+          </Dialog>
         </Grid>
         {/* <Box
           justifyContent="flex-end"
