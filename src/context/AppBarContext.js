@@ -1,4 +1,5 @@
-import { useState, createContext } from 'react';
+import { useState, createContext, useEffect } from 'react';
+import useAxios from '@/hooks/useAxios';
 
 export const useStore = () => {
   const [hasNotification, setHasNotification] = useState(false);
@@ -16,6 +17,8 @@ export const useStore = () => {
     openPopupClient,
     unseenTaskListNumber,
     unseenUpdateNumber,
+    clientSelected,
+    // loading,
   };
 };
 export const AppBarContext = createContext({});
