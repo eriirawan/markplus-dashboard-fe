@@ -27,6 +27,7 @@ import {
 } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { Close } from '@mui/icons-material';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Saturation } from 'react-color/lib/components/common';
 import { CustomPicker, SketchPicker } from 'react-color';
@@ -51,20 +52,32 @@ import TableChart from '../../components/chart/TableChart';
 import { BarChartIcon, ChevronDownRed, DeleteFill, DragIndicator, ExportFiles, Gear } from '../../helpers/Icons';
 import DefaultImageInformationCard from '@/assets/images/default-image-infomation-card.png';
 import ExampleFileEdit from '@/assets/file_example_XLS_10.xlsx';
+import { AddOrEditChartContext, useAddOrEditChartStore } from './addChartContext';
+import { AppBarContext } from '@/context/AppBarContext';
+import XlsxPopulate from 'xlsx-populate';
 
 const AddChart = (props) => {
-  const [optionDataChartType, setOptionDataChartType] = useState([
-    { label: 'Area Chart', value: 'Area Chart' },
-    { label: 'Bar Chart', value: 'Bar Chart' },
-    { label: 'Column Bar', value: 'Column Bar' },
-    { label: 'Line', value: 'Line Chart' },
-    { label: 'Stacked Chart', value: 'Stacked Chart' },
-    { label: '100% Stacked Chart', value: '100% Stacked Chart' },
-    { label: 'Table', value: 'Table Chart' },
-    { label: 'Donut Chart', value: 'Donut Chart' },
-    { label: 'Pie Chart', value: 'Pie Chart' },
-    { label: 'Information Card', value: 'Information Card' },
-  ]);
+  const store = useAddOrEditChartStore();
+  const appBarStore = useContext(AppBarContext);
+
+  const { clientSelected, setOpenPopupClient } = appBarStore;
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    handleFileInputChange,
+    setOpenDialog,
+    openDialog,
+    typeDialog,
+    setTypeDialog,
+    methods,
+    optionChartTypes,
+    setUserId,
+    setSectionId,
+    setChartId,
+    handleClick,
+    chartDetail,
+    userId,
+  } = store;
+  const [optionDataChartType, setOptionDataChartType] = useState([...optionChartTypes]);
   const { setDashboardContent, dashboardContent } = useDashboard();
   const [displayInputLabel, setDisplayInputLabel] = useState(true);
   const [colorSelected, setColorSelected] = useState('#FFFFFF');
@@ -84,21 +97,15 @@ const AddChart = (props) => {
   });
   const navigate = useNavigate();
   const { id } = useParams();
-  const [formData, setFormData] = useState({
-    chartType: '',
-    chartLabel: '',
-    chartData: [],
-    verticalAxisLabel: '',
-    horizontalAxisLabel: '',
-  });
-  const [openDialogStatusImport, setOpenDialogStatusImport] = useState({
-    loading: false,
-    success: false,
-    error: false,
-    confrimDeleteImportData: false,
-    confrimDeleteChartData: false,
-  });
-  const [typeDialog, setTypeDialog] = useState('loading');
+  // const [formData, setFormData] = useState({
+  //   chartType: '',
+  //   chartLabel: '',
+  //   chartData: [],
+  //   verticalAxisLabel: '',
+  //   horizontalAxisLabel: '',
+  // });
+  const [openDialogStatusImport, setOpenDialogStatusImport] = useState(openDialog);
+  // const [typeDialog, setTypeDialog] = useState('loading');
   const refInputFileImport = useRef(null);
   const [fileImport, setFileImport] = useState(null);
   const [errorImportForm, setErrorImportForm] = useState({
@@ -110,58 +117,49 @@ const AddChart = (props) => {
   const handleClickCover = () => {
     setDisplayColorPicker(!displayColorPicker);
   };
+  const watchAllField = methods.watch();
+  useEffect(() => {
+    if (optionChartTypes) {
+      // console.info(optionChartTypes, '<<< list api');
+      setOptionDataChartType(optionChartTypes);
+    }
+    if (clientSelected?.id) {
+      // setSectionType(location?.pathname?.slice(1));
+      setUserId(clientSelected?.id);
+    }
+    if (id) {
+      setChartId(id);
+    }
+    if (localStorage.optionChart) {
+      if (localStorage.optionChart === '100%' || localStorage.optionChart === '75%') {
+        setOptionDataChartType((prev) => {
+          return prev.filter(
+            (el) => el.name !== 'Information Chart' && el.name !== 'Pie Chart' && el.name !== 'Donut Chart'
+          );
+        });
+      } else if (localStorage.optionChart === '50%') {
+        setOptionDataChartType((prev) => {
+          return prev?.filter((el) => el.name !== 'Information Chart');
+        });
+      } else {
+        setOptionDataChartType((prev) => {
+          return prev.filter(
+            (el) => el.name === 'Information Chart' || el.name === 'Pie Chart' || el.name === 'Donut Chart'
+          );
+        });
+      }
+      // if(localStorage.)
+      // setDisplayInputLabel(false);
+    }
+    // console.info(methods.getValues(), watchAllField, '<<<< kentod');
+  }, [optionChartTypes, clientSelected]);
+
+  // console.info(methods.getValues(), '<<<< kentod');
   const handleChangeForm = (key, value) => {
-    setFormData({ ...formData, [key]: value });
+    // setFormData({ ...formData, [key]: value });
+    methods.setValue(key, value);
   };
   const [showAxisValue, setShowAxisValue] = useState(true);
-  const submitChart = () => {
-    let content = [...dashboardContent];
-    let jsonStr = localStorage.indexChart.replace(/(\w+:)|(\w+ :)/g, function (matchedStr) {
-      return '"' + matchedStr.substring(0, matchedStr.length - 1) + '":';
-    });
-    const indexChart = JSON.parse(jsonStr);
-    const widthSectionChart = id
-      ? JSON.parse(JSON.stringify(content[+indexChart.parent]))[+indexChart.child].width
-      : JSON.parse(JSON.stringify(content[+indexChart.parent]))[+indexChart.child];
-    let indexColor = 0;
-    const defaultColor = ['#F54D3D', '#E95670', '#B34270', '#713770'];
-    const changeToneColorDefault = {
-      ...dataChart,
-      datasets: [...dataChart.datasets].map((el, i) => {
-        if (i !== 0 && i !== defaultColorChart.length - 1) {
-          indexColor += 1;
-        } else {
-          indexColor = 0;
-        }
-        return {
-          ...el,
-          borderColor: defaultColor[indexColor],
-          backgroundColor: defaultColor[indexColor],
-          ...(formData.chartType === 'Area Chart' ? { fill: true } : {}),
-        };
-      }),
-    };
-    const newValue = {
-      ...formData,
-      chartData:
-        formData.chartType === 'Donut Chart' || formData.chartType === 'Pie Chart'
-          ? dataChartDonutOrPie
-          : changeToneColorDefault,
-      width: widthSectionChart,
-      file: fileImport,
-    };
-    if (formData.chartType === 'Bar Chart') {
-      newValue.chartData = {
-        axis: 'y',
-        ...newValue.chartData,
-      };
-    }
-    content[+indexChart.parent][+indexChart.child] = {
-      ...newValue,
-    };
-    setDashboardContent(content);
-    navigate('/home');
-  };
   const breadcrumbs = useMemo(() => {
     return [
       <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/home')} sx={{ cursor: 'pointer' }}>
@@ -173,44 +171,43 @@ const AddChart = (props) => {
     ];
   }, [id]);
   const SettingContent = useMemo(() => {
-    if (formData.chartType && JSON.stringify(dataChart) !== '{}') {
-      switch (formData.chartType) {
+    if (methods.getValues('chartType') && JSON.stringify(watchAllField.chartData) !== '{}') {
+      switch (methods.getValues('chartType')) {
         case 'Line Chart': {
           setDisplayInputLabel(true);
           return (
             <Box>
               <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
-                {formData.chartLabel}
+                {methods.getValues('chartLabel')}
               </Typography>
               <LineChart
                 refChart={chartRef}
                 width={'549px'}
                 height={'335px'}
                 maxWidthLegend={'369px'}
-                labelX={formData.verticalAxisLabel}
-                // legendClassName={'legend-container-bar-chart'}
-                labelY={formData.horizontalAxisLabel}
+                labelX={methods.getValues('verticalAxisLabel')}
+                labelY={methods.getValues('horizontalAxisLabel')}
                 legendClassName={'legend-container-line'}
                 options={{}}
-                chartData={dataChart}
+                chartData={methods.getValues('chartData')}
                 showAxisValue={showAxisValue}
               ></LineChart>
             </Box>
           );
         }
-        case 'Column Bar': {
+        case 'Column Chart': {
           setDisplayInputLabel(true);
           return (
             <Box>
               <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
-                {formData.chartLabel}
+                {methods.getValues('chartLabel')}
               </Typography>
               <BarChart
                 refChart={chartRef}
                 maxWidthLegend={'369px'}
-                chartData={dataChart}
-                labelX={formData.verticalAxisLabel}
-                labelY={formData.horizontalAxisLabel}
+                chartData={methods.getValues('chartData')}
+                labelX={methods.getValues('verticalAxisLabel')}
+                labelY={methods.getValues('horizontalAxisLabel')}
                 legendClassName={'legend-container-column-chart'}
                 options={{}}
                 showAxisValue={showAxisValue}
@@ -223,18 +220,18 @@ const AddChart = (props) => {
           return (
             <Box>
               <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
-                {formData.chartLabel}
+                {methods.getValues('chartLabel')}
               </Typography>
               <BarChart
                 refChart={chartRef}
                 maxWidthLegend={'369px'}
                 legendClassName={'legend-container-bar-chart'}
                 indexAxis={'y'}
-                labelX={formData.verticalAxisLabel}
-                labelY={formData.horizontalAxisLabel}
+                labelX={methods.getValues('verticalAxisLabel')}
+                labelY={methods.getValues('horizontalAxisLabel')}
                 chartData={{
                   axis: 'y',
-                  ...dataChart,
+                  ...methods.getValues('chartData'),
                 }}
                 options={{}}
                 showAxisValue={showAxisValue}
@@ -247,7 +244,7 @@ const AddChart = (props) => {
           return (
             <Box sx={{ marginTop: '16px' }}>
               <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'16px'}>
-                {formData.chartLabel}
+                {methods.getValues('chartLabel')}
               </Typography>
               <DonutChart
                 refChart={chartRef}
@@ -265,7 +262,7 @@ const AddChart = (props) => {
           return (
             <Box sx={{ marginTop: '16px' }}>
               <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'16px'}>
-                {formData.chartLabel}
+                {methods.getValues('chartLabel')}
               </Typography>
               <PieChart
                 refChart={chartRef}
@@ -283,23 +280,23 @@ const AddChart = (props) => {
           return (
             <Box>
               <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
-                {formData.chartLabel}
+                {methods.getValues('chartLabel')}
               </Typography>
               <AreaChart
                 refChart={chartRef}
                 width={'549px'}
                 height={'335px'}
                 legendClassName={'legend-container-area-chart'}
-                labelX={formData.verticalAxisLabel}
-                labelY={formData.horizontalAxisLabel}
+                labelX={methods.getValues('verticalAxisLabel')}
+                labelY={methods.getValues('horizontalAxisLabel')}
                 chartData={{
-                  ...dataChart,
-                  datasets: { ...dataChart }.datasets.map((el) => ({
+                  ...methods.getValues('chartData'),
+                  datasets: { ...methods.getValues('chartData') }.datasets.map((el) => ({
                     ...el,
                     // data: [0, ...el.data],
                     fill: {
                       target: 'origin', // 3. Set the fill options
-                      above: el.backgroundColor.replace('1)', '0.3)'),
+                      above: el.backgroundColor?.replace('1)', '0.3)') || el?.backgroundColor,
                     },
                   })),
                 }}
@@ -319,10 +316,10 @@ const AddChart = (props) => {
                 width={'549px'}
                 height={'335px'}
                 maxWidthLegend={'369px'}
-                chartData={dataChart}
+                chartData={methods.getValues('chartData')}
                 legendClassName={'legend-container-bar-chart'}
-                labelX={formData.verticalAxisLabel}
-                labelY={formData.horizontalAxisLabel}
+                labelX={methods.getValues('verticalAxisLabel')}
+                labelY={methods.getValues('horizontalAxisLabel')}
                 isStackedChart={true}
                 options={{}}
                 showAxisValue={showAxisValue}
@@ -339,10 +336,10 @@ const AddChart = (props) => {
                 width={'549px'}
                 height={'335px'}
                 maxWidthLegend={'369px'}
-                chartData={dataChart}
+                chartData={methods.getValues('chartData')}
                 legendClassName={'legend-container-bar-chart'}
-                labelX={formData.verticalAxisLabel}
-                labelY={formData.horizontalAxisLabel}
+                labelX={methods.getValues('verticalAxisLabel')}
+                labelY={methods.getValues('horizontalAxisLabel')}
                 isFullStackedChart={true}
                 isStackedChart={true}
                 options={{}}
@@ -356,13 +353,13 @@ const AddChart = (props) => {
           return (
             <Box sx={{ marginTop: '20px' }}>
               <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
-                {formData.chartLabel}
+                {methods.getValues('chartLabel')}
               </Typography>
-              <TableChart chartData={dataChart} />
+              <TableChart chartData={methods.getValues('chartData')} />
             </Box>
           );
         }
-        case 'Information Card': {
+        case 'Information Chart': {
           return (
             <Paper
               sx={{
@@ -408,7 +405,7 @@ const AddChart = (props) => {
                         fontWeight="700"
                         lineHeight="31px"
                       >
-                        {formData.chartLabel}
+                        {methods.getValues('chartLabel')}
                       </Typography>
                     </Box>
                     <Box>
@@ -426,16 +423,6 @@ const AddChart = (props) => {
                   </Stack>
                   <Box sx={{ width: '100%' }} display={'flex'} justifyContent={'flex-end'} alignItems={'flex-end'}>
                     <img src={DefaultImageInformationCard} />
-                    {/* <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
-                    10.638
-                  </Typography>
-                  <Box display="flex" alignItems={'center'}>
-                    <ChevronDownRed />
-                    <Typography fontSize={'24px'} fontWeight={400} lineHeight="31px">
-                      {' '}
-                      1045
-                    </Typography>
-                  </Box> */}
                   </Box>
                 </Box>
               </Box>
@@ -454,16 +441,6 @@ const AddChart = (props) => {
         }
       }
     } else {
-      // if (
-      //   formData.chartType === 'Table Chart' ||
-      //   formData.chartType === 'Information Card' ||
-      //   formData.chartType === 'Donut Chart' ||
-      //   formData.chartType === 'Pie Chart'
-      // ) {
-      //   setDisplayInputLabel(false);
-      // } else {
-      //   setDisplayInputLabel(true);
-      // }
       return (
         <Box sx={{ width: '100%', height: '100%' }} display="flex" justifyContent={'center'} alignItems="center">
           <Typography fontSize={'18px'} lineHeight="27px" fontWeight={400} color="#BFBFBF">
@@ -472,123 +449,61 @@ const AddChart = (props) => {
         </Box>
       );
     }
+  }, [
+    methods.getValues('chartData'),
+    methods.getValues('chartType'),
 
-    // }
-  }, [formData, dataChart, displayColorPicker, colorSelected, showAxisValue]);
-  useEffect(() => {
-    if (localStorage.optionChart) {
-      if (localStorage.optionChart === '100%' || localStorage.optionChart === '75%') {
-        setOptionDataChartType((prev) => {
-          return prev.filter(
-            (el) => el.value !== 'Information Card' && el.value !== 'Pie Chart' && el.value !== 'Donut Chart'
-          );
-        });
-      } else if (localStorage.optionChart === '50%') {
-        setOptionDataChartType((prev) => {
-          return prev?.filter((el) => el.value !== 'Information Card');
-        });
-      } else {
-        setOptionDataChartType((prev) => {
-          return prev.filter(
-            (el) => el.value === 'Information Card' || el.value === 'Pie Chart' || el.value === 'Donut Chart'
-          );
-        });
-      }
-      // if(localStorage.)
-      // setDisplayInputLabel(false);
-    }
-    if (id) {
-      // console.info(dashboardContent, '<<< dashboardContent');
-      let jsonStr = localStorage.indexChart.replace(/(\w+:)|(\w+ :)/g, function (matchedStr) {
-        return '"' + matchedStr.substring(0, matchedStr.length - 1) + '":';
+    displayColorPicker,
+    colorSelected,
+    showAxisValue,
+  ]);
+
+  const saveAsExcel = async () => {
+    const data = chartDetail?.tabular?.labels?.map((el) => ({ test: el }));
+    chartDetail?.tabular?.datasets?.forEach((element) => {
+      element.data.forEach((el, i) => {
+        data[i][element.label] = el;
       });
-      const indexChart = JSON.parse(jsonStr);
-      // console.info(indexChart, '<<<< indexChart');
-      const content = dashboardContent[+indexChart?.parent][+indexChart?.child];
-      // parseFile(content?.file);
-      setFileImport(content?.file);
-      setDataChart(content?.chartData);
-      setFormData((prev) => ({
-        ...prev,
-        chartType: content?.chartType,
-        chartLabel: content?.chartLabel,
-        horizontalAxisLabel: content?.horizontalAxisLabel,
-        verticalAxisLabel: content?.verticalAxisLabel,
-        chartData: content?.chartData,
-      }));
-      // setFile()
-      // console.info(new File([ExampleFileEdit], 'fileExample.xlsx'), ExampleFileEdit, '<<< apa dianya');
-      // const reader = new FileReader();
-      // reader.onload = (evnt) => {
-      //   console.info(evnt.target.result, '<<<< apa dia');
-      // };
-      // parseFile(
-      //   new File([ExampleFileEdit], 'fileExample.xlsx', {
-      //     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      //   })
-      // );
-      // console.info(new File(ExampleFileEdit, ), '<<<< example');
-      // window.req(
-      //   window.TEMPORARY,
-      //   5 * 1024 * 1024,
-      //   function (fs) {
-      //     fs.root.getFile(
-      //       ExampleFileEdit,
-      //       { create: true, exclusive: false },
-      //       function (fileEntry) {
-      //         fileEntry.file(function (file) {
-      //           console.log(file);
-      //         });
-      //       },
-      //       (err) => {
-      //         console.log(err);
-      //       }
-      //     );
-      //   },
-      //   (err) => {
-      //     console.log(err);
-      //   }
-      // );
-      // parseFile(ExampleFileEdit);
-      // const fileExample = await import()
-      // console.info(ExampleFileEdit.arrayBuffer(), '<<<< cinsada');
+    });
+    let header = ['', ...chartDetail?.tabular?.datasets?.map((el) => el.label)];
+    const ws = XLSX.utils.book_new();
+    XLSX.utils.sheet_add_aoa(ws, [header]);
+    XLSX.utils.sheet_add_json(ws, data, { origin: 'A2', skipHeader: true });
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+    const finalData = new Blob([excelBuffer], { type: '.xlsx' });
+    const file = new File([finalData], chartDetail?.tabular?.filename, { lastModified: new Date() });
+    setFileImport(file);
+  };
+  useEffect(() => {
+    if (id && chartDetail) {
+      saveAsExcel();
+      const mappingDataFormDetail = {
+        chartType: chartDetail?.chart_type_name,
+        chartTypeId: chartDetail?.chart_type_id,
+        chartLabel: chartDetail.title,
+        chartData: {
+          labels: chartDetail?.tabular?.labels,
+          datasets: chartDetail?.tabular?.datasets.map((el) => {
+            return {
+              data: el.data,
+              label: el.label,
+              backgroundColor: chartDetail?.colorway[el.label].backgroundColor,
+              borderColor: chartDetail?.colorway[el.label].borderColor,
+            };
+          }),
+        },
+        verticalAxisLabel: chartDetail?.label_vertical,
+        horizontalAxisLabel: chartDetail?.label_horizontal,
+      };
+      for (let obj in mappingDataFormDetail) {
+        handleChangeForm(obj, mappingDataFormDetail[obj]);
+      }
+
+      setChartId(id);
     }
-  }, []);
-  // useEffect(() => {
-  //   if (!refInputFileImport?.current?.value && id) {
-  //     // refInputFileImport.current.value = ExampleFileEdit;
-  //     // var GetFileBlobUsingURL = function (url, convertBlob) {
-  //     //   var xhr = new XMLHttpRequest();
-  //     //   xhr.open('GET', url);
-  //     //   xhr.responseType = 'blob';
-  //     //   xhr.addEventListener('load', function () {
-  //     //     convertBlob(xhr.response);
-  //     //   });
-  //     //   xhr.send();
-  //     // };
+  }, [chartDetail, id]);
 
-  //     // var blobToFile = function (blob, name) {
-  //     //   blob.lastModifiedDate = new Date();
-  //     //   blob.name = name;
-  //     //   return blob;
-  //     // };
-
-  //     // var GetFileObjectFromURL = function (filePathOrUrl, convertBlob) {
-  //     //   GetFileBlobUsingURL(filePathOrUrl, function (blob) {
-  //     //     convertBlob(blobToFile(blob, 'fileExample.xlsx'));
-  //     //   });
-  //     // };
-  //     // var FileURL = ExampleFileEdit;
-  //     // GetFileObjectFromURL(FileURL, function (fileObject) {
-  //     //   console.log(fileObject);
-  //     //   parseFile(fileObject);
-  //     // });
-  //     // console.info(refInputFileImport?.current?.change());
-  //     refInputFileImport.current.dispatchEvent(new Event('change', ExampleFileEdit));
-
-  //     // console.info(ExampleFileEdit, '<<< apa dah');
-  //   }
-  // }, [id, refInputFileImport?.current]);
   const DialogStatusImport = ({ openDialogImport, setOpenDialogImport, typeDialog = 'loading' }) => {
     const getLayoutContentText = () => {
       switch (typeDialog) {
@@ -608,9 +523,10 @@ const AddChart = (props) => {
       switch (typeDialog) {
         case 'loading':
           return (
-            <Box display={'flex'} gap={'10px'} flexDirection={'column'} sx={{ maxWidth: '512px', width: '100%' }}>
+            // <Box display={'flex'} gap={'10px'} flexDirection={'column'} sx={{ maxWidth: '512px', width: '100%' }}>
+            <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
               <CircularProgress />
-            </Box>
+            </Stack>
           );
         case 'success':
           return (
@@ -618,17 +534,17 @@ const AddChart = (props) => {
               <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
                 <img src={SuccessImage} />
               </Stack>
-              <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, success: false }))}>OK</Button>
+              <Button onClick={() => setOpenDialogImport((prev) => ({ ...prev, success: false }))}>OK</Button>
             </Box>
           );
         case 'deleteChart':
           return (
             <Box display={'flex'} flexDirection={'column'} gap={'16px'}>
-              <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, success: false }))}>
+              <Button onClick={() => setOpenDialogImport((prev) => ({ ...prev, success: false }))}>
                 <WarningOutlined />
                 <Typography>Delete</Typography>
               </Button>
-              <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, success: false }))}>Cancel</Button>
+              <Button onClick={() => setOpenDialogImport((prev) => ({ ...prev, success: false }))}>Cancel</Button>
             </Box>
           );
         case 'deleteImportData':
@@ -639,7 +555,7 @@ const AddChart = (props) => {
               <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
                 <img src={ErrorImage} />
               </Stack>
-              <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, error: false }))}>OK</Button>
+              <Button onClick={() => setOpenDialogImport((prev) => ({ ...prev, error: false }))}>OK</Button>
             </Box>
           );
       }
@@ -667,40 +583,16 @@ const AddChart = (props) => {
           <Typography sx={{ fontWeight: 700, fontSize: '18px', lineHeight: '27px' }}>Import Data</Typography>
           <IconButton
             aria-label="close"
-            onClick={() => setOpenDialogImport((prev) => ({ ...prev, [typeDialog]: false }))}
-            sx={{
-              // position: 'absolute',
-              // right: 8,
-              // top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
+            onClick={() => setOpenDialogImport((prev) => !prev)}
+            sx={{ border: 1.5, color: 'primary.main', height: '44px', width: '44px' }}
           >
-            <CancelOutlinedIcon />
+            <Close />
           </IconButton>
         </Stack>
         <DialogContent sx={{ padding: 0 }}>
           <Stack display={'flex'} direction="column" gap={'16px'}>
             <Typography>{getLayoutContentText(typeDialog)}</Typography>
             {getLayoutContentAction()}
-            {/* {typeDialog === 'loading' ? (
-              <Box display={'flex'} gap={'10px'} flexDirection={'column'} sx={{ maxWidth: '512px', width: '100%' }}>
-                <CircularProgress />
-              </Box>
-            ) : typeDialog === 'success' ? (
-              <Box display={'flex'} flexDirection={'column'} gap={'16px'}>
-                <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
-                  <img src={SuccessImage} />
-                </Stack>
-                <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, success: false }))}>OK</Button>
-              </Box>
-            ) : (
-              <Box display={'flex'} flexDirection={'column'}>
-                <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
-                  <img src={ErrorImage} />
-                </Stack>
-                <Button onClick={() => setOpenDialogStatusImport((prev) => ({ ...prev, error: false }))}>OK</Button>
-              </Box>
-            )} */}
           </Stack>
         </DialogContent>
       </Dialog>
@@ -710,198 +602,49 @@ const AddChart = (props) => {
   // }, [window.innerWidth]);
   const parseFile = async (file) => {
     try {
-      // console.info(file, '<<<< file');
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { blankrows: false });
-      const temp = {
-        labels: [],
-        datasets: [],
-      };
-      const tempDonut = {
-        labels: [],
-        datasets: [],
-      };
-      const color = ['rgba(0, 108, 183, 1)', 'rgba(173, 195, 43, 1)', 'rgba(237, 27, 47, 1)', 'rgba(255, 213, 61, 1)'];
-      let indexColor = 0;
-      const tempEachData = {};
-      const tempEachLabels = [];
-      jsonData.forEach((el, i) => {
-        const tempData = {
-          label: '',
-          data: [],
-          backgroundColor: '',
-          borderColor: '',
-        };
-        const tempLabels = [];
-        // el.forEach((data, index) => {
-        //   if (index > 0 && i === 0) {
-        //     temp.labels.push(data);
-        //   } else {
-        //     if (tempEachData[el[0]]) {
-        //       tempEachData[el[0]].push(data);
-        //     } else {
-        //       tempEachData[el[0]] = [data];
-        //     }
-        //   }
-        // });
-        Object.entries(el).forEach((data, index) => {
-          if (index > 0) {
-            if (tempEachData[data[0]]) {
-              tempEachData[data[0]].push(data[1]);
-            } else {
-              tempEachData[data[0]] = [data[1]];
-            }
-          } else {
-            tempEachLabels.push(data[1]);
-          }
-        });
-        // if (i === 0) {
-        //   temp.labels.push(el.slice(0));
-        // } else {
-        //   el.forEach((data, index) => {
-        //     if (index === 0) {
-        //       tempData.label = data;
-        //     } else {
-        //       tempData.data.push(data);
-        //       tempData.backgroundColor = color[indexColor];
-        //       tempData.borderColor = color[index];
-        //     }
-        //   });
-        // }
-        // console.info(tempData, '<<< tempData');
-
-        // console.info(key, '<<< entries');
-
-        // if (i === 0) {
-        //   temp.labels.push(el);
-        //   temp.datasets.push({
-        //     label: el[0],
-        //     data: tempData,
-        //     backgroundColor: color[indexColor],
-        //     borderColor: color[indexColor],
-        //   });
-        // }
-        // console.info
-        // tempData.data.
-        // if (i !== 1) {
-        //   if (index !== 0) {
-        //     tempData.push(data);
-        //   } else {
-        //   }
-        // }
-        // console.info(temp, '<<< temp');
-        // temp.labels.push(el.label);
-        // if (el?.category) {
-        //   temp.datasets.push({
-        //     label: el.category,
-        //     data: el?.data?.split(',').map((data) => +data),
-        //     backgroundColor: color[indexColor],
-        //     borderColor: color[indexColor],
-        //   });
-        // }
-        // indexColor += 1;
-        // if (indexColor > color.length - 1) {
-        //   indexColor = 0;
-        // }
-        // if (i === 0) {
-        //   tempDonut.datasets.push({
-        //     data: el.data.split(',').map((data) => +data),
-        //     label: el.label,
-        //     borderColor: [],
-        //     backgroundColor: [],
-        //   });
-        // }
-        // tempDonut.labels.push(el.label);
-        // tempDonut.datasets[0].borderColor.push(color[indexColor]);
-        // tempDonut.datasets[0].backgroundColor.push(color[indexColor]);
-      });
-      // console.info(tempEachData, temp, '<<< temp ');
-      Object.entries(tempEachData).forEach((data, index) => {
-        const datasetValue = {
-          label: tempEachLabels[index],
-          data: data[1],
-          backgroundColor: color[indexColor],
-          borderColor: color[indexColor],
-        };
-        indexColor += 1;
-        if (index === color.length - 1) {
-          indexColor = 0;
-        }
-        if (index === 0) {
-          tempDonut.datasets.push({
-            label: tempEachLabels[index],
-            data: data[1],
-            backgroundColor: [],
-            borderColor: [],
-          });
-        }
-        tempDonut.datasets[0].borderColor.push(color[indexColor]);
-        tempDonut.datasets[0].backgroundColor.push(color[indexColor]);
-        tempDonut.labels.push(data[0]);
-
-        temp.datasets.push({ ...datasetValue });
-        temp.labels.push(data[0]);
-      });
-      // temp.labels = [...tempEachLabels];
-      // console.info(temp, '<<<< temp');
-      setDataChartDonutOrPie(tempDonut);
-      setDataChart(temp);
-      handleChangeForm('chartData', temp.datasets);
-
-      // }
-      // setDataChart(temp);
-      // handleChangeForm('chartData', temp.datasets);
-
-      // // }
-      // // setDataChart(temp);
-      // // handleChangeForm('chartData', temp.datasets);
-      setOpenDialogStatusImport((prev) => ({ ...prev, loading: false }));
-      setTypeDialog('success');
-      setOpenDialogStatusImport((prev) => ({ ...prev, success: true }));
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { blankrows: false, header: 1 });
     } catch (err) {
       console.info(err);
-      setOpenDialogStatusImport((prev) => ({ ...prev, loading: false }));
-      setTypeDialog('error');
-      setOpenDialogStatusImport((prev) => ({ ...prev, error: true }));
     }
-
-    //  handleChangeForm('chartData', temp);
-    //   setDataChart(temp);
   };
-  // useEffect(() => {
-  //   if (colorSelected) {
-  //     console.info(tinycolor(colorSelected).toHsl(), '<<<< to hsl');
-  //     console.info(tinycolor(colorSelected).toHsv(), '<<<< to hsv');
-  //   }
-  // }, [colorSelected]);
+  useEffect(() => {
+    if (id) {
+      store.setAction('update');
+    } else {
+      store.setAction('create');
+    }
+  }, [id]);
+  // console.info(watchAllField, '<<< watch  <<<');
 
   return (
-    <Stack
-      sx={{
-        height: '100%',
-        width: '100%',
-      }}
-      gap={'20px'}
-      //   onClick={() => handleClickCover()}
-    >
-      <Paper sx={{ padding: '32px' }}>
-        <Grid container>
-          <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
-            {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '548px', mt: 1 }}> */}
-            <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
-              <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>{breadcrumbs}</Breadcrumbs>
-              <Typography
-                fontWeight={700}
-                fontSize="30px"
-                lineHeight={'39px'}
-                color="primary"
-                sx={{ marginTop: '16px' }}
-              >
-                {id ? 'Edit Chart' : 'Add Chart'}
-              </Typography>
-              {/* <Typography
+    <AddOrEditChartContext.Provider value={store}>
+      <Stack
+        sx={{
+          height: '100%',
+          width: '100%',
+        }}
+        gap={'20px'}
+        //   onClick={() => handleClickCover()}
+      >
+        <Paper sx={{ padding: '32px' }}>
+          <Grid container>
+            <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
+              {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '548px', mt: 1 }}> */}
+              <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
+                <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>{breadcrumbs}</Breadcrumbs>
+                <Typography
+                  fontWeight={700}
+                  fontSize="30px"
+                  lineHeight={'39px'}
+                  color="primary"
+                  sx={{ marginTop: '16px' }}
+                >
+                  {id ? 'Edit Chart' : 'Add Chart'}
+                </Typography>
+                {/* <Typography
                 fontWeight={700}
                 fontSize="18px"
                 lineHeight={'27px'}
@@ -910,82 +653,62 @@ const AddChart = (props) => {
               >
                 Chart Settings
               </Typography> */}
-              <Box display={'flex'} flexDirection="column">
-                <Box display={'flex'} alignItems={'center'} gap="10px" sx={{ py: '32px' }}>
-                  <Button
-                    aria-label="close"
-                    color="primary"
-                    sx={{ minWidth: '200px' }}
-                    onClick={() => refInputFileImport.current.click()}
-                    disabled={fileImport}
-                  >
-                    <FileOpenOutlinedIcon color="white" />
-                    <Typography
-                      sx={{ marginLeft: '5px' }}
-                      fontSize={'14px'}
-                      fontWeight={400}
-                      lineHeight={'21px'}
-                      color={'#FFFFFF'}
+                <Box display={'flex'} flexDirection="column">
+                  <Box display={'flex'} alignItems={'center'} gap="10px" sx={{ py: '32px' }}>
+                    <Button
+                      aria-label="close"
+                      color="primary"
+                      sx={{ minWidth: '200px' }}
+                      onClick={() => {
+                        if (!clientSelected) {
+                          setOpenPopupClient(true);
+                        } else {
+                          refInputFileImport.current.click();
+                        }
+                      }}
+                      disabled={fileImport ? true : false}
                     >
-                      Import
-                    </Typography>
-                  </Button>
-                  {fileImport ? (
-                    <Box display={'flex'} alignItems={'center'}>
-                      <Typography textAlign={'center'} maxWidth={'350px'}>
-                        {fileImport?.name}
-                      </Typography>
-                      <IconButton
-                        onClick={() => {
-                          setFileImport(null);
-                          setDataChart({});
-                        }}
+                      <FileOpenOutlinedIcon color="white" />
+                      <Typography
+                        sx={{ marginLeft: '5px' }}
+                        fontSize={'14px'}
+                        fontWeight={400}
+                        lineHeight={'21px'}
+                        color={'#FFFFFF'}
                       >
-                        <DeleteFill />
-                      </IconButton>
-                    </Box>
-                  ) : (
-                    <Typography>No data imported yet.</Typography>
-                  )}
-                </Box>
-                <Box display={'flex'} flexDirection={'column'} gap="16px">
-                  <Autocomplete
-                    fullWidth
-                    disablePortal
-                    options={optionDataChartType}
-                    value={formData.chartType}
-                    inputValue={formData.chartType}
-                    PaperComponent={(props) => (
-                      <Paper
-                        sx={(theme) => ({
-                          border: `${theme.palette.primary.main} 1px solid`,
-                          marginTop: '4px',
-                          borderRadius: '10px',
-                        })}
-                        {...props}
-                      ></Paper>
+                        Import
+                      </Typography>
+                    </Button>
+                    {fileImport ? (
+                      <Box display={'flex'} alignItems={'center'}>
+                        <Typography textAlign={'center'} maxWidth={'350px'}>
+                          {fileImport?.name}
+                        </Typography>
+                        <IconButton
+                          onClick={() => {
+                            setFileImport(null);
+                            methods.setValue('chartData', {});
+                          }}
+                        >
+                          <DeleteFill />
+                        </IconButton>
+                      </Box>
+                    ) : (
+                      <Typography>No data imported yet.</Typography>
                     )}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        InputProps={{ style: { height: '44px' }, ...params.InputProps }}
-                        InputLabelProps={{ shrink: true, ...params.InputLabelProps }}
-                        label="Chart Type"
-                        placeholder="Chart Type"
-                      />
-                    )}
-                    onChange={(e, newValue) => {
-                      handleChangeForm('chartType', newValue?.value || '');
-                    }}
-                    sx={{ padding: '9px 0px 19px 0px' }}
-                  ></Autocomplete>
-                  {formData.chartType === 'Information Card' && (
+                  </Box>
+                  <Box display={'flex'} flexDirection={'column'} gap="16px">
                     <Autocomplete
                       fullWidth
+                      // freeSolo
+                      isOptionEqualToValue={(opt) => opt.name === methods.getValues('chartType')}
                       disablePortal
-                      options={[{ label: 'Median', value: 'Median' }]}
-                      value={'Median'}
-                      inputValue={'Median'}
+                      options={optionDataChartType}
+                      {...methods.register('chartType')}
+                      getOptionLabel={(option) => option.name || ''}
+                      defaultValue={methods.getValues('chartType')}
+                      // value={methods.getValues('chartType')}
+                      inputValue={methods.getValues('chartType')}
                       PaperComponent={(props) => (
                         <Paper
                           sx={(theme) => ({
@@ -1001,206 +724,260 @@ const AddChart = (props) => {
                           {...params}
                           InputProps={{ style: { height: '44px' }, ...params.InputProps }}
                           InputLabelProps={{ shrink: true, ...params.InputLabelProps }}
-                          label="Formula"
-                          placeholder="Formula"
+                          label="Chart Type"
+                          placeholder="Chart Type"
                         />
                       )}
-                      // onChange={(e, newValue) => {
-                      //   handleChangeForm('chartType', newValue?.value || '');
-                      // }}
+                      onChange={(e, newValue) => {
+                        handleChangeForm('chartTypeId', newValue?.id || '');
+                        handleChangeForm('chartType', newValue?.name || '');
+                      }}
                       sx={{ padding: '9px 0px 19px 0px' }}
                     ></Autocomplete>
-                  )}
-                  <TextField
-                    label={
-                      formData.chartType === 'Table Chart'
-                        ? 'Table Label'
-                        : formData.chartType === 'Information Card'
-                        ? 'Information Label'
-                        : 'Chart Label'
-                    }
-                    placeholder={
-                      formData.chartType === 'Table Chart'
-                        ? 'Type table label'
-                        : formData.chartType === 'Information Card'
-                        ? 'Type information label'
-                        : 'Type chart label'
-                    }
-                    value={formData?.chartLabel}
-                    InputProps={{ style: { height: '44px' } }}
-                    InputLabelProps={{ shrink: true }}
-                    onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
-                    sx={{ padding: '9px 0px 19px 0px' }}
-                  ></TextField>
-                  {displayInputLabel && (
-                    <>
-                      <Box
-                        display={'flex'}
-                        justifyContent={'space-between'}
-                        alignItems={'center'}
-                        sx={{ marginBottom: '16px' }}
-                      >
-                        <Box>
-                          <Typography fontWeight={400} size="14px" lineHeight={'21px'} color={'#000000'}>
-                            Hide or Show Axis Value
-                          </Typography>
-                          <Typography fontWeight={400} size="12px" lineHeight={'16px'} color={'#808080'}>
-                            Switch OFF to make the axis X and Y value hide, and Switch ON to show the axis
-                          </Typography>
+                    {methods.getValues('chartType') === 'Information Card' && (
+                      <Autocomplete
+                        fullWidth
+                        disablePortal
+                        options={[{ label: 'Median', value: 'Median' }]}
+                        value={'Median'}
+                        inputValue={'Median'}
+                        PaperComponent={(props) => (
+                          <Paper
+                            sx={(theme) => ({
+                              border: `${theme.palette.primary.main} 1px solid`,
+                              marginTop: '4px',
+                              borderRadius: '10px',
+                            })}
+                            {...props}
+                          ></Paper>
+                        )}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            InputProps={{ style: { height: '44px' }, ...params.InputProps }}
+                            InputLabelProps={{ shrink: true, ...params.InputLabelProps }}
+                            label="Formula"
+                            placeholder="Formula"
+                          />
+                        )}
+                        // onChange={(e, newValue) => {
+                        //   handleChangeForm('chartType', newValue?.value || '');
+                        // }}
+                        sx={{ padding: '9px 0px 19px 0px' }}
+                      ></Autocomplete>
+                    )}
+                    <TextField
+                      {...methods.register('chartLabel')}
+                      label={
+                        methods.getValues('chartType') === 'Table Chart'
+                          ? 'Table Label'
+                          : methods.getValues('chartType') === 'Information Card'
+                          ? 'Information Label'
+                          : 'Chart Label'
+                      }
+                      placeholder={
+                        methods.getValues('chartType') === 'Table Chart'
+                          ? 'Type table label'
+                          : methods.getValues('chartType') === 'Information Card'
+                          ? 'Type information label'
+                          : 'Type chart label'
+                      }
+                      // value={methods.getValues('chartLabel')}
+                      InputProps={{ style: { height: '44px' } }}
+                      InputLabelProps={{ shrink: true }}
+                      onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
+                      sx={{ padding: '9px 0px 19px 0px' }}
+                    ></TextField>
+                    {displayInputLabel && (
+                      <>
+                        <Box
+                          display={'flex'}
+                          justifyContent={'space-between'}
+                          alignItems={'center'}
+                          sx={{ marginBottom: '16px' }}
+                        >
+                          <Box>
+                            <Typography fontWeight={400} size="14px" lineHeight={'21px'} color={'#000000'}>
+                              Hide or Show Axis Value
+                            </Typography>
+                            <Typography fontWeight={400} size="12px" lineHeight={'16px'} color={'#808080'}>
+                              Switch OFF to make the axis X and Y value hide, and Switch ON to show the axis
+                            </Typography>
+                          </Box>
+                          <Switch
+                            checked={methods.getValues('showAxisLabels')}
+                            onChange={() => methods.setValue('showAxisLabels', !methods.getValues('showAxisLabels'))}
+                          />
                         </Box>
-                        <Switch checked={showAxisValue} onChange={() => setShowAxisValue((prev) => !prev)} />
-                      </Box>
-                      <Stack direction={'row'} gap="16px">
-                        <TextField
-                          label="Vertical Axis Label"
-                          placeholder="Vertical Axis Label"
-                          InputProps={{ style: { height: '44px' } }}
-                          InputLabelProps={{ shrink: true }}
-                          value={formData?.verticalAxisLabel}
-                          onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
-                          sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                        ></TextField>
-                        <TextField
-                          label="Horizontal Axis Label"
-                          placeholder="Horizontal Axis Label"
-                          InputProps={{ style: { height: '44px' } }}
-                          InputLabelProps={{ shrink: true }}
-                          value={formData?.horizontalAxisLabel}
-                          onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
-                          sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                        ></TextField>
-                      </Stack>
-                    </>
-                  )}
+                        <Stack direction={'row'} gap="16px">
+                          <TextField
+                            {...methods.register('verticalAxisLabel')}
+                            label="Vertical Axis Label"
+                            placeholder="Vertical Axis Label"
+                            InputProps={{ style: { height: '44px' } }}
+                            InputLabelProps={{ shrink: true }}
+                            // value={methods.getValues('verticalAxisLabel')}
+                            onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
+                            sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
+                          ></TextField>
+                          <TextField
+                            {...methods.register('horizontalAxisLabel')}
+                            label="Horizontal Axis Label"
+                            placeholder="Horizontal Axis Label"
+                            InputProps={{ style: { height: '44px' } }}
+                            InputLabelProps={{ shrink: true }}
+                            // value={methods.getValues('horizontalAxisLabel')}
+                            onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
+                            sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
+                          ></TextField>
+                        </Stack>
+                      </>
+                    )}
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-            {/* </Paper> */}
-          </Grid>
-          <Grid item xl={1} lg={0.5} justifyContent={'center'} display={'flex'}>
-            <Divider light orientation={+window.innerWidth >= 1200 ? 'vertical' : 'horizontal'} />
-          </Grid>
-          <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
-            {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', minWidth: '548px', mt: 1 }}> */}
-            <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
-              <Box display={'flex'} justifyContent={'space-between'}>
-                <Typography fontSize="24px" fontWeight={700} lineHeight="31px" color={'primary'}>
-                  Preview
-                </Typography>
-                {JSON.stringify(dataChart) !== '{}' && (
-                  <Button
-                    onClick={() => {
-                      if (formData.chartType === 'Information Card') {
-                      } else {
-                        setOpenDialogColorPicker((prev) => !prev);
-                      }
-                    }}
-                    variant="outlined"
-                  >
-                    {formData.chartType === 'Information Card' ? 'Change Image' : 'Change Colors'}
-                  </Button>
-                )}
-              </Box>
-              {SettingContent}
-              {displayColorPicker && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    zIndex: '2',
-                    top: '100px',
-                  }}
-                >
+              {/* </Paper> */}
+            </Grid>
+            <Grid item xl={1} lg={0.5} justifyContent={'center'} display={'flex'}>
+              <Divider light orientation={+window.innerWidth >= 1200 ? 'vertical' : 'horizontal'} />
+            </Grid>
+            <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
+              {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', minWidth: '548px', mt: 1 }}> */}
+              <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
+                <Box display={'flex'} justifyContent={'space-between'}>
+                  <Typography fontSize="24px" fontWeight={700} lineHeight="31px" color={'primary'}>
+                    Preview
+                  </Typography>
+                  {JSON.stringify(methods.getValues('chartData')) !== '{}' && (
+                    <Button
+                      onClick={() => {
+                        if (methods.getValues('chartType') === 'Information Card') {
+                        } else {
+                          setOpenDialogColorPicker((prev) => !prev);
+                        }
+                      }}
+                      variant="outlined"
+                    >
+                      {methods.getValues('chartType') === 'Information Card' ? 'Change Image' : 'Change Colors'}
+                    </Button>
+                  )}
+                </Box>
+                {SettingContent}
+                {displayColorPicker && (
                   <Box
                     sx={{
-                      position: 'fixed',
-                      top: '0px',
-                      right: '0px',
-                      bottom: '0px',
-                      left: '0px',
+                      position: 'absolute',
+                      zIndex: '2',
+                      top: '100px',
                     }}
-                    onClick={handleClickCover}
-                  ></Box>
-                  <CustomColorPicker codeColor={codeColor} onChange={() => {}}></CustomColorPicker>
-                </Box>
-              )}
-            </Box>
-            {/* </Paper> */}
-          </Grid>
-        </Grid>
-      </Paper>
-      <input
-        type="file"
-        style={{ display: 'none' }}
-        ref={refInputFileImport}
-        accept=".xlsx, .xls, .csv"
-        // value={fileImport}
-        onChange={(e) => {
-          setTypeDialog('loading');
-          setOpenDialogStatusImport((prev) => ({ ...prev, loading: true }));
-          parseFile(e.target.files[0]);
-          setFileImport(e.target.files[0]);
-          setOpenDialogStatusImport((prev) => ({ ...prev, error: true }));
-        }}
-      />
-      <DialogColorPicker
-        dataSets={dataChart?.datasets || []}
-        openDialog={openDialogColorPicker}
-        onSaveChanges={(data) => {
-          setDataChart((prev) => ({ ...prev, datasets: [...data] }));
-          setOpenDialogColorPicker((prev) => !prev);
-        }}
-        onCancel={() => setOpenDialogColorPicker((prev) => !prev)}
-      ></DialogColorPicker>
-      <DialogStatusImport
-        openDialogImport={openDialogStatusImport}
-        setOpenDialogImport={setOpenDialogStatusImport}
-        // contentText={'Choose your data import method:'
-        typeDialog={typeDialog}
-      />
-      <Paper sx={{ borderRadius: 1.25, display: 'flex', justifyContent: 'space-between', maxHeight: '105px', mt: 1 }}>
-        {id && (
-          <Box sx={{ width: '100%', my: 'auto', p: 4 }}>
-            <Button
-              variant={'outlined'}
-              color="error"
-              sx={{
-                maxWidth: '286px',
-                width: '100%',
-                backgroundColor: '#E563630D',
-              }}
-            >
-              <Box display={'flex'} gap={'8px'} alignItems={'center'}>
-                <DeleteFill />
-                <Typography sx={(theme) => ({ color: theme.palette.error.light })}>Delete Chart</Typography>
+                  >
+                    <Box
+                      sx={{
+                        position: 'fixed',
+                        top: '0px',
+                        right: '0px',
+                        bottom: '0px',
+                        left: '0px',
+                      }}
+                      onClick={handleClickCover}
+                    ></Box>
+                    <CustomColorPicker codeColor={codeColor} onChange={() => {}}></CustomColorPicker>
+                  </Box>
+                )}
               </Box>
-            </Button>
-          </Box>
-        )}
-        <Box
-          sx={{ width: '100%', my: 'auto', p: 4 }}
-          display="flex"
-          justifyContent={'flex-end'}
-          alignItems="center"
-          gap={'16px'}
-        >
-          {/* <Typography fontWeight={700} fontSize="18px" lineHeight="27px" color="primary">
+              {/* </Paper> */}
+            </Grid>
+          </Grid>
+        </Paper>
+        <input
+          type="file"
+          style={{ display: 'none' }}
+          ref={refInputFileImport}
+          accept=".xlsx"
+          // value={fileImport}
+          onClick={(event) => {
+            const { target = {} } = event || {};
+            target.value = '';
+          }}
+          onChange={(e) => {
+            // console.info(e, '<<< diaJalan gasi ?');
+            setTypeDialog('loading');
+            // setOpenDialogStatusImport((prev) => ({ ...prev, loading: true }));
+            handleFileInputChange(e);
+            parseFile(e.target.files[0]);
+            setFileImport(e.target.files[0]);
+            // setOpenDialogStatusImport((prev) => ({ ...prev, error: true }));
+          }}
+        />
+        <DialogColorPicker
+          dataSets={methods.getValues('chartData')?.datasets || []}
+          openDialog={openDialogColorPicker}
+          onSaveChanges={(data) => {
+            methods.setValue('chartData', { ...methods.getValues('chartData'), datasets: [...data] });
+            setOpenDialogColorPicker((prev) => !prev);
+          }}
+          onCancel={() => setOpenDialogColorPicker((prev) => !prev)}
+        ></DialogColorPicker>
+        <DialogStatusImport
+          openDialogImport={openDialog}
+          setOpenDialogImport={setOpenDialog}
+          // contentText={'Choose your data import method:'
+          typeDialog={typeDialog}
+        />
+        <Paper sx={{ borderRadius: 1.25, display: 'flex', justifyContent: 'space-between', maxHeight: '105px', mt: 1 }}>
+          {id && (
+            <Box sx={{ width: '100%', my: 'auto', p: 4 }}>
+              <Button
+                variant={'outlined'}
+                color="error"
+                sx={{
+                  maxWidth: '286px',
+                  width: '100%',
+                  backgroundColor: '#E563630D',
+                }}
+              >
+                <Box display={'flex'} gap={'8px'} alignItems={'center'}>
+                  <DeleteFill />
+                  <Typography sx={(theme) => ({ color: theme.palette.error.light })}>Delete Chart</Typography>
+                </Box>
+              </Button>
+            </Box>
+          )}
+          <Box
+            sx={{ width: '100%', my: 'auto', p: 4 }}
+            display="flex"
+            justifyContent={'flex-end'}
+            alignItems="center"
+            gap={'16px'}
+          >
+            {/* <Typography fontWeight={700} fontSize="18px" lineHeight="27px" color="primary">
             Create column?
           </Typography> */}
 
-          <Button sx={{ maxWidth: '256px', width: '100%' }} variant="outlined">
-            Cancel
-          </Button>
-          <Button
-            sx={{ maxWidth: '256px', width: '100%' }}
-            onClick={(_) => {
-              submitChart();
-            }}
-          >
-            {id ? 'Save Changes' : 'Add Chart'}
-          </Button>
-        </Box>
-      </Paper>
-    </Stack>
+            <Button sx={{ maxWidth: '256px', width: '100%' }} variant="outlined">
+              Cancel
+            </Button>
+            {clientSelected && (
+              <Button
+                sx={{ maxWidth: '256px', width: '100%' }}
+                onClick={(_) => {
+                  // submitChart();
+                  methods.setValue('section_id', localStorage.sectionId);
+                  methods.setValue('fileName', fileImport?.name);
+                  // if (id && chartDetail?.tabular.filename !== fileImport?.name) {
+                  //   console.info('changes file', chartDetail?.tabular?.filename, fileImport?.name);
+                  // }
+                  handleClick();
+                }}
+                disabled={JSON.stringify(methods?.getValues('chartData')) === '{}'}
+              >
+                {id ? 'Save Changes' : 'Add Chart'}
+              </Button>
+            )}
+          </Box>
+        </Paper>
+      </Stack>
+    </AddOrEditChartContext.Provider>
   );
 };
 

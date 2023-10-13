@@ -15,7 +15,8 @@ import useSidebarMenus from '../SidebarMenu';
 import Sidebar from './Sidebar';
 import SidebarSmall from './SidebarSmall';
 import useAfterLoginStartup from '@/hooks/useAfterLogin';
-
+import Dialog from '../../Dialog/Dialog';
+import useAxios from '@/hooks/useAxios';
 const ProtectedLayout = () => {
   const { refreshMeData } = useAuth();
   const { userToken: token, me } = useContext(AppContext);
@@ -31,7 +32,8 @@ const ProtectedLayout = () => {
   const [showDrawerBackground, setShowDrawerBackground] = useState(false);
   const windowDimensions = getWindowDimensions();
   const { refreshMasterData } = useAfterLoginStartup();
-
+  const [clientValue, setClientValue] = useState(null);
+  const [pageClientList, setPageClientList] = useState(1);
   const styles = {
     appBarContainer: {
       alignItems: 'center',
@@ -67,7 +69,10 @@ const ProtectedLayout = () => {
       window.location.href = `/login`;
     }
   };
-
+  const onSaveClient = () => {
+    store.setClientSelected(clientValue);
+    store.setOpenPopupClient(false);
+  };
   return (
     <AppBarContext.Provider value={store}>
       <Grid container>
@@ -102,12 +107,38 @@ const ProtectedLayout = () => {
                     setOpenTaskList={setOpenTaskList}
                     setOpenProfileBar={setOpenProfileBar}
                     setShowDrawerBackground={setShowDrawerBackground}
+                    setShowDialogClient={store.setOpenPopupClient}
                   />
                 </Box>
                 <Stack sx={{ px: 2, overflow: 'auto' }}>{outlet}</Stack>
               </Stack>
             </Box>
           </Stack>
+          <Dialog
+            open={store.openPopupClient}
+            setOpen={store.setOpenPopupClient}
+            option={response?.data}
+            onSave={onSaveClient}
+          >
+            <FormControl variant="standard">
+              <RadioGroup
+                aria-labelledby="demo-error-radios"
+                name="client"
+                value={clientValue?.id || null}
+                onChange={(e, value) => {
+                  setClientValue(response?.data?.find((el) => el.id === +value));
+                }}
+              >
+                {response?.data?.map((el) => (
+                  <FormControlLabel
+                    value={el.id}
+                    control={<Radio sx={{ p: 2 }} />}
+                    label={<Typography sx={{}}>{el.company_name} </Typography>}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+          </Dialog>
         </Grid>
         {/* <Box
           justifyContent="flex-end"

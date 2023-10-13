@@ -33,15 +33,16 @@ const useAxios = ({ url, method, options = null, pause = false }) => {
           setResponse(res.data);
           if (res?.data?.error) {
             enqueueSnackbar(String(res?.data?.error), {
-              variant: 'errorSnackbar',
+              variant: 'error',
             });
           }
           return res.data;
         })
         .catch((err) => {
           setError(err);
+          console.info(err?.response, '<<< apa dia');
           enqueueSnackbar(err?.response?.data?.message, {
-            variant: 'errorSnackbar',
+            variant: 'error',
           });
           if (err?.response?.data?.status === 401) {
             localStorage.clear();
@@ -59,7 +60,7 @@ const useAxios = ({ url, method, options = null, pause = false }) => {
         setResponse(res.data);
         if (res?.data?.error) {
           enqueueSnackbar(String(res?.data?.error), {
-            variant: 'errorSnackbar',
+            variant: 'error',
           });
         }
         return res.data;
@@ -67,7 +68,7 @@ const useAxios = ({ url, method, options = null, pause = false }) => {
       .catch((err) => {
         setError(err);
         enqueueSnackbar(err?.response?.data?.message, {
-          variant: 'errorSnackbar',
+          variant: 'error',
         });
         if (err?.response?.data?.status === 401) {
           localStorage.clear();
