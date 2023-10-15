@@ -29,7 +29,7 @@ const Appbar = ({
         }}
         onClick={(e) => setShowDialogClient((prev) => !prev)}
       >
-        <Typography variant="h2" sx={{ textTransform: 'uppercase' }}>
+        <Typography variant="h2" sx={{ textTransform: 'uppercase', color: 'primary.main' }}>
           {title}
         </Typography>
         <ExpandMore />

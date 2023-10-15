@@ -15,7 +15,7 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
   return (
     <Box
       sx={(theme) => ({
-        backgroundColor: 'white',
+        backgroundColor: 'bgcolor.card',
         borderRight: `1px solid ${theme.palette.neutral.lightGrey}`,
         height,
         overflow: 'hidden',

@@ -117,15 +117,16 @@ const ModalUserDetail = ({}) => {
                 <Typography variant="h3" color="primary.main">
                   User Details
                 </Typography>
-                <Stack direction="row" spacing={2}>
-                  <MPTextField
+                <MPTextField required label="Email" name="email" placeholder="companyemail@emaildomain.com" />
+                <Stack direction="row" spacing={2} sx={{ py: 2 }}>
+                  {/* <MPTextField
                     fullWidth
                     required
                     label="Username"
                     name="username"
                     placeholder="Company Name"
                     size="normal"
-                  />
+                  /> */}
                   <MPSelect
                     options={roles}
                     label="Role"
@@ -137,12 +138,12 @@ const ModalUserDetail = ({}) => {
                     placeholder="Select Role"
                     customborderradius="5px 0px 0px 5px"
                     fullWidth
+                    required
                   />
                 </Stack>
-                <MPTextField label="Email" name="email" placeholder="companyemail@emaildomain.com" sx={{ my: 2 }} />
                 <Stack direction="row" spacing={2}>
-                  <MPTextField label="First Name" name="first_name" placeholder="PT AAA" />
-                  <MPTextField label="Last Name" name="last_name" placeholder="Tbk" />
+                  <MPTextField required label="First Name" name="first_name" placeholder="PT AAA" />
+                  <MPTextField required label="Last Name" name="last_name" placeholder="Tbk" />
                 </Stack>
               </Stack>
             )}

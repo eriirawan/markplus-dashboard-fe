@@ -1,93 +1,47 @@
 // useAxios hook
-
-import { useState, useEffect, useMemo } from 'react';
 import { tokenString } from '@/helpers/Constants';
-import { useSnackbar } from 'notistack';
-import axios from 'axios';
+import { enqueueSnackbar } from 'notistack';
+import Axios from 'axios';
+import { configure } from 'axios-hooks';
+// import LRU from 'lru-cache'
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+// const cache = new LRU({ max: 10 })
+const axios = Axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+});
 
-const useAxios = ({ url, method, options = null, pause = false }) => {
+axios.interceptors.request.use(function (config) {
   const token = localStorage.getItem(tokenString);
-  const { enqueueSnackbar } = useSnackbar();
+  config.headers.Authorization = token.replaceAll('"', '');
 
-  const [response, setResponse] = useState(null);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  return config;
+});
 
-  const headers = useMemo(() => {
-    const tempHeader = {};
-
-    if (token) {
-      tempHeader.Authorization = token.replaceAll('"', '');
-    }
-
-    return { ...tempHeader, ...options?.headers };
-  }, [token]);
-
-  const fetchData = (body = null) => {
-    setLoading(true);
-    if (method === 'get' || method === 'delete') {
-      return axios[method](url, { headers })
-        .then((res) => {
-          setResponse(res.data);
-          if (res?.data?.error) {
-            enqueueSnackbar(String(res?.data?.error), {
-              variant: 'error',
-            });
-          }
-          return res.data;
-        })
-        .catch((err) => {
-          setError(err);
-          console.info(err?.response, '<<< apa dia');
-          enqueueSnackbar(err?.response?.data?.message, {
-            variant: 'error',
-          });
-          if (err?.response?.data?.status === 401) {
-            localStorage.clear();
-            window.location.href = `/login`;
-          }
-          return err;
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-
-    return axios[method](url, body, { headers })
-      .then((res) => {
-        setResponse(res.data);
-        if (res?.data?.error) {
-          enqueueSnackbar(String(res?.data?.error), {
-            variant: 'error',
-          });
-        }
-        return res.data;
-      })
-      .catch((err) => {
-        setError(err);
-        enqueueSnackbar(err?.response?.data?.message, {
-          variant: 'error',
-        });
-        if (err?.response?.data?.status === 401) {
-          localStorage.clear();
-          window.location.href = `/login`;
-        }
-        return err;
-      })
-      .finally(() => {
-        setLoading(false);
+axios.interceptors.response.use(
+  function (res) {
+    if (res?.data?.error) {
+      enqueueSnackbar(String(res?.data?.error), {
+        variant: 'errorSnackbar',
       });
-  };
-
-  useEffect(() => {
-    if (method?.toLowerCase() === 'get' && !pause) {
-      fetchData();
     }
-  }, [method, url, headers, pause]);
 
-  return [{ response, error, loading }, fetchData];
-};
+    return res;
+  },
+  (err) => {
+    enqueueSnackbar(err?.response?.data?.message, {
+      variant: 'errorSnackbar',
+    });
 
-export default useAxios;
+    if (err?.response?.data?.status === 401) {
+      localStorage.clear();
+      window.location.href = `/login`;
+    }
+
+    return Promise.reject(err);
+  }
+);
+
+const makeUseAxios = () => configure({ axios });
+
+export { axios };
+export default makeUseAxios;

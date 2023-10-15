@@ -73,7 +73,7 @@ const useSidebarMenus = () => {
             inActive: 'UserNormal',
           },
           name: 'Users',
-          path: 'users',
+          path: 'user-list',
         },
       ],
     },
