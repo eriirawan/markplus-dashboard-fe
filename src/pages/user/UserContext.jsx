@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import useAxios from '@/hooks/useAxios';
+import useAxios from 'axios-hooks';
 import { enqueueSnackbar } from 'notistack';
 
 export const useUserStore = () => {
@@ -13,50 +13,75 @@ export const useUserStore = () => {
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [openPopupTheme, setOpenPopupTheme] = useState(false);
 
-  const [{ response, loading }, reFetch] = useAxios({
+  const [{ data: response, loading }, reFetch] = useAxios({
     url: `/dashboard/v1/users/list?page=${page}&page_size=${pageSize}&sort_by=${
       sortBy || 'id'
     }&sort_dir=${sortDir}&search=${search || '%20'}`,
     method: 'get',
   });
 
-  const [{ response: userDetail, loading: loadingUser }] = useAxios({
-    url: `/dashboard/v1/users/${userId}`,
-    method: 'get',
-    pause: !userId,
-  });
+  const [{ data: userDetail, loading: loadingUser }] = useAxios(
+    {
+      url: `/dashboard/v1/users/${userId}`,
+      method: 'get',
+    },
+    {
+      manual: !userId,
+    }
+  );
 
-  const [, uploadFile] = useAxios({
-    url: `/dashboard/v1/files/upload`,
-    method: 'post',
-    options: {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+  const [, uploadFile] = useAxios(
+    {
+      url: `/dashboard/v1/users/upload-image`,
+      method: 'post',
+      options: {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       },
     },
-  });
-  const [, addUser] = useAxios({
-    url: `/dashboard/v1/users/add`,
-    method: 'post',
-  });
-  const [, updateUser] = useAxios({
-    url: `/dashboard/v1/users/${userId}`,
-    method: 'put',
-  });
-  const [, deleteUser] = useAxios({
-    url: `/dashboard/v1/users/${userId}`,
-    method: 'delete',
-  });
+    {
+      manual: true,
+    }
+  );
+  const [, addUser] = useAxios(
+    {
+      url: `/dashboard/v1/users/add`,
+      method: 'post',
+    },
+    {
+      manual: true,
+    }
+  );
+  const [, updateUser] = useAxios(
+    {
+      url: `/dashboard/v1/users/update`,
+      method: 'put',
+    },
+    {
+      manual: true,
+    }
+  );
+  const [, deleteUser] = useAxios(
+    {
+      url: `/dashboard/v1/users/${userId}`,
+      method: 'delete',
+    },
+    {
+      manual: true,
+    }
+  );
 
   const defaultForm = {
     email: '',
-    first_name: '',
+    first_name: undefined,
     // imgName: '',
     company_logo_url: '',
-    last_name: '',
+    last_name: undefined,
     role_id: '',
-    username: '',
+    // username: '',
     filename: '',
   };
 
@@ -80,16 +105,23 @@ export const useUserStore = () => {
     setIsLoading(true);
     if (action === 'create') {
       const submit = await addUser({
-        username: formData.username,
-        role_id: formData.role_id,
-        email: formData.email,
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        company: {
-          logo_url: formData?.company_logo_url || undefined,
-          name: `${formData.first_name} ${formData.last_name}`,
+        data: {
+          role_id: formData.role_id,
+          email: formData.email,
+          first_name: formData.first_name,
+          last_name: formData?.last_name || undefined,
+          company_name: `${formData.first_name} ${formData.last_name}`,
+          company_logo_url: formData?.company_logo_url || undefined,
+          password: 'password',
+          colorway: {
+            theme: 'light',
+            color1: '#EEF0F5',
+            color2: '#006CB7',
+            color3: '#006CB7',
+            color4: '#ffffff',
+            color5: '#000000',
+          },
         },
-        password: 'password',
       });
       if (submit?.status === 200) {
         setOpenPopup(false);
@@ -100,12 +132,15 @@ export const useUserStore = () => {
       }
     } else if (action === 'edit') {
       const update = await updateUser({
-        username: formData.username,
-        role_id: formData.role_id,
-        email: formData.email,
-        // first_name: formData.first_name,
-        // last_name: formData.last_name,
-        company_id: formData?.company_id,
+        data: {
+          user_id: userId,
+          role_id: formData.role_id,
+          email: formData.email,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          company_name: `${formData.first_name} ${formData.last_name}`,
+          company_logo_url: formData?.company_logo_url || undefined,
+        },
       });
       if (update?.status === 200) {
         setOpenPopup(false);
@@ -141,6 +176,23 @@ export const useUserStore = () => {
     }
   };
 
+  const handleSaveColorway = async (value) => {
+    const update = await updateUser({
+      data: {
+        colorway: value,
+        user_id: userId,
+      },
+    });
+    if (update?.status === 200) {
+      enqueueSnackbar('User theme changed successfully.', {
+        anchorOrigin: { horizontal: 'center', vertical: 'top' },
+        variant: 'successSnackbar',
+      });
+      setOpenPopupTheme(false);
+      reFetch();
+    }
+  };
+
   return {
     methods,
     handleFileInputChange,
@@ -166,6 +218,9 @@ export const useUserStore = () => {
     setSearch,
     search,
     handleDelete,
+    handleSaveColorway,
+    openPopupTheme,
+    setOpenPopupTheme,
   };
 };
 

@@ -6,69 +6,28 @@ import svgrPlugin from 'vite-plugin-svgr';
 import VitePluginHtmlEnv from 'vite-plugin-html-env';
 import removeConsole from 'vite-plugin-remove-console';
 import viteCompression from 'vite-plugin-compression';
-import vsharp from 'vite-plugin-vsharp';
 import { ViteMinifyPlugin } from 'vite-plugin-minify';
-import terser from '@rollup/plugin-terser';
-import { obfuscate } from 'javascript-obfuscator';
-import cssnano from 'cssnano';
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+
+const buildHash = Date.now();
 
 export default ({ mode }) => {
   process.env = Object.assign(process.env, loadEnv(mode, process.cwd(), ''));
   return defineConfig({
     base: '/',
-    optimizeDeps: {
-      esbuildOptions: {
-        // Node.js global to browser globalThis
-        define: {
-          global: 'globalThis',
-        },
-        // Enable esbuild polyfill plugins
-        plugins: [
-          NodeGlobalsPolyfillPlugin({
-            buffer: true,
-          }),
-        ],
-      },
-    },
     build: {
       rollupOptions: {
-        output: {
-          format: 'es',
-          plugins: [
-            {
-              name: 'obfuscate',
-              async transform(code, id) {
-                if (id.endsWith('.js')) {
-                  const obfuscatedCode = await obfuscate(code, {
-                    controlFlowFlattening: true,
-                    deadCodeInjection: true,
-                    identifierNamesGenerator: 'mangled',
-                    renameGlobals: true,
-                    seed: 'random_seed',
-                    stringArray: true,
-                    stringArrayEncoding: ['base64'],
-                    transformObjectKeys: true,
-                    transformObjectValues: true,
-                  });
-                  return {
-                    code: obfuscatedCode,
-                    map: null,
-                  };
-                }
-                if (id.endsWith('.css')) {
-                  const minifiedCode = await cssnano.process(code);
-                  return {
-                    code: minifiedCode.css,
-                    map: null,
-                  };
-                }
-                return null;
-              },
-            },
-          ],
+        onwarn(warning, warn) {
+          if (warning.code === 'MODULE_LEVEL_DIRECTIVE' && warning.message.includes(`"use client"`)) {
+            return;
+          }
+          warn(warning);
         },
-        plugins: [terser()],
+        output: {
+          assetFileNames: `[name]-${buildHash}.[ext]`,
+          chunkFileNames: `[name]-${buildHash}.js`,
+          entryFileNames: `[name]-${buildHash}.js`,
+        },
       },
     },
     define: {
@@ -86,6 +45,16 @@ export default ({ mode }) => {
       react(),
       removeConsole(),
       VitePluginHtmlEnv(),
+      nodePolyfills({
+        exclude: ['fs'],
+        globals: {
+          Buffer: true, // can also be 'build', 'dev', or false
+          global: true,
+          process: true,
+        },
+        // Whether to polyfill `node:` protocol imports.
+        protocolImports: true,
+      }),
       svgrPlugin({
         svgrOptions: {
           icon: true,
@@ -112,7 +81,6 @@ export default ({ mode }) => {
           preload: true,
         },
       }),
-      vsharp(),
       ViteMinifyPlugin({}),
       splitVendorChunkPlugin(),
       viteCompression(),
@@ -125,10 +93,6 @@ export default ({ mode }) => {
     server: {
       host: true,
       port: 3000,
-    },
-    test: {
-      outputFile: 'sonar-report.xml',
-      reporters: 'vitest-sonar-reporter',
     },
     assetsInclude: ['**/*.xlsx'],
   });

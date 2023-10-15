@@ -8,14 +8,17 @@ import SuccessSnackbar from '@/components/noti-snackbar/SuccessSnackbar';
 import Loading from '@/components/Loading';
 import { AppContext, useStore } from './context/AppContext';
 import AppRoutes from './routes';
-import theme from './theme';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import makeUseAxios from './hooks/useAxios';
+
 ChartJS.register(ArcElement, Tooltip, Legend);
+makeUseAxios();
+
 const App = () => {
   const store = useStore();
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={store.theme}>
       <AppContext.Provider value={store}>
         <SnackbarProvider
           anchorOrigin={{

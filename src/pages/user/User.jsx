@@ -14,13 +14,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import { useDemoData } from '@mui/x-data-grid-generator';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { MaterialReactTable } from 'material-react-table';
 
-import useAxios from '@/hooks/useAxios';
 import ModalUserDetail from './components/ModalUserDetail';
 import Loading from '../../components/Loading';
 import UserThemeSettings from './components/UserThemeSettings';
@@ -30,12 +27,13 @@ import { useUserStore, UserContext } from './UserContext';
 
 const defaultForm = {
   email: '',
-  first_name: '',
+  first_name: undefined,
   // imgName: '',
   company_logo_url: '',
-  last_name: '',
-  role: '',
-  username: '',
+  last_name: undefined,
+  role_id: '',
+  // username: '',
+  filename: '',
 };
 
 const User = () => {
@@ -55,10 +53,12 @@ const User = () => {
     setPageSize,
     search: searchCtx,
     setSearch: setSearchCtx,
+    handleSaveColorway,
     metaList,
+    openPopupTheme,
+    setOpenPopupTheme,
   } = store;
   const location = useLocation();
-  const [openPopupTheme, setOpenPopupTheme] = useState(false);
   const [openPopupDelete, setOpenPopupDelete] = useState(false);
   const [sort, setSort] = useState('DESC');
   const [search, setSearch] = useState(undefined);
@@ -70,47 +70,84 @@ const User = () => {
     }
   }, [loadingUser, userDetail]);
 
-  const { data } = useDemoData({
-    dataSet: 'Commodity',
-    maxColumns: 6,
-    rowLength: 5,
-    sortable: false,
-  });
-
   const columns = [
-    { field: 'nanoId', headerAlign: 'center', sortable: false, headerName: 'ID', width: 50, align: 'center' },
-    { field: 'username', headerAlign: 'center', sortable: false, headerName: 'Username', flex: 1 },
-    { field: 'email', headerAlign: 'center', sortable: false, headerName: 'Email', flex: 1 },
-    { field: 'firstName', headerAlign: 'center', sortable: false, headerName: 'First Name', width: 142 },
-    { field: 'lastName', headerAlign: 'center', sortable: false, headerName: 'Last Name', width: 141 },
-    { field: 'imgName', headerAlign: 'center', sortable: false, headerName: 'Profile Picture', flex: 1 },
-    { field: 'role', headerAlign: 'center', sortable: false, headerName: 'Role', width: 127, align: 'center' },
     {
-      field: 'created_at',
-      headerAlign: 'center',
-      sortable: false,
-      headerName: 'Active Date',
-      width: 171,
-      valueGetter: (params) => ISODateToLuxon(params?.value)?.toFormat('dd MMMM yyyy') || '-',
-      align: 'center',
+      accessorKey: 'nanoId',
+      header: 'ID',
+      size: 50,
+      muiTableHeadCellProps: { align: 'center' },
+      muiTableBodyCellProps: { align: 'center' },
     },
     {
-      field: 'action',
-      flex: 1,
-      headerAlign: 'center',
-      sortable: false,
-      headerName: 'Action',
-      align: 'center',
-      renderCell: (params) => (
-        <Stack direction="row" spacing={1.5}>
+      accessorKey: 'email',
+      header: 'Email',
+      muiTableHeadCellProps: { align: 'center' },
+      muiTableBodyCellProps: { align: 'center' },
+    },
+    {
+      accessorKey: 'first_name',
+      header: 'First Name',
+      size: 142,
+      muiTableHeadCellProps: { align: 'center' },
+      muiTableBodyCellProps: { align: 'center' },
+    },
+    {
+      accessorKey: 'last_name',
+      header: 'Last Name',
+      size: 141,
+      muiTableHeadCellProps: { align: 'center' },
+      muiTableBodyCellProps: { align: 'center' },
+    },
+    {
+      accessorKey: 'company_logo_url',
+      header: 'Profile Picture',
+      muiTableHeadCellProps: { align: 'center' },
+      muiTableBodyCellProps: { align: 'center' },
+    },
+    { accessorKey: 'role', header: 'Role', size: 127 },
+    {
+      accessorKey: 'created_at',
+      header: 'Active Date',
+      size: 171,
+      muiTableHeadCellProps: {
+        align: 'center',
+      },
+      muiTableBodyCellProps: {
+        align: 'center',
+      },
+      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('dd MMMM yyyy') || '-',
+    },
+    {
+      accessorKey: 'updated_at',
+      header: 'Last Modified',
+      size: 171,
+      muiTableHeadCellProps: {
+        align: 'center',
+      },
+      muiTableBodyCellProps: {
+        align: 'center',
+      },
+      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('dd MMMM yyyy') || '-',
+    },
+    {
+      accessorKey: 'action',
+      header: 'Action',
+      muiTableHeadCellProps: {
+        align: 'center',
+      },
+      muiTableBodyCellProps: {
+        align: 'center',
+      },
+      Cell: (params) => (
+        <Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5}>
           <InfoOutlined
             sx={{ cursor: 'pointer', fontSize: 20 }}
             onClick={() => {
-              if (userDetail?.id === params.id) {
+              if (userDetail?.id === params?.row?.original?.id) {
                 store?.setAction('detail');
                 store?.setOpenPopup(true);
               } else {
-                setUserId(params.id);
+                setUserId(params?.row?.original?.id);
                 store?.setAction('detail');
               }
             }}
@@ -118,11 +155,11 @@ const User = () => {
           <Edit
             sx={{ cursor: 'pointer', fontSize: 20 }}
             onClick={() => {
-              if (userDetail?.id === params.id) {
+              if (userDetail?.id === params?.row?.original?.id) {
                 store?.setAction('edit');
                 store?.setOpenPopup(true);
               } else {
-                setUserId(params.id);
+                setUserId(params?.row?.original?.id);
                 store?.setAction('edit');
               }
             }}
@@ -131,14 +168,14 @@ const User = () => {
             onClick={() => {
               setOpenPopupTheme(true);
               store?.setAction('');
-              setUserId(params.id);
+              setUserId(params?.row?.original?.id);
             }}
-            sx={{ color: '#000000', cursor: 'pointer', fontSize: 20 }}
+            sx={{ cursor: 'pointer', fontSize: 20 }}
           />
           <Delete
             sx={{ color: '#E56363', fontSize: 20, cursor: 'pointer' }}
             onClick={() => {
-              setUserId(params.id);
+              setUserId(params?.row?.original?.id);
               setOpenPopupDelete(true);
             }}
           />
@@ -173,7 +210,10 @@ const User = () => {
       <UserThemeSettings
         openPopup={openPopupTheme}
         setOpenPopup={setOpenPopupTheme}
-        username={methods.getValues('username')}
+        username={`${methods.getValues('first_name')} ${methods.getValues('last_name')}`}
+        userId={store.userId}
+        colorway={userDetail?.colorway}
+        handleSaveColorway={handleSaveColorway}
       />
       <GeneralDeletePopup
         open={openPopupDelete}
@@ -264,40 +304,35 @@ const User = () => {
           </Stack>
           <Box sx={{ pt: 4, width: '100%' }}>
             <Box sx={{ display: 'flex', minHeight: 400 }}>
-              <DataGrid
-                {...data}
+              <MaterialReactTable
                 columns={columns}
-                rows={userList ? userList?.map((item) => ({ ...item, nanoId: item?.id })) : []}
-                getRowId={(row) => row.id}
-                sx={{
-                  '& .MuiDataGrid-cell': {
-                    bgcolor: '#EEF0F5',
+                data={userList ? userList?.map((item) => ({ ...item, nanoId: item?.id })) : []}
+                enablePagination={false}
+                enableSorting={false}
+                enableFilters={false}
+                enablePinning
+                enableColumnActions={false}
+                enableColumnFilters={false}
+                enableBottomToolbar={false}
+                enableTopToolbar={false}
+                muiTableHeadCellProps={{
+                  sx: {
                     border: 1,
-                    borderColor: 'white',
-                    color: '#000',
-                  },
-                  '& .MuiDataGrid-columnHeader': {
-                    border: 1,
-                  },
-                  '& .MuiDataGrid-columnHeaderTitle': {
                     fontWeight: 'bold',
-                  },
-                  '& .MuiDataGrid-columnHeaders': {
-                    bgcolor: 'primary.main',
+                    bgcolor: 'primary.container',
                     borderColor: 'white',
                     color: 'white',
                   },
-                  '& > .MuiDataGrid-columnSeparator': {
-                    visibility: 'hidden',
-                  },
-                  border: 0,
-                  overflowX: 'auto',
                 }}
-                hideFooter
-                autoHeight
-                disableColumnMenu
-                disableColumnFilter
-                disableColumnSelector
+                muiTableBodyCellProps={{
+                  sx: {
+                    bgcolor: '#EEF0F5',
+                    border: 1,
+                    borderColor: 'white',
+                    color: 'secondary.main',
+                  },
+                }}
+                initialState={{ columnPinning: { right: ['action'] } }}
               />
             </Box>
           </Box>
@@ -306,15 +341,17 @@ const User = () => {
               page={page || 1}
               count={metaList?.total_page || 1}
               color="primary"
-              sx={{ display: 'flex', flex: 1, justifyContent: 'right', color: '#000' }}
+              sx={{ display: 'flex', flex: 1, justifyContent: 'right', color: 'primary.main' }}
               onChange={(e, val) => setPage(val)}
             />
-            <Box sx={{ alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'right', color: '#000' }}>
+            <Box
+              sx={{ alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'right', color: 'primary.main' }}
+            >
               Show
               <Select
                 size="small"
                 value={pageSize}
-                sx={{ mx: 1 }}
+                sx={{ mx: 1, color: 'inherit' }}
                 onChange={(e) => {
                   setPageSize(e.target.value);
                   setPage(
