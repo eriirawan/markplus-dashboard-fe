@@ -14,6 +14,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Pagination,
+  Select,
 } from '@mui/material';
 import {
   Search,
@@ -366,6 +368,40 @@ const Evidence = () => {
               </>
             )}
           </Stack>
+          <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Pagination
+              page={store?.page || 1}
+              count={store?.metaList?.total_page || 1}
+              color="primary"
+              sx={{ display: 'flex', flex: 1, justifyContent: 'right', color: 'primary.main' }}
+              onChange={(e, val) => store?.setPage(val)}
+            />
+            <Box
+              sx={{ alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'right', color: 'primary.main' }}
+            >
+              Show
+              <Select
+                size="small"
+                value={store?.pageSize}
+                sx={{ mx: 1, color: 'inherit' }}
+                onChange={(e) => {
+                  store?.setPageSize(e.target.value);
+                  store?.setPage(
+                    page > Math.ceil(store?.metaList?.total_data / e.target.value)
+                      ? Math.ceil(store?.metaList?.total_data / e.target.value)
+                      : page
+                  );
+                }}
+              >
+                {[5, 10, 20, 50, 100].map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </Select>
+              {`of ${store?.metaList?.total_data || 0} entries`}
+            </Box>
+          </Box>
         </Stack>
       </Paper>
     </EvidenceContext.Provider>
