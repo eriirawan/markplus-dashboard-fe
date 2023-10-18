@@ -3,7 +3,18 @@ import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import PropTypes from 'prop-types';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-const PieChart = ({ chartData, width, height, maxWidthLegend, options, refChart, legendClassName, isWidth25 }) => {
+const PieChart = ({
+  chartData,
+  width,
+  height,
+  maxWidthLegend,
+  options,
+  refChart,
+  legendClassName,
+  isWidth25,
+  className,
+  layoutWidth = 100,
+}) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
 
@@ -139,8 +150,31 @@ const PieChart = ({ chartData, width, height, maxWidthLegend, options, refChart,
     // },
   };
   return (
-    <Box display={'flex'} justifyContent={'center'} flexWrap={isWidth25 ? 'wrap' : 'nowrap'} gap={'48px'}>
-      <Box sx={{ height: '100vh', maxHeight: '315px' }}>
+    <Box
+      sx={{
+        ...(layoutWidth > 20
+          ? {
+              display: 'flex',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              gap: '40px',
+            }
+          : {}),
+      }}
+      className={className}
+    >
+      <Box
+        sx={{
+          ...(layoutWidth !== 20
+            ? {
+                height: '100vh',
+                maxHeight: '315px',
+                display: 'flex',
+                alignItems: 'center',
+              }
+            : {}),
+        }}
+      >
         <Pie
           ref={refChart}
           width={width}
@@ -150,7 +184,14 @@ const PieChart = ({ chartData, width, height, maxWidthLegend, options, refChart,
           plugins={[htmlLegendPlugin, ChartDataLabels]}
         />
       </Box>
-      <Box display={'flex'} justifyContent={'center'} id={legendClassName}></Box>
+      <Box
+        display={'flex'}
+        justifyContent={'center'}
+        id={legendClassName}
+        sx={{
+          ...(layoutWidth === 20 ? { marginTop: '32px' } : {}),
+        }}
+      ></Box>
     </Box>
   );
 };

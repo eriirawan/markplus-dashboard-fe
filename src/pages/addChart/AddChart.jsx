@@ -27,7 +27,7 @@ import {
 } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import { Close } from '@mui/icons-material';
+import { Close, ErrorOutline } from '@mui/icons-material';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Saturation } from 'react-color/lib/components/common';
 import { CustomPicker, SketchPicker } from 'react-color';
@@ -55,6 +55,7 @@ import ExampleFileEdit from '@/assets/file_example_XLS_10.xlsx';
 import { AddOrEditChartContext, useAddOrEditChartStore } from './addChartContext';
 import { AppBarContext } from '@/context/AppBarContext';
 import XlsxPopulate from 'xlsx-populate';
+import DialogConfirmation from '../../components/Dialog/DialogConfirmation';
 
 const AddChart = (props) => {
   const store = useAddOrEditChartStore();
@@ -76,6 +77,7 @@ const AddChart = (props) => {
     handleClick,
     chartDetail,
     userId,
+    handleDelete,
   } = store;
   const [optionDataChartType, setOptionDataChartType] = useState([...optionChartTypes]);
   const { setDashboardContent, dashboardContent } = useDashboard();
@@ -95,6 +97,7 @@ const AddChart = (props) => {
       l: 0,
     },
   });
+  const [openDialogDelete, setOpenDialogDelete] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   // const [formData, setFormData] = useState({
@@ -120,7 +123,6 @@ const AddChart = (props) => {
   const watchAllField = methods.watch();
   useEffect(() => {
     if (optionChartTypes) {
-      // console.info(optionChartTypes, '<<< list api');
       setOptionDataChartType(optionChartTypes);
     }
     if (clientSelected?.id) {
@@ -151,10 +153,8 @@ const AddChart = (props) => {
       // if(localStorage.)
       // setDisplayInputLabel(false);
     }
-    // console.info(methods.getValues(), watchAllField, '<<<< kentod');
   }, [optionChartTypes, clientSelected]);
 
-  // console.info(methods.getValues(), '<<<< kentod');
   const handleChangeForm = (key, value) => {
     // setFormData({ ...formData, [key]: value });
     methods.setValue(key, value);
@@ -190,7 +190,7 @@ const AddChart = (props) => {
                 legendClassName={'legend-container-line'}
                 options={{}}
                 chartData={methods.getValues('chartData')}
-                showAxisValue={showAxisValue}
+                showAxisValue={methods.getValues('showAxisLabels')}
               ></LineChart>
             </Box>
           );
@@ -210,7 +210,7 @@ const AddChart = (props) => {
                 labelY={methods.getValues('horizontalAxisLabel')}
                 legendClassName={'legend-container-column-chart'}
                 options={{}}
-                showAxisValue={showAxisValue}
+                showAxisValue={methods.getValues('showAxisLabels')}
               />
             </Box>
           );
@@ -234,7 +234,7 @@ const AddChart = (props) => {
                   ...methods.getValues('chartData'),
                 }}
                 options={{}}
-                showAxisValue={showAxisValue}
+                showAxisValue={methods.getValues('showAxisLabels')}
               />
             </Box>
           );
@@ -250,7 +250,7 @@ const AddChart = (props) => {
                 refChart={chartRef}
                 width={'240px'}
                 height={'240px'}
-                chartData={dataChartDonutOrPie}
+                chartData={methods.getValues('chartDataDonutOrPie')}
                 legendClassName={'legend-container-donut-chart'}
                 options={{}}
               />
@@ -269,7 +269,7 @@ const AddChart = (props) => {
                 width={'240px'}
                 height={'240px'}
                 legendClassName={'legend-container-pie-chart'}
-                chartData={dataChartDonutOrPie}
+                chartData={methods.getValues('chartDataDonutOrPie')}
                 options={{}}
               />
             </Box>
@@ -302,7 +302,7 @@ const AddChart = (props) => {
                 }}
                 isAreaChart={true}
                 options={{}}
-                showAxisValue={showAxisValue}
+                showAxisValue={methods.getValues('showAxisLabels')}
               ></AreaChart>
             </Box>
           );
@@ -322,7 +322,8 @@ const AddChart = (props) => {
                 labelY={methods.getValues('horizontalAxisLabel')}
                 isStackedChart={true}
                 options={{}}
-                showAxisValue={showAxisValue}
+                // showAxisValue={showAxisValue}
+                showAxisValue={methods.getValues('showAxisLabels')}
               />
             </Box>
           );
@@ -343,12 +344,12 @@ const AddChart = (props) => {
                 isFullStackedChart={true}
                 isStackedChart={true}
                 options={{}}
-                showAxisValue={showAxisValue}
+                showAxisValue={methods.getValues('showAxisLabels')}
               />
             </Box>
           );
         }
-        case 'Table Chart': {
+        case 'Table': {
           setDisplayInputLabel(false);
           return (
             <Box sx={{ marginTop: '20px' }}>
@@ -360,6 +361,8 @@ const AddChart = (props) => {
           );
         }
         case 'Information Chart': {
+          setDisplayInputLabel(false);
+
           return (
             <Paper
               sx={{
@@ -452,10 +455,12 @@ const AddChart = (props) => {
   }, [
     methods.getValues('chartData'),
     methods.getValues('chartType'),
-
+    methods.getValues('chartLabel'),
+    methods.getValues('verticalAxisLabel'),
+    methods.getValues('horizontalAxisLabel'),
     displayColorPicker,
     colorSelected,
-    showAxisValue,
+    methods.getValues('showAxisLabels'),
   ]);
 
   const saveAsExcel = async () => {
@@ -488,13 +493,25 @@ const AddChart = (props) => {
             return {
               data: el.data,
               label: el.label,
-              backgroundColor: chartDetail?.colorway[el.label].backgroundColor,
-              borderColor: chartDetail?.colorway[el.label].borderColor,
+              backgroundColor: chartDetail?.colorway?.[el.label]?.backgroundColor || null,
+              borderColor: chartDetail?.colorway?.[el.label]?.borderColor || null,
+            };
+          }),
+        },
+        chartDataDonutOrPie: {
+          labels: chartDetail?.tabular?.labels,
+          datasets: chartDetail?.tabular?.datasets.map((el) => {
+            return {
+              data: el.data,
+              label: el.label,
+              backgroundColor: chartDetail?.colorway?.[el.label]?.backgroundColor || null,
+              borderColor: chartDetail?.colorway?.[el.label]?.borderColor || null,
             };
           }),
         },
         verticalAxisLabel: chartDetail?.label_vertical,
         horizontalAxisLabel: chartDetail?.label_horizontal,
+        showAxisLabels: chartDetail.show_axis_labels,
       };
       for (let obj in mappingDataFormDetail) {
         handleChangeForm(obj, mappingDataFormDetail[obj]);
@@ -617,34 +634,37 @@ const AddChart = (props) => {
       store.setAction('create');
     }
   }, [id]);
-  // console.info(watchAllField, '<<< watch  <<<');
 
-  return (
-    <AddOrEditChartContext.Provider value={store}>
-      <Stack
-        sx={{
-          height: '100%',
-          width: '100%',
-        }}
-        gap={'20px'}
-        //   onClick={() => handleClickCover()}
-      >
-        <Paper sx={{ padding: '32px' }}>
-          <Grid container>
-            <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
-              {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '548px', mt: 1 }}> */}
-              <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
-                <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>{breadcrumbs}</Breadcrumbs>
-                <Typography
-                  fontWeight={700}
-                  fontSize="30px"
-                  lineHeight={'39px'}
-                  color="primary"
-                  sx={{ marginTop: '16px' }}
-                >
-                  {id ? 'Edit Chart' : 'Add Chart'}
-                </Typography>
-                {/* <Typography
+  const handleDeleteChart = () => {
+    handleDelete(setOpenDialogDelete);
+  };
+  const renderMain = useMemo(() => {
+    return (
+      <AddOrEditChartContext.Provider value={store}>
+        <Stack
+          sx={{
+            height: '100%',
+            width: '100%',
+          }}
+          gap={'20px'}
+          //   onClick={() => handleClickCover()}
+        >
+          <Paper sx={{ padding: '32px' }}>
+            <Grid container>
+              <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
+                {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '548px', mt: 1 }}> */}
+                <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
+                  <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>{breadcrumbs}</Breadcrumbs>
+                  <Typography
+                    fontWeight={700}
+                    fontSize="30px"
+                    lineHeight={'39px'}
+                    color="primary"
+                    sx={{ marginTop: '16px' }}
+                  >
+                    {id ? 'Edit Chart' : 'Add Chart'}
+                  </Typography>
+                  {/* <Typography
                 fontWeight={700}
                 fontSize="18px"
                 lineHeight={'27px'}
@@ -653,94 +673,62 @@ const AddChart = (props) => {
               >
                 Chart Settings
               </Typography> */}
-                <Box display={'flex'} flexDirection="column">
-                  <Box display={'flex'} alignItems={'center'} gap="10px" sx={{ py: '32px' }}>
-                    <Button
-                      aria-label="close"
-                      color="primary"
-                      sx={{ minWidth: '200px' }}
-                      onClick={() => {
-                        if (!clientSelected) {
-                          setOpenPopupClient(true);
-                        } else {
-                          refInputFileImport.current.click();
-                        }
-                      }}
-                      disabled={fileImport ? true : false}
-                    >
-                      <FileOpenOutlinedIcon color="white" />
-                      <Typography
-                        sx={{ marginLeft: '5px' }}
-                        fontSize={'14px'}
-                        fontWeight={400}
-                        lineHeight={'21px'}
-                        color={'#FFFFFF'}
+                  <Box display={'flex'} flexDirection="column">
+                    <Box display={'flex'} alignItems={'center'} gap="10px" sx={{ py: '32px' }}>
+                      <Button
+                        aria-label="close"
+                        color="primary"
+                        sx={{ minWidth: '200px' }}
+                        onClick={() => {
+                          if (!clientSelected) {
+                            setOpenPopupClient(true);
+                          } else {
+                            refInputFileImport.current.click();
+                          }
+                        }}
+                        disabled={fileImport ? true : false}
                       >
-                        Import
-                      </Typography>
-                    </Button>
-                    {fileImport ? (
-                      <Box display={'flex'} alignItems={'center'}>
-                        <Typography textAlign={'center'} maxWidth={'350px'}>
-                          {fileImport?.name}
-                        </Typography>
-                        <IconButton
-                          onClick={() => {
-                            setFileImport(null);
-                            methods.setValue('chartData', {});
-                          }}
+                        <FileOpenOutlinedIcon color="white" />
+                        <Typography
+                          sx={{ marginLeft: '5px' }}
+                          fontSize={'14px'}
+                          fontWeight={400}
+                          lineHeight={'21px'}
+                          color={'#FFFFFF'}
                         >
-                          <DeleteFill />
-                        </IconButton>
-                      </Box>
-                    ) : (
-                      <Typography>No data imported yet.</Typography>
-                    )}
-                  </Box>
-                  <Box display={'flex'} flexDirection={'column'} gap="16px">
-                    <Autocomplete
-                      fullWidth
-                      // freeSolo
-                      isOptionEqualToValue={(opt) => opt.name === methods.getValues('chartType')}
-                      disablePortal
-                      options={optionDataChartType}
-                      {...methods.register('chartType')}
-                      getOptionLabel={(option) => option.name || ''}
-                      defaultValue={methods.getValues('chartType')}
-                      // value={methods.getValues('chartType')}
-                      inputValue={methods.getValues('chartType')}
-                      PaperComponent={(props) => (
-                        <Paper
-                          sx={(theme) => ({
-                            border: `${theme.palette.primary.main} 1px solid`,
-                            marginTop: '4px',
-                            borderRadius: '10px',
-                          })}
-                          {...props}
-                        ></Paper>
+                          Import
+                        </Typography>
+                      </Button>
+                      {fileImport ? (
+                        <Box display={'flex'} alignItems={'center'}>
+                          <Typography textAlign={'center'} maxWidth={'350px'}>
+                            {fileImport?.name}
+                          </Typography>
+                          <IconButton
+                            onClick={() => {
+                              setFileImport(null);
+                              methods.setValue('chartData', {});
+                            }}
+                          >
+                            <DeleteFill />
+                          </IconButton>
+                        </Box>
+                      ) : (
+                        <Typography>No data imported yet.</Typography>
                       )}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          InputProps={{ style: { height: '44px' }, ...params.InputProps }}
-                          InputLabelProps={{ shrink: true, ...params.InputLabelProps }}
-                          label="Chart Type"
-                          placeholder="Chart Type"
-                        />
-                      )}
-                      onChange={(e, newValue) => {
-                        handleChangeForm('chartTypeId', newValue?.id || '');
-                        handleChangeForm('chartType', newValue?.name || '');
-                      }}
-                      sx={{ padding: '9px 0px 19px 0px' }}
-                    ></Autocomplete>
-                    {methods.getValues('chartType') === 'Information Card' && (
+                    </Box>
+                    <Box display={'flex'} flexDirection={'column'} gap="16px">
                       <Autocomplete
                         fullWidth
+                        // freeSolo
+                        isOptionEqualToValue={(opt) => opt.name === methods.getValues('chartType')}
                         disablePortal
-                        options={[{ label: 'Median', value: 'Median' }]}
-                        value={'Median'}
-                        inputValue={'Median'}
+                        options={optionDataChartType}
+                        {...methods.register('chartType')}
+                        getOptionLabel={(option) => option.name || ''}
+                        defaultValue={methods.getValues('chartType')}
+                        // value={methods.getValues('chartType')}
+                        inputValue={methods.getValues('chartType')}
                         PaperComponent={(props) => (
                           <Paper
                             sx={(theme) => ({
@@ -756,229 +744,286 @@ const AddChart = (props) => {
                             {...params}
                             InputProps={{ style: { height: '44px' }, ...params.InputProps }}
                             InputLabelProps={{ shrink: true, ...params.InputLabelProps }}
-                            label="Formula"
-                            placeholder="Formula"
+                            label="Chart Type"
+                            placeholder="Chart Type"
                           />
                         )}
-                        // onChange={(e, newValue) => {
-                        //   handleChangeForm('chartType', newValue?.value || '');
-                        // }}
+                        onChange={(e, newValue) => {
+                          handleChangeForm('chartTypeId', newValue?.id || '');
+                          handleChangeForm('chartType', newValue?.name || '');
+                        }}
                         sx={{ padding: '9px 0px 19px 0px' }}
                       ></Autocomplete>
-                    )}
-                    <TextField
-                      {...methods.register('chartLabel')}
-                      label={
-                        methods.getValues('chartType') === 'Table Chart'
-                          ? 'Table Label'
-                          : methods.getValues('chartType') === 'Information Card'
-                          ? 'Information Label'
-                          : 'Chart Label'
-                      }
-                      placeholder={
-                        methods.getValues('chartType') === 'Table Chart'
-                          ? 'Type table label'
-                          : methods.getValues('chartType') === 'Information Card'
-                          ? 'Type information label'
-                          : 'Type chart label'
-                      }
-                      // value={methods.getValues('chartLabel')}
-                      InputProps={{ style: { height: '44px' } }}
-                      InputLabelProps={{ shrink: true }}
-                      onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
-                      sx={{ padding: '9px 0px 19px 0px' }}
-                    ></TextField>
-                    {displayInputLabel && (
-                      <>
-                        <Box
-                          display={'flex'}
-                          justifyContent={'space-between'}
-                          alignItems={'center'}
-                          sx={{ marginBottom: '16px' }}
-                        >
-                          <Box>
-                            <Typography fontWeight={400} size="14px" lineHeight={'21px'} color={'#000000'}>
-                              Hide or Show Axis Value
-                            </Typography>
-                            <Typography fontWeight={400} size="12px" lineHeight={'16px'} color={'#808080'}>
-                              Switch OFF to make the axis X and Y value hide, and Switch ON to show the axis
-                            </Typography>
+                      {methods.getValues('chartType') === 'Information Chart' && (
+                        <Autocomplete
+                          fullWidth
+                          disablePortal
+                          options={[{ label: 'Median', value: 'Median' }]}
+                          value={'Median'}
+                          inputValue={'Median'}
+                          PaperComponent={(props) => (
+                            <Paper
+                              sx={(theme) => ({
+                                border: `${theme.palette.primary.main} 1px solid`,
+                                marginTop: '4px',
+                                borderRadius: '10px',
+                              })}
+                              {...props}
+                            ></Paper>
+                          )}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              InputProps={{ style: { height: '44px' }, ...params.InputProps }}
+                              InputLabelProps={{ shrink: true, ...params.InputLabelProps }}
+                              label="Formula"
+                              placeholder="Formula"
+                            />
+                          )}
+                          // onChange={(e, newValue) => {
+                          //   handleChangeForm('chartType', newValue?.value || '');
+                          // }}
+                          sx={{ padding: '9px 0px 19px 0px' }}
+                        ></Autocomplete>
+                      )}
+                      <TextField
+                        {...methods.register('chartLabel')}
+                        label={
+                          methods.getValues('chartType') === 'Table'
+                            ? 'Table Label'
+                            : methods.getValues('chartType') === 'Information Chart'
+                            ? 'Information Label'
+                            : 'Chart Label'
+                        }
+                        placeholder={
+                          methods.getValues('chartType') === 'Table Chart'
+                            ? 'Type table label'
+                            : methods.getValues('chartType') === 'Information Chart'
+                            ? 'Type information label'
+                            : 'Type chart label'
+                        }
+                        // value={methods.getValues('chartLabel')}
+                        InputProps={{ style: { height: '44px' } }}
+                        InputLabelProps={{ shrink: true }}
+                        onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
+                        sx={{ padding: '9px 0px 19px 0px' }}
+                      ></TextField>
+                      {displayInputLabel && (
+                        <>
+                          <Box
+                            display={'flex'}
+                            justifyContent={'space-between'}
+                            alignItems={'center'}
+                            sx={{ marginBottom: '16px' }}
+                          >
+                            <Box>
+                              <Typography fontWeight={400} size="14px" lineHeight={'21px'} color={'#000000'}>
+                                Hide or Show Axis Value
+                              </Typography>
+                              <Typography fontWeight={400} size="12px" lineHeight={'16px'} color={'#808080'}>
+                                Switch OFF to make the axis X and Y value hide, and Switch ON to show the axis
+                              </Typography>
+                            </Box>
+                            <Switch
+                              {...methods.register('showAxisLabels')}
+                              checked={methods.getValues('showAxisLabels')}
+                              onChange={() => {
+                                methods.setValue('showAxisLabels', !methods.getValues('showAxisLabels'));
+                              }}
+                            />
                           </Box>
-                          <Switch
-                            checked={methods.getValues('showAxisLabels')}
-                            onChange={() => methods.setValue('showAxisLabels', !methods.getValues('showAxisLabels'))}
-                          />
-                        </Box>
-                        <Stack direction={'row'} gap="16px">
-                          <TextField
-                            {...methods.register('verticalAxisLabel')}
-                            label="Vertical Axis Label"
-                            placeholder="Vertical Axis Label"
-                            InputProps={{ style: { height: '44px' } }}
-                            InputLabelProps={{ shrink: true }}
-                            // value={methods.getValues('verticalAxisLabel')}
-                            onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
-                            sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                          ></TextField>
-                          <TextField
-                            {...methods.register('horizontalAxisLabel')}
-                            label="Horizontal Axis Label"
-                            placeholder="Horizontal Axis Label"
-                            InputProps={{ style: { height: '44px' } }}
-                            InputLabelProps={{ shrink: true }}
-                            // value={methods.getValues('horizontalAxisLabel')}
-                            onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
-                            sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                          ></TextField>
-                        </Stack>
-                      </>
-                    )}
+                          <Stack direction={'row'} gap="16px">
+                            <TextField
+                              {...methods.register('verticalAxisLabel')}
+                              label="Vertical Axis Label"
+                              placeholder="Vertical Axis Label"
+                              InputProps={{ style: { height: '44px' } }}
+                              InputLabelProps={{ shrink: true }}
+                              // value={methods.getValues('verticalAxisLabel')}
+                              onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
+                              sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
+                            ></TextField>
+                            <TextField
+                              {...methods.register('horizontalAxisLabel')}
+                              label="Horizontal Axis Label"
+                              placeholder="Horizontal Axis Label"
+                              InputProps={{ style: { height: '44px' } }}
+                              InputLabelProps={{ shrink: true }}
+                              // value={methods.getValues('horizontalAxisLabel')}
+                              onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
+                              sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
+                            ></TextField>
+                          </Stack>
+                        </>
+                      )}
+                    </Box>
                   </Box>
                 </Box>
-              </Box>
-              {/* </Paper> */}
-            </Grid>
-            <Grid item xl={1} lg={0.5} justifyContent={'center'} display={'flex'}>
-              <Divider light orientation={+window.innerWidth >= 1200 ? 'vertical' : 'horizontal'} />
-            </Grid>
-            <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
-              {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', minWidth: '548px', mt: 1 }}> */}
-              <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
-                <Box display={'flex'} justifyContent={'space-between'}>
-                  <Typography fontSize="24px" fontWeight={700} lineHeight="31px" color={'primary'}>
-                    Preview
-                  </Typography>
-                  {JSON.stringify(methods.getValues('chartData')) !== '{}' && (
-                    <Button
-                      onClick={() => {
-                        if (methods.getValues('chartType') === 'Information Card') {
-                        } else {
-                          setOpenDialogColorPicker((prev) => !prev);
-                        }
-                      }}
-                      variant="outlined"
-                    >
-                      {methods.getValues('chartType') === 'Information Card' ? 'Change Image' : 'Change Colors'}
-                    </Button>
-                  )}
-                </Box>
-                {SettingContent}
-                {displayColorPicker && (
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      zIndex: '2',
-                      top: '100px',
-                    }}
-                  >
+                {/* </Paper> */}
+              </Grid>
+              <Grid item xl={1} lg={0.5} justifyContent={'center'} display={'flex'}>
+                <Divider light orientation={+window.innerWidth >= 1200 ? 'vertical' : 'horizontal'} />
+              </Grid>
+              <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
+                {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', minWidth: '548px', mt: 1 }}> */}
+                <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
+                  <Box display={'flex'} justifyContent={'space-between'}>
+                    <Typography fontSize="24px" fontWeight={700} lineHeight="31px" color={'primary'}>
+                      Preview
+                    </Typography>
+                    {JSON.stringify(methods.getValues('chartData')) !== '{}' && (
+                      <Button
+                        onClick={() => {
+                          if (methods.getValues('chartType') === 'Information Chart') {
+                          } else {
+                            setOpenDialogColorPicker((prev) => !prev);
+                          }
+                        }}
+                        variant="outlined"
+                      >
+                        {methods.getValues('chartType') === 'Information Chart' ? 'Change Image' : 'Change Colors'}
+                      </Button>
+                    )}
+                  </Box>
+                  {SettingContent}
+                  {displayColorPicker && (
                     <Box
                       sx={{
-                        position: 'fixed',
-                        top: '0px',
-                        right: '0px',
-                        bottom: '0px',
-                        left: '0px',
+                        position: 'absolute',
+                        zIndex: '2',
+                        top: '100px',
                       }}
-                      onClick={handleClickCover}
-                    ></Box>
-                    <CustomColorPicker codeColor={codeColor} onChange={() => {}}></CustomColorPicker>
-                  </Box>
-                )}
-              </Box>
-              {/* </Paper> */}
-            </Grid>
-          </Grid>
-        </Paper>
-        <input
-          type="file"
-          style={{ display: 'none' }}
-          ref={refInputFileImport}
-          accept=".xlsx"
-          // value={fileImport}
-          onClick={(event) => {
-            const { target = {} } = event || {};
-            target.value = '';
-          }}
-          onChange={(e) => {
-            // console.info(e, '<<< diaJalan gasi ?');
-            setTypeDialog('loading');
-            // setOpenDialogStatusImport((prev) => ({ ...prev, loading: true }));
-            handleFileInputChange(e);
-            parseFile(e.target.files[0]);
-            setFileImport(e.target.files[0]);
-            // setOpenDialogStatusImport((prev) => ({ ...prev, error: true }));
-          }}
-        />
-        <DialogColorPicker
-          dataSets={methods.getValues('chartData')?.datasets || []}
-          openDialog={openDialogColorPicker}
-          onSaveChanges={(data) => {
-            methods.setValue('chartData', { ...methods.getValues('chartData'), datasets: [...data] });
-            setOpenDialogColorPicker((prev) => !prev);
-          }}
-          onCancel={() => setOpenDialogColorPicker((prev) => !prev)}
-        ></DialogColorPicker>
-        <DialogStatusImport
-          openDialogImport={openDialog}
-          setOpenDialogImport={setOpenDialog}
-          // contentText={'Choose your data import method:'
-          typeDialog={typeDialog}
-        />
-        <Paper sx={{ borderRadius: 1.25, display: 'flex', justifyContent: 'space-between', maxHeight: '105px', mt: 1 }}>
-          {id && (
-            <Box sx={{ width: '100%', my: 'auto', p: 4 }}>
-              <Button
-                variant={'outlined'}
-                color="error"
-                sx={{
-                  maxWidth: '286px',
-                  width: '100%',
-                  backgroundColor: '#E563630D',
-                }}
-              >
-                <Box display={'flex'} gap={'8px'} alignItems={'center'}>
-                  <DeleteFill />
-                  <Typography sx={(theme) => ({ color: theme.palette.error.light })}>Delete Chart</Typography>
+                    >
+                      <Box
+                        sx={{
+                          position: 'fixed',
+                          top: '0px',
+                          right: '0px',
+                          bottom: '0px',
+                          left: '0px',
+                        }}
+                        onClick={handleClickCover}
+                      ></Box>
+                      <CustomColorPicker codeColor={codeColor} onChange={() => {}}></CustomColorPicker>
+                    </Box>
+                  )}
                 </Box>
-              </Button>
-            </Box>
-          )}
-          <Box
-            sx={{ width: '100%', my: 'auto', p: 4 }}
-            display="flex"
-            justifyContent={'flex-end'}
-            alignItems="center"
-            gap={'16px'}
+                {/* </Paper> */}
+              </Grid>
+            </Grid>
+          </Paper>
+          <input
+            type="file"
+            style={{ display: 'none' }}
+            ref={refInputFileImport}
+            accept=".xlsx"
+            // value={fileImport}
+            onClick={(event) => {
+              const { target = {} } = event || {};
+              target.value = '';
+            }}
+            onChange={(e) => {
+              setTypeDialog('loading');
+              // setOpenDialogStatusImport((prev) => ({ ...prev, loading: true }));
+              handleFileInputChange(e);
+              parseFile(e.target.files[0]);
+              setFileImport(e.target.files[0]);
+              // setOpenDialogStatusImport((prev) => ({ ...prev, error: true }));
+            }}
+          />
+          <DialogColorPicker
+            dataSets={
+              methods.getValues('chartType') === 'Donut Chart' || methods.getValues('chartType') === 'Pie Chart'
+                ? methods.getValues('chartDataDonutOrPie')?.datasets || []
+                : methods.getValues('chartData')?.datasets || []
+            }
+            openDialog={openDialogColorPicker}
+            onSaveChanges={(data) => {
+              methods.setValue('chartData', { ...methods.getValues('chartData'), datasets: [...data] });
+              setOpenDialogColorPicker((prev) => !prev);
+            }}
+            typeChart={methods.getValues('chartType')}
+            onCancel={() => setOpenDialogColorPicker((prev) => !prev)}
+          ></DialogColorPicker>
+          <DialogStatusImport
+            openDialogImport={openDialog}
+            setOpenDialogImport={setOpenDialog}
+            // contentText={'Choose your data import method:'
+            typeDialog={typeDialog}
+          />
+          <DialogConfirmation
+            open={openDialogDelete}
+            setOpen={() => setOpenDialogDelete((prev) => !prev)}
+            IconConfrim={() => <ErrorOutline />}
+            cancelButonText={'Cancel'}
+            confrimButtonText={'Delete'}
+            header={'Delete Chart'}
+            text={'Are you sure you want to delete this chart?'}
+            typeButtonConfrim={'error'}
+            onConfrimOk={handleDeleteChart}
+          />
+          <Paper
+            sx={{ borderRadius: 1.25, display: 'flex', justifyContent: 'space-between', maxHeight: '105px', mt: 1 }}
           >
-            {/* <Typography fontWeight={700} fontSize="18px" lineHeight="27px" color="primary">
+            {id && (
+              <Box sx={{ width: '100%', my: 'auto', p: 4 }}>
+                <Button
+                  variant={'outlined'}
+                  color="error"
+                  sx={{
+                    maxWidth: '286px',
+                    width: '100%',
+                    backgroundColor: '#E563630D',
+                  }}
+                  onClick={() => {
+                    setChartId(id);
+                    setOpenDialogDelete((prev) => !prev);
+                  }}
+                >
+                  <Box display={'flex'} gap={'8px'} alignItems={'center'}>
+                    <DeleteFill />
+                    <Typography sx={(theme) => ({ color: theme.palette.error.light })}>Delete Chart</Typography>
+                  </Box>
+                </Button>
+              </Box>
+            )}
+            <Box
+              sx={{ width: '100%', my: 'auto', p: 4 }}
+              display="flex"
+              justifyContent={'flex-end'}
+              alignItems="center"
+              gap={'16px'}
+            >
+              {/* <Typography fontWeight={700} fontSize="18px" lineHeight="27px" color="primary">
             Create column?
           </Typography> */}
 
-            <Button sx={{ maxWidth: '256px', width: '100%' }} variant="outlined">
-              Cancel
-            </Button>
-            {clientSelected && (
-              <Button
-                sx={{ maxWidth: '256px', width: '100%' }}
-                onClick={(_) => {
-                  // submitChart();
-                  methods.setValue('section_id', localStorage.sectionId);
-                  methods.setValue('fileName', fileImport?.name);
-                  // if (id && chartDetail?.tabular.filename !== fileImport?.name) {
-                  //   console.info('changes file', chartDetail?.tabular?.filename, fileImport?.name);
-                  // }
-                  handleClick();
-                }}
-                disabled={JSON.stringify(methods?.getValues('chartData')) === '{}'}
-              >
-                {id ? 'Save Changes' : 'Add Chart'}
+              <Button sx={{ maxWidth: '256px', width: '100%' }} variant="outlined" onClick={() => navigate('/home')}>
+                Cancel
               </Button>
-            )}
-          </Box>
-        </Paper>
-      </Stack>
-    </AddOrEditChartContext.Provider>
-  );
+              {clientSelected && (
+                <Button
+                  sx={{ maxWidth: '256px', width: '100%' }}
+                  onClick={(_) => {
+                    // submitChart();
+                    methods.setValue('section_id', localStorage.sectionId);
+                    methods.setValue('fileName', fileImport?.name);
+                    // if (id && chartDetail?.tabular.filename !== fileImport?.name) {
+                    // }
+                    handleClick();
+                  }}
+                  disabled={JSON.stringify(methods?.getValues('chartData')) === '{}'}
+                >
+                  {id ? 'Save Changes' : 'Add Chart'}
+                </Button>
+              )}
+            </Box>
+          </Paper>
+        </Stack>
+      </AddOrEditChartContext.Provider>
+    );
+  }, [store, methods.getValues()]);
+  return renderMain;
 };
 
 export default AddChart;

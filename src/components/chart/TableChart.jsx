@@ -15,7 +15,7 @@ import {
   tableCellClasses,
 } from '@mui/material';
 
-const TableChart = ({ chartData }) => {
+const TableChart = ({ chartData, className }) => {
   function createData(name, calories, fat, carbs, protein) {
     return { name, calories, fat, carbs, protein };
   }
@@ -56,7 +56,7 @@ const TableChart = ({ chartData }) => {
   }));
   return (
     <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} className={className}>
         <Table
           sx={{
             // minWidth: 700,
@@ -69,7 +69,7 @@ const TableChart = ({ chartData }) => {
         >
           <TableHead>
             <TableRow>
-              {chartData?.labels?.map((el) => {
+              {(chartData?.tabular?.labels || chartData?.labels)?.map((el) => {
                 return <StyledTableCell>{el}</StyledTableCell>;
               })}
               {/* <StyledTableCell>Title</StyledTableCell>
@@ -81,7 +81,7 @@ const TableChart = ({ chartData }) => {
             </TableRow>
           </TableHead>
           <TableBody sx={{ margin: '2px', border: 'none' }}>
-            {chartData?.datasets?.map((row) => (
+            {(chartData?.tabular?.datasets || chartData?.datasets)?.map((row) => (
               <StyledTableRow key={row.name}>
                 {row.data.map((data) => (
                   <StyledTableCell

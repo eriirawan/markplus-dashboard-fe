@@ -30,7 +30,6 @@ export const useAddOrEditChartStore = () => {
   const [page, setPage] = useState(1);
   const [sectionId, setSectionId] = useState(null);
   // const [search, setSearch] = useState('');
-  // console.info(chartId, userId, '<<< aiueoioooooo');
   const [{ response, loading }, reFetch] = useAxios({
     url: `/dashboard/v1/charts/user/${userId}/${chartId}`,
     method: 'get',
@@ -60,11 +59,11 @@ export const useAddOrEditChartStore = () => {
   //   method: 'post',
   // });
   const [, updateChartTabular] = useAxios({
-    url: `/dashboard/v1/charts/user/${userId}/${chartId}/tabular`,
+    url: `/dashboard/v1/charts/tabular/update`,
     method: 'put',
   });
   const [, updateChart] = useAxios({
-    url: `/dashboard/v1/charts/user/${userId}/${chartId}`,
+    url: `/dashboard/v1/charts/update`,
     method: 'put',
   });
   const [, parseFile] = useAxios({
@@ -76,10 +75,10 @@ export const useAddOrEditChartStore = () => {
       },
     },
   });
-  // const [, deleteUser] = useAxios({
-  //   url: `/dashboard/v1/users/${userId}`,
-  //   method: 'delete',
-  // });
+  const [, deleteChart] = useAxios({
+    url: `/dashboard/v1/charts/user/${userId}/${chartId}`,
+    method: 'delete',
+  });
 
   const defaultForm = {
     chartType: '',
@@ -88,6 +87,7 @@ export const useAddOrEditChartStore = () => {
     verticalAxisLabel: '',
     horizontalAxisLabel: '',
     showAxisLabels: true,
+    chartDataDonutOrPie: {},
   };
 
   const methods = useForm({
@@ -96,17 +96,15 @@ export const useAddOrEditChartStore = () => {
   });
 
   const handleFileInputChange = async (e) => {
-    console.info(e, '<<<< event');
     // setIsLoading(true);
     setOpenDialog((prev) => ({ ...prev, loading: true }));
     const bodyFormData = new FormData();
     bodyFormData.append('file', e.target.files[0]);
     const data = await parseFile(bodyFormData);
-    const colorTheme = Object.values(clientSelected?.colorway)?.slice(1);
+    const colorTheme = Object.values(clientSelected?.colorway)?.filter((el) => el.includes('#'));
     let indexColorTheme = 0;
-    console.info(Object.values(clientSelected?.colorway).slice(1), '<<< object valuess');
     if (data?.status === 200) {
-      const mappingChartColorDefault = {
+      const mappingDataChart = {
         labels: data.data.labels,
         datasets: data.data.datasets?.map((el, i) => {
           const newData = {
@@ -124,7 +122,19 @@ export const useAddOrEditChartStore = () => {
           };
         }),
       };
-
+      const mappingDataDonutOrPieChart = {
+        labels: data.data.labels,
+        datasets: data.data.datasets?.map((el, i) => {
+          const newData = {
+            ...el,
+            backgroundColor: colorTheme.slice(0, el?.data?.length),
+            borderColor: colorTheme.slice(0, el?.data?.length),
+          };
+          return {
+            ...newData,
+          };
+        }),
+      };
       // data.data?.dataset.map((el) => {
       //   return {
       //     ...el,
@@ -140,8 +150,8 @@ export const useAddOrEditChartStore = () => {
       //     }),
       //   };
       // });
-      console.info(mappingChartColorDefault, '<<<< colorDefault');
-      methods.setValue('chartData', mappingChartColorDefault);
+      methods.setValue('chartDataDonutOrPie', mappingDataDonutOrPieChart);
+      methods.setValue('chartData', mappingDataChart);
       setOpenDialog((prev) => ({ ...prev, loading: false }));
       setTypeDialog('success');
       setOpenDialog((prev) => ({ ...prev, success: true }));
@@ -152,7 +162,6 @@ export const useAddOrEditChartStore = () => {
 
   const onSubmit = async (formData, cb) => {
     setIsLoading(true);
-    console.info(formData, cb, '<<<< cb');
     if (action === 'create') {
       const colorway = {};
       formData.chartData.datasets.forEach((el) => {
@@ -168,8 +177,8 @@ export const useAddOrEditChartStore = () => {
         section_id: formData.section_id,
         title: formData.chartLabel,
         chart_type_id: formData.chartTypeId,
-        label_vertical: formData.verticalAxisLabel,
-        label_horizontal: formData.horizontalAxisLabel,
+        label_vertical: formData.verticalAxisLabel || 'null',
+        label_horizontal: formData.horizontalAxisLabel || 'null',
         colorway: {
           ...colorway,
         },
@@ -192,7 +201,6 @@ export const useAddOrEditChartStore = () => {
         navigate('/home');
       }
     } else if (action === 'update') {
-      console.info('masuk sini', formData, '<<< apa');
       const colorway = {};
       formData.chartData.datasets.forEach((el) => {
         if (!colorway[el.label]) {
@@ -220,6 +228,8 @@ export const useAddOrEditChartStore = () => {
       const dataDetail = await response;
       const update = await updateChart({
         ...payloadChart,
+        user_id: userId,
+        chart_id: chartId,
       });
 
       if (update?.status === 200) {
@@ -231,6 +241,8 @@ export const useAddOrEditChartStore = () => {
           ) {
             const updateTabular = await updateChartTabular({
               ...payloadChartTabular,
+              user_id: userId,
+              chart_id: chartId,
             });
             if (updateTabular?.status === 200) {
               enqueueSnackbar('Section Delete successfully.', {
@@ -246,14 +258,12 @@ export const useAddOrEditChartStore = () => {
           }
         }
       }
-      // console.info(payloadChart, payloadChartTabular, '<<< payloadChart');
       // if (update?.status === 200) {
       //   setOpenPopup(false);
       //   enqueueSnackbar('Section Delete successfully.', {
       //     variant: 'successSnackbar',
       //   });
       //   reFetch();
-      //   // console.info(cb, '<<< apa dia');
       //   // cb(false);
       // }
     }
@@ -272,16 +282,16 @@ export const useAddOrEditChartStore = () => {
   //   }, 500);
   // };
 
-  // const handleDelete = async (cb) => {
-  //   const deleteAct = await deleteUser();
-  //   if (deleteAct.status === 200) {
-  //     enqueueSnackbar('User deleted successfully.', {
-  //       variant: 'successSnackbar',
-  //     });
-  //     reFetch();
-  //     cb(false);
-  //   }
-  // };
+  const handleDelete = async (cb) => {
+    const deleteAct = await deleteChart();
+    if (deleteAct.status === 200) {
+      enqueueSnackbar('Chart deleted successfully.', {
+        variant: 'successSnackbar',
+      });
+      cb(false);
+      navigate('/home');
+    }
+  };
 
   return {
     methods,
@@ -319,6 +329,7 @@ export const useAddOrEditChartStore = () => {
     optionChartTypes: responseChartTypeList?.data || [],
     setChartId,
     userId,
+    handleDelete,
   };
 };
 

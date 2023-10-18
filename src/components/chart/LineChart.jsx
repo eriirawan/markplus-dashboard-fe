@@ -16,6 +16,7 @@ const LineChart = ({
   isAreaChart,
   legendClassName,
   showAxisValue = true,
+  className,
 }) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
@@ -197,6 +198,7 @@ const LineChart = ({
         sx={{
           height: '100%',
         }}
+        className={className}
       >
         <Box
           sx={{
@@ -221,7 +223,19 @@ const LineChart = ({
         {/* <Box id="subLabels" /> */}
       </Box>
     );
-  }, [chartData, refChart, width, height, labelX, labelY, isAreaChart, options, defaultOptions]);
+  }, [
+    chartData,
+    refChart,
+    width,
+    height,
+    labelX,
+    labelY,
+    isAreaChart,
+    options,
+    defaultOptions,
+    showAxisValue,
+    className,
+  ]);
   return renderMain;
   // return (
   //   <Box sx={{ maxWidth: '1173px' }}>

@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import useAxios from '@/hooks/useAxios';
+// import  from 'axios-hooks'
 import { enqueueSnackbar } from 'notistack';
+import axios from 'axios';
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 export const useHomeStore = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +33,7 @@ export const useHomeStore = () => {
   // });
 
   const [, addSection] = useAxios({
-    url: `/dashboard/v1/sections/type/${sectionType}/user/${userId}/add`,
+    url: `/dashboard/v1/sections/add`,
     method: 'post',
     options: {
       // headers: {
@@ -38,23 +41,28 @@ export const useHomeStore = () => {
       // },
     },
   });
-  const [, updateAxisLabel] = useAxios({
-    url: `/dashboard/v1/charts/user/${userId}/${chartSelectedId}`,
-    method: 'put',
-  });
+
   const [, updateSection] = useAxios({
-    url: `/dashboard/v1/sections/id/${sectionId}`,
+    url: `/dashboard/v1/sections/id/update`,
     method: 'put',
   });
-  useEffect(() => {
-    console.info(response, '<<<< ini useEffectContext');
-  }, [response]);
+
+  const [, updateAxisLabel] = useAxios({
+    url: `/dashboard/v1/charts/update`,
+    method: 'put',
+    // pause: !userId && !chartSelectedId,
+  });
+  // const updatingAxisLabel = async (data) => {
+  //   const response = await axios.put(`${url}`, data);
+  //   if (response.status === 200) {
+  //   }
+  // };
   const handleChangeAxis = async (data) => {
     const update = await updateAxisLabel({
       ...data,
     });
-    if (update.status === 200) {
-      enqueueSnackbar('Section added successfully.', {
+    if (update?.status === 200) {
+      enqueueSnackbar('Chart updated successfully.', {
         variant: 'successSnackbar',
       });
       reFetch();
@@ -94,10 +102,11 @@ export const useHomeStore = () => {
 
   const onSubmitSection = async (formData, cb) => {
     setIsLoading(true);
-    console.info(action, formData, '<<<< apa actionn ya????');
     if (action === 'create') {
       const submit = await addSection({
         ...formData,
+        section_type: sectionType,
+        user_id: userId,
       });
       if (submit?.status === 200) {
         setOpenPopup(false);
@@ -107,7 +116,6 @@ export const useHomeStore = () => {
         reFetch();
       }
     } else if (action === 'update') {
-      console.info('masuk sini');
       const update = await updateSection({
         ...formData,
       });
@@ -117,7 +125,6 @@ export const useHomeStore = () => {
           variant: 'successSnackbar',
         });
         reFetch();
-        console.info(cb, '<<< apa dia');
         cb(false);
       }
     }
@@ -177,6 +184,7 @@ export const useHomeStore = () => {
     chartSelectedId,
     // setSearch,
     loading,
+    setIsLoading,
     // search,
     // handleDelete,
   };

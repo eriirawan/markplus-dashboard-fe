@@ -17,6 +17,7 @@ const AreaChart = ({
   isAreaChart,
   legendClassName,
   showAxisValue = true,
+  className,
 }) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
@@ -218,6 +219,7 @@ const AreaChart = ({
         sx={{
           height: '100%',
         }}
+        className={className}
       >
         <Box
           sx={{
@@ -239,7 +241,7 @@ const AreaChart = ({
         {/* <Box id="subLabels" /> */}
       </Box>
     );
-  }, [chartData, refChart, width, height, labelX, labelY, isAreaChart, options, defaultOptions]);
+  }, [chartData, refChart, width, height, labelX, labelY, isAreaChart, options, defaultOptions, className]);
   return renderMain;
   // return (
   //   <Box sx={{ maxWidth: '1173px' }}>
