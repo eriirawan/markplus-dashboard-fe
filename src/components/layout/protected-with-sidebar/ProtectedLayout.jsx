@@ -25,12 +25,13 @@ import useSidebarMenus from '../SidebarMenu';
 import Sidebar from './Sidebar';
 import SidebarSmall from './SidebarSmall';
 import useAfterLoginStartup from '@/hooks/useAfterLogin';
+import useAxios from 'axios-hooks';
 import DialogFormContainer from '../../Dialog/DialogForm';
-import useAxios from '@/hooks/useAxios';
 import { useUserStore } from '../../../pages/user/UserContext';
+
 const ProtectedLayout = () => {
   const { refreshMeData } = useAuth();
-  const { userToken: token, me } = useContext(AppContext);
+  const { userToken: token, me, setClientSelected } = useContext(AppContext);
   const store = useStore();
   const menus = useSidebarMenus();
   const outlet = useOutlet();
@@ -49,7 +50,7 @@ const ProtectedLayout = () => {
   const styles = {
     appBarContainer: {
       alignItems: 'center',
-      bgcolor: '#F5F5F5',
+      bgcolor: 'bgcolor.header',
       height: appBarHeight,
       layout: 'fixed',
       m: 0,
@@ -60,7 +61,7 @@ const ProtectedLayout = () => {
       mb: 1,
       // width: `calc(100% - ${sideBarContentWidth}px)`,
     },
-    appContainer: { height: '100%', layout: 'fixed', bgcolor: '#F5F5F5' },
+    appContainer: { height: '100%', layout: 'fixed', bgcolor: 'bgcolor.main' },
     outletContainer: {
       height: windowDimensions.height,
       overflow: 'auto',
@@ -72,13 +73,15 @@ const ProtectedLayout = () => {
   };
 
   const handleOpenSidebar = (state) => setOpenSidebar(state);
-  const [{ response, loading }, reFetch] = useAxios({
+  const [{ data, loading }] = useAxios({
     url: `/dashboard/v1/users/list?page=${pageClientList}&page_size=${10}&sort_by=${'id'}&sort_dir=${'ASC'}`,
     method: 'get',
   });
+
   useEffect(() => {
-    if (response?.meta?.totalData > 10) setPageClientList(response?.meta?.totalData);
-  }, [response]);
+    if (data?.meta?.totalData > 10) setPageClientList(data?.meta?.totalData);
+  }, [data]);
+
   window.onload = async () => {
     if (token) {
       await refreshMeData();
@@ -89,22 +92,12 @@ const ProtectedLayout = () => {
   };
   const onSaveClient = () => {
     store.setClientSelected(clientValue);
+    setClientSelected(clientValue);
     store.setOpenPopupClient(false);
   };
   return (
     <AppBarContext.Provider value={store}>
       <Grid container>
-        {/* <Grid item container xs={12} sx={styles.appBarContainer}>
-          <Appbar
-            openNotification={openNotification}
-            openTaskList={openTaskList}
-            openProfileBar={openProfileBar}
-            setOpenNotification={setOpenNotification}
-            setOpenTaskList={setOpenTaskList}
-            setOpenProfileBar={setOpenProfileBar}
-            setShowDrawerBackground={setShowDrawerBackground}
-          />
-        </Grid> */}
         <Grid item container direction="row" xs={12} sx={styles.appContainer}>
           <Stack direction="row" width="100%">
             <ClickAwayListener onClickAway={() => handleOpenSidebar(false)}>
@@ -135,7 +128,7 @@ const ProtectedLayout = () => {
           <DialogFormContainer
             open={store.openPopupClient}
             setOpen={store.setOpenPopupClient}
-            option={response?.data}
+            option={data?.data}
             onSave={onSaveClient}
           >
             <FormControl variant="standard">
@@ -144,10 +137,10 @@ const ProtectedLayout = () => {
                 name="client"
                 value={clientValue?.id || null}
                 onChange={(e, value) => {
-                  setClientValue(response?.data?.find((el) => el.id === +value));
+                  setClientValue(data?.data?.find((el) => el.id === +value));
                 }}
               >
-                {response?.data?.map((el) => (
+                {data?.data?.map((el) => (
                   <FormControlLabel
                     value={el.id}
                     control={<Radio sx={{ p: 2 }} />}
@@ -158,37 +151,6 @@ const ProtectedLayout = () => {
             </FormControl>
           </DialogFormContainer>
         </Grid>
-        {/* <Box
-          justifyContent="flex-end"
-          alignItems="flex-end"
-          flexDirection="row"
-          sx={(theme) => ({
-            backgroundColor: alpha(theme.palette.text.primary, 0.1),
-            display: showDrawerBackground ? 'block' : 'none',
-            height: windowDimensions.height - appBarHeight,
-            marginLeft: `${sideBarContentWidth}px`,
-            marginTop: `${appBarHeight}px`,
-            position: 'fixed',
-            width: `calc(100% - ${sideBarContentWidth}px)`,
-            zIndex: 900,
-          })}
-        >
-          <NotificationDrawer
-            openNotification={openNotification}
-            setOpenNotification={setOpenNotification}
-            setShowDrawerBackground={setShowDrawerBackground}
-          />
-          <TaskListDrawer
-            openTaskList={openTaskList}
-            setOpenTaskList={setOpenTaskList}
-            setShowDrawerBackground={setShowDrawerBackground}
-          />
-          <ProfileBarDrawer
-            openProfileBar={openProfileBar}
-            setOpenProfileBar={setOpenProfileBar}
-            setShowDrawerBackground={setShowDrawerBackground}
-          />
-        </Box> */}
       </Grid>
     </AppBarContext.Provider>
   );

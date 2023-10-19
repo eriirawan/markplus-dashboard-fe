@@ -998,7 +998,7 @@ const AddChart = (props) => {
             Create column?
           </Typography> */}
 
-              <Button sx={{ maxWidth: '256px', width: '100%' }} variant="outlined" onClick={() => navigate('/home')}>
+              <Button sx={{ maxWidth: '256px', width: '100%' }} variant="outlined" onClick={() => navigate(-1)}>
                 Cancel
               </Button>
               {clientSelected && (

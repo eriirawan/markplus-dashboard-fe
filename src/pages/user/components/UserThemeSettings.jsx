@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext, useEffect } from 'react';
 import { FavoriteBorderOutlined, Close } from '@mui/icons-material';
 import {
   Grid,
@@ -15,9 +15,11 @@ import {
 } from '@mui/material';
 import { SketchPicker } from 'react-color';
 import { useSnackbar } from 'notistack';
+import { AppContext } from '../../../context/AppContext';
 
 const UserThemeSettings = (props) => {
-  const { openPopup, setOpenPopup, username } = props;
+  const { openPopup, setOpenPopup, username, userId, colorway, handleSaveColorway } = props;
+  const { me } = useContext(AppContext);
   const dialogRef = useRef(null);
   const colorRef = useRef([]);
   const { enqueueSnackbar } = useSnackbar();
@@ -31,6 +33,17 @@ const UserThemeSettings = (props) => {
   const [color3, setColor3] = useState('#2e459a');
   const [color4, setColor4] = useState('#ffffff');
   const [color5, setColor5] = useState('#000000');
+
+  useEffect(() => {
+    if (colorway) {
+      setUserTheme(colorway.theme || 'light');
+      setColor1(colorway?.color1 || '#EEF0F5');
+      setColor2(colorway?.color2 || '#2e459a');
+      setColor3(colorway?.color3 || '#2e459a');
+      setColor4(colorway?.color4 || '#ffffff');
+      setColor5(colorway?.color5 || '#000000');
+    }
+  }, [colorway]);
 
   const colorPreviews = [
     {
@@ -88,7 +101,7 @@ const UserThemeSettings = (props) => {
             alignItems="center"
             sx={{ backgroundColor: color4, borderRadius: '6px', height: '60px' }}
           >
-            <Typography sx={{ font: color5 }}>Card</Typography>
+            <Typography sx={{ color: color3 }}>Card</Typography>
           </Stack>
         </Grid>
       );
@@ -156,9 +169,8 @@ const UserThemeSettings = (props) => {
     setOpenPopup(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const values = {
-      username,
       theme: userTheme,
       color1,
       color2,
@@ -166,11 +178,7 @@ const UserThemeSettings = (props) => {
       color4,
       color5,
     };
-    enqueueSnackbar('User theme changed successfully.', {
-      anchorOrigin: { horizontal: 'center', vertical: 'top' },
-      variant: 'successSnackbar',
-    });
-    setOpenPopup(false);
+    await handleSaveColorway(values);
   };
 
   return (
@@ -192,7 +200,11 @@ const UserThemeSettings = (props) => {
       <DialogContent ref={dialogRef}>
         <Stack direction="row" sx={{ padding: '15px 0px 22px' }}>
           <Typography>
-            This setting affect the theme of this account: <strong>{username}</strong>.
+            This setting affect the theme of this account:{' '}
+            <Typography component="span" sx={{ fontWeight: 'bold', textTransform: 'capitalize' }}>
+              {username?.toLowerCase()}
+            </Typography>
+            .
           </Typography>
         </Stack>
         <Stack>
@@ -303,7 +315,7 @@ const UserThemeSettings = (props) => {
                           sx={{ backgroundColor: color2, width: '1.5vw', height: '1.5vw', borderRadius: '0.75vw' }}
                         />
                         <Box
-                          sx={{ backgroundColor: color5, width: '1.5vw', height: '1.5vw', borderRadius: '0.75vw' }}
+                          sx={{ backgroundColor: color2, width: '1.5vw', height: '1.5vw', borderRadius: '0.75vw' }}
                         />
                       </Stack>
                     </Grid>
@@ -409,8 +421,8 @@ const UserThemeSettings = (props) => {
                         opacity: 0.2,
                       }}
                     >
-                      <FavoriteBorderOutlined sx={{ color: color5, marginRight: '8px' }} />
-                      <Typography sx={{ color: color5 }}>Button Disabled</Typography>
+                      <FavoriteBorderOutlined sx={{ color: color4, marginRight: '8px' }} />
+                      <Typography sx={{ color: color4 }}>Button Disabled</Typography>
                     </Stack>
                     <Stack
                       alignItems="center"
@@ -418,8 +430,8 @@ const UserThemeSettings = (props) => {
                       direction="row"
                       sx={{ border: `1px solid ${color2}`, borderRadius: '6px', padding: '8px 22px', width: '95%' }}
                     >
-                      <FavoriteBorderOutlined sx={{ color: color3, marginRight: '8px' }} />
-                      <Typography sx={{ color: color3 }}>Button Outline</Typography>
+                      <FavoriteBorderOutlined sx={{ color: color2, marginRight: '8px' }} />
+                      <Typography sx={{ color: color2 }}>Button Outline</Typography>
                     </Stack>
                   </Stack>
                 </Stack>

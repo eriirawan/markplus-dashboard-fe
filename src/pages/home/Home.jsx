@@ -84,6 +84,7 @@ const Home = () => {
     handleChangeAxis,
     chartSelectedId,
     reFetchSectionList,
+    reFetch,
   } = store;
   const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -110,11 +111,14 @@ const Home = () => {
     }
   };
   useEffect(() => {
-    setSectionType(location?.pathname?.slice(1));
     if (clientSelected?.id) {
+      setSectionType(location?.pathname?.slice(1));
       setUserId(clientSelected?.id);
     }
   }, [clientSelected]);
+  // useEffect(() => {
+  //   reFetch({ test: 2 });
+  // }, [store.userId, store.sectionType]);
   const renderChart = (data, indexParent, indexChild) => {
     const mappingDataChart = (data, type) => ({
       labels: [...data?.tabular?.labels],
@@ -539,6 +543,8 @@ const Home = () => {
       sections: sizeLayoutData[selectedLayout]?.map((data) => ({
         layout: +getTextLayout(data)?.slice(0, -1),
       })),
+      section_type: location?.pathname?.slice(1),
+      user_id: clientSelected?.id,
     };
     handleClick(payload);
   };
@@ -563,7 +569,7 @@ const Home = () => {
       >
         {/* {renderDashboard} */}
         <Stack direction="column" gap="20px">
-          {store.sectionList?.data?.map((data, index) => {
+          {sectionList?.map((data, index) => {
             return (
               <Grid container gap={'20px'} flexWrap={'nowrap'}>
                 {data.map((el, indexChild) => {
@@ -685,7 +691,7 @@ const Home = () => {
             </Box>
           </Stack>
         )}
-        {!sectionList?.data?.length && clientSelected && (
+        {!sectionList?.length && clientSelected && (
           <Stack direction={'column'} justifyContent={'center'} alignItems={'center'} height={'100%'} gap={'8px'}>
             <Typography fontSize="16px" fontWeight={400} lineHeight={'24px'}>
               No chart created yet.
@@ -695,7 +701,7 @@ const Home = () => {
             </Button>
           </Stack>
         )}
-        {sectionList?.data?.length ? (
+        {sectionList?.length ? (
           <Paper
             sx={{
               borderRadius: 1.25,
@@ -757,7 +763,7 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
     false
   );
   const handleDownload = async (type, data, e) => {
-    const downloadChartPdf = async (isAll) => {
+    const downloadChartPdf = (isAll) => {
       if (isAll) {
         store.setIsLoading(true);
       }
@@ -776,22 +782,13 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
         const pdfHeight = data.layout > 25 ? (imgProps.height * pdfWidth) / imgProps.width : input.clientHeight;
 
         pdf.addImage(img, 'png', 0, 10, pdfWidth, pdfHeight);
-        pdf.save('chart.pdf');
+        pdf.save(data?.chart?.tabular?.filename.split('.')[0] || 'chart.pdf');
         but.style.display = 'block';
         store.setIsLoading(false);
         if (isAll) {
-          downloadChartExcel(all);
+          downloadChartExcel(isAll);
         }
       });
-      // const converHtmlToCanvas = await html2canvas(input);
-      // if (converHtmlToCanvas) {
-      //   const img = converHtmlToCanvas.toDataURL('image/png');
-      //   const pdf = new pdfConverter('l', 'pt');
-      //   pdf.addImage(img, 'png', input.offsetLeft, input.offsetTop, input.clientWidth, input.clientHeight);
-      //   pdf.save('chart.pdf');
-      //   but.style.display = 'block';
-      //   store.setIsLoading(false);
-      // }
     };
     const downloadChartExcel = (isAll) => {
       if (isAll) {
@@ -810,7 +807,7 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
       const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
       const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
       const finalData = new Blob([excelBuffer], { type: '.xlsx' });
-      const filename = data?.chart?.tabular?.file_name || 'sheet.xlsx';
+      const filename = data?.chart?.tabular?.filename || 'sheet.xlsx';
       let url = window.URL.createObjectURL(finalData);
       let a = document.createElement('a');
       a.href = url;
@@ -818,9 +815,6 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
       a.click();
       a.remove();
       store.setIsLoading(false);
-
-      // const file = new File([finalData], chartDetail?.tabular?.filename, { lastModified: new Date() });
-      // setFileImport(file);
     };
     if (type === 'pdf') {
       downloadChartPdf();
@@ -929,6 +923,13 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
                 vertical: 'top',
                 horizontal: 'right',
               }}
+              sx={{
+                marginTop: '6px',
+                '&.MuiPopover-paper': {
+                  borderRadius: '10px',
+                },
+              }}
+              PaperProps={{ style: { borderRadius: '10px' } }}
             >
               <Box
                 sx={(theme) => ({

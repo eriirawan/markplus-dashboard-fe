@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useForm } from 'react-hook-form';
-import useAxios from '@/hooks/useAxios';
+import useAxios from 'axios-hooks';
 import { enqueueSnackbar } from 'notistack';
 import { AppBarContext } from '@/context/AppBarContext';
 import { useNavigate } from 'react-router-dom';
@@ -30,12 +30,16 @@ export const useAddOrEditChartStore = () => {
   const [page, setPage] = useState(1);
   const [sectionId, setSectionId] = useState(null);
   // const [search, setSearch] = useState('');
-  const [{ response, loading }, reFetch] = useAxios({
-    url: `/dashboard/v1/charts/user/${userId}/${chartId}`,
-    method: 'get',
-    pause: !userId || !chartId,
-  });
-  const [{ response: responseChartTypeList, loading: loadingChartTypeList }] = useAxios({
+  const [{ data: response, loading }, reFetch] = useAxios(
+    {
+      url: `/dashboard/v1/charts/user/${userId}/${chartId}`,
+      method: 'get',
+    },
+    {
+      manual: !userId || !chartId,
+    }
+  );
+  const [{ data: responseChartTypeList, loading: loadingChartTypeList }] = useAxios({
     url: `/dashboard/v1/chart-types/list?page=1&page_size=10&sort_by=id&sort_dir=ASC`,
     method: 'get',
   });
@@ -45,40 +49,57 @@ export const useAddOrEditChartStore = () => {
   //   pause: !userId,
   // });
 
-  const [, addChart] = useAxios({
-    url: `/dashboard/v1/charts/add`,
-    method: 'post',
-    options: {
-      // headers: {
-      //   'Content-Type': 'appl',
-      // },
+  const [, addChart] = useAxios(
+    {
+      url: `/dashboard/v1/charts/add`,
+      method: 'post',
+      options: {},
     },
-  });
-  // const [, addUser] = useAxios({
-  //   url: `/dashboard/v1/users/add`,
-  //   method: 'post',
-  // });
-  const [, updateChartTabular] = useAxios({
-    url: `/dashboard/v1/charts/tabular/update`,
-    method: 'put',
-  });
-  const [, updateChart] = useAxios({
-    url: `/dashboard/v1/charts/update`,
-    method: 'put',
-  });
-  const [, parseFile] = useAxios({
-    url: `/dashboard/v1/charts/parse-sheets`,
-    method: 'post',
-    options: {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    {
+      manual: true,
+    }
+  );
+  const [, updateChartTabular] = useAxios(
+    {
+      url: `/dashboard/v1/charts/tabular/update`,
+      method: 'put',
+    },
+    {
+      manual: true,
+    }
+  );
+  const [, updateChart] = useAxios(
+    {
+      url: `/dashboard/v1/charts/update`,
+      method: 'put',
+    },
+    {
+      manual: true,
+    }
+  );
+  const [, parseFile] = useAxios(
+    {
+      url: `/dashboard/v1/charts/parse-sheets`,
+      method: 'post',
+      options: {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       },
     },
-  });
-  const [, deleteChart] = useAxios({
-    url: `/dashboard/v1/charts/user/${userId}/${chartId}`,
-    method: 'delete',
-  });
+    {
+      manual: true,
+    }
+  );
+  const [, deleteChart] = useAxios(
+    {
+      url: `/dashboard/v1/charts/user/${userId}/${chartId}`,
+      method: 'delete',
+    },
+    {
+      manual: true,
+    }
+  );
 
   const defaultForm = {
     chartType: '',
@@ -96,14 +117,13 @@ export const useAddOrEditChartStore = () => {
   });
 
   const handleFileInputChange = async (e) => {
-    // setIsLoading(true);
     setOpenDialog((prev) => ({ ...prev, loading: true }));
     const bodyFormData = new FormData();
     bodyFormData.append('file', e.target.files[0]);
-    const data = await parseFile(bodyFormData);
+    const { data, status } = await parseFile({ data: bodyFormData });
     const colorTheme = Object.values(clientSelected?.colorway)?.filter((el) => el.includes('#'));
     let indexColorTheme = 0;
-    if (data?.status === 200) {
+    if (status === 200) {
       const mappingDataChart = {
         labels: data.data.labels,
         datasets: data.data.datasets?.map((el, i) => {
@@ -135,27 +155,11 @@ export const useAddOrEditChartStore = () => {
           };
         }),
       };
-      // data.data?.dataset.map((el) => {
-      //   return {
-      //     ...el,
-      //     datasets: el.dataset?.map((data, i) => {
-      //       const newData = { ...data, backgroundColor: colorTheme[indexColorTheme] };
-      //       indexColorTheme++;
-      //       if (indexColorTheme >= el.dataset.length - 1) {
-      //         indexColorTheme = 0;
-      //       }
-      //       return {
-      //         ...newData,
-      //       };
-      //     }),
-      //   };
-      // });
       methods.setValue('chartDataDonutOrPie', mappingDataDonutOrPieChart);
       methods.setValue('chartData', mappingDataChart);
       setOpenDialog((prev) => ({ ...prev, loading: false }));
       setTypeDialog('success');
       setOpenDialog((prev) => ({ ...prev, success: true }));
-      // methods.setValue('filename', data.data.filename);
       setIsLoading(false);
     }
   };
@@ -164,17 +168,28 @@ export const useAddOrEditChartStore = () => {
     setIsLoading(true);
     if (action === 'create') {
       const colorway = {};
-      formData.chartData.datasets.forEach((el) => {
-        if (!colorway[el.label]) {
-          colorway[el.label] = {
-            backgroundColor: el.backgroundColor,
-            borderColor: el.borderColor,
-          };
-        }
-      });
+      if (formData.chartType === 'Pie Chart' || formData.chartType === 'Donut Chart') {
+        formData.chartDataDonutOrPie.datasets.forEach((el) => {
+          if (!colorway[el.label]) {
+            colorway[el.label] = {
+              backgroundColor: el.backgroundColor,
+              borderColor: el.borderColor,
+            };
+          }
+        });
+      } else {
+        formData.chartData.datasets.forEach((el) => {
+          if (!colorway[el.label]) {
+            colorway[el.label] = {
+              backgroundColor: el.backgroundColor,
+              borderColor: el.borderColor,
+            };
+          }
+        });
+      }
       const payloadChart = {
         user_id: userId,
-        section_id: formData.section_id,
+        section_id: +formData.section_id,
         title: formData.chartLabel,
         chart_type_id: formData.chartTypeId,
         label_vertical: formData.verticalAxisLabel || 'null',
@@ -190,7 +205,9 @@ export const useAddOrEditChartStore = () => {
       };
 
       const submit = await addChart({
-        ...payloadChart,
+        data: {
+          ...payloadChart,
+        },
       });
       if (submit?.status === 200) {
         setOpenPopup(false);
@@ -202,14 +219,26 @@ export const useAddOrEditChartStore = () => {
       }
     } else if (action === 'update') {
       const colorway = {};
-      formData.chartData.datasets.forEach((el) => {
-        if (!colorway[el.label]) {
-          colorway[el.label] = {
-            backgroundColor: el.backgroundColor,
-            borderColor: el.borderColor,
-          };
-        }
-      });
+      if (formData.chartType === 'Pie Chart' || formData.chartType === 'Donut Chart') {
+        formData.chartDataDonutOrPie.datasets.forEach((el) => {
+          if (!colorway[el.label]) {
+            colorway[el.label] = {
+              backgroundColor: el.backgroundColor,
+              borderColor: el.borderColor,
+            };
+          }
+        });
+      } else {
+        formData.chartData.datasets.forEach((el) => {
+          if (!colorway[el.label]) {
+            colorway[el.label] = {
+              backgroundColor: el.backgroundColor,
+              borderColor: el.borderColor,
+            };
+          }
+        });
+      }
+
       const payloadChart = {
         title: formData.chartLabel,
         chart_type_id: formData.chartTypeId,
@@ -227,9 +256,11 @@ export const useAddOrEditChartStore = () => {
       };
       const dataDetail = await response;
       const update = await updateChart({
-        ...payloadChart,
-        user_id: userId,
-        chart_id: chartId,
+        data: {
+          ...payloadChart,
+          user_id: userId,
+          chart_id: chartId,
+        },
       });
 
       if (update?.status === 200) {
@@ -240,32 +271,26 @@ export const useAddOrEditChartStore = () => {
             JSON.stringify(payloadChartTabular?.tabular?.datasets)
           ) {
             const updateTabular = await updateChartTabular({
-              ...payloadChartTabular,
-              user_id: userId,
-              chart_id: chartId,
+              data: {
+                ...payloadChartTabular,
+                user_id: userId,
+                chart_id: chartId,
+              },
             });
             if (updateTabular?.status === 200) {
-              enqueueSnackbar('Section Delete successfully.', {
+              enqueueSnackbar('Chart updated successfully.', {
                 variant: 'successSnackbar',
               });
               navigate('/home');
             }
           } else {
-            enqueueSnackbar('Section Delete successfully.', {
+            enqueueSnackbar('Chart updated successfully.', {
               variant: 'successSnackbar',
             });
             navigate('/home');
           }
         }
       }
-      // if (update?.status === 200) {
-      //   setOpenPopup(false);
-      //   enqueueSnackbar('Section Delete successfully.', {
-      //     variant: 'successSnackbar',
-      //   });
-      //   reFetch();
-      //   // cb(false);
-      // }
     }
     setIsLoading(false);
   };
@@ -273,14 +298,6 @@ export const useAddOrEditChartStore = () => {
   const handleClick = (cb) => {
     methods.handleSubmit(onSubmit)();
   };
-
-  // const handleClose = () => {
-  //   setOpenPopup(false);
-  //   setTimeout(() => {
-  //     setAction('');
-  //     methods.reset();
-  //   }, 500);
-  // };
 
   const handleDelete = async (cb) => {
     const deleteAct = await deleteChart();
@@ -299,31 +316,27 @@ export const useAddOrEditChartStore = () => {
     handleClick,
     openDialog,
     setOpenDialog,
-    // handleClose,
+
     openPopup,
     action,
     setAction,
     setOpenPopup,
     isLoading,
     setUserId,
-    // setSortDir,
-    // setSortBy,
-    // userDetail: userDetail?.data,
-    // loadingUser,
+
     chartDetail: response?.data,
     chartDetailMetaList: response?.meta,
-    // loading,
+
     page,
     pageSize,
     setPage,
     setPageSize,
-    // addSection,
+
     setSectionType,
     setSectionId,
-    // setSearch,
+
     loading,
-    // search,
-    // handleDelete,
+
     typeDialog,
     setTypeDialog,
     optionChartTypes: responseChartTypeList?.data || [],
