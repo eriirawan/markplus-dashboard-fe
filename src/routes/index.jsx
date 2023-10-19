@@ -70,7 +70,7 @@ const router = createBrowserRouter(
             errorElement={<ErrorBoundary />}
           ></Route>
         </Route>
-        <Route path="result" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
+        <Route path="results" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
         <Route path="fieldwork" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
         <Route path="evidence" element={<LazyComponent children={<Evidence />} />} errorElement={<ErrorBoundary />} />
         <Route path="user-list" element={<LazyComponent children={<User />} />} errorElement={<ErrorBoundary />} />
