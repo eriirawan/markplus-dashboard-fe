@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import useAxios from '@/hooks/useAxios';
+import React, { useCallback, useEffect, useState } from 'react';
+import useAxios from 'axios-hooks';
+// import  from 'axios-hooks'
 import { enqueueSnackbar } from 'notistack';
 
 export const useHomeStore = () => {
@@ -17,87 +17,88 @@ export const useHomeStore = () => {
   const [chartSelectedId, setChartSelectedId] = useState(null);
   // const [search, setSearch] = useState('');
 
-  const [{ response, loading }, reFetch] = useAxios({
-    url: `/dashboard/v1/sections/type/${sectionType}/user/${userId}/list?page=${page}&page_size=${pageSize}`,
-    method: 'get',
-    pause: !userId || !sectionType,
-  });
-
+  const [{ data: response, loading }, reFetch] = useAxios(
+    {
+      url: `/dashboard/v1/sections/type/${sectionType}/user/${userId}/list?page=${page}&page_size=${pageSize}`,
+      method: 'get',
+    },
+    {
+      manual: true,
+    }
+  );
+  const callbackGetList = useCallback(() => {
+    if (userId && sectionType) {
+      return reFetch();
+    }
+  }, [userId, sectionType]);
+  useEffect(() => {
+    callbackGetList();
+  }, [callbackGetList]);
   // const [{ response: userDetail, loading: loadingUser }] = useAxios({
   //   url: `/dashboard/v1/users/${userId}`,
   //   method: 'get',
   //   pause: !userId,
   // });
 
-  const [, addSection] = useAxios({
-    url: `/dashboard/v1/sections/type/${sectionType}/user/${userId}/add`,
-    method: 'post',
-    options: {
-      // headers: {
-      //   'Content-Type': 'appl',
-      // },
+  const [, addSection] = useAxios(
+    {
+      url: `/dashboard/v1/sections/add`,
+      method: 'post',
+      options: {},
     },
-  });
-  const [, updateAxisLabel] = useAxios({
-    url: `/dashboard/v1/charts/user/${userId}/${chartSelectedId}`,
-    method: 'put',
-  });
-  const [, updateSection] = useAxios({
-    url: `/dashboard/v1/sections/id/${sectionId}`,
-    method: 'put',
-  });
-  useEffect(() => {
-    console.info(response, '<<<< ini useEffectContext');
-  }, [response]);
+    {
+      manual: true,
+    }
+  );
+
+  const [, updateSection] = useAxios(
+    {
+      url: `/dashboard/v1/sections/update`,
+      method: 'put',
+    },
+    {
+      manual: true,
+    }
+  );
+
+  const [, updateAxisLabel] = useAxios(
+    {
+      url: `/dashboard/v1/charts/update`,
+      method: 'put',
+      // pause: !userId && !chartSelectedId,
+    },
+    {
+      manual: true,
+    }
+  );
+  // const updatingAxisLabel = async (data) => {
+  //   const response = await axios.put(`${url}`, data);
+  //   if (response.status === 200) {
+  //   }
+  // };
   const handleChangeAxis = async (data) => {
     const update = await updateAxisLabel({
-      ...data,
+      data: {
+        ...data,
+        user_id: data.user_id,
+        chart_id: data?.chart_id,
+      },
     });
-    if (update.status === 200) {
-      enqueueSnackbar('Section added successfully.', {
+    if (update?.status === 200) {
+      enqueueSnackbar('Chart updated successfully.', {
         variant: 'successSnackbar',
       });
       reFetch();
     }
   };
-  // const [, deleteUser] = useAxios({
-  //   url: `/dashboard/v1/users/${userId}`,
-  //   method: 'delete',
-  // });
-
-  // const defaultForm = {
-  //   email: '',
-  //   first_name: '',
-  //   // imgName: '',
-  //   company_logo_url: '',
-  //   last_name: '',
-  //   role_id: '',
-  //   username: '',
-  //   filename: '',
-  // };
-
-  // const methods = useForm({
-  //   defaultValues: { ...defaultForm },
-  //   mode: 'onChange',
-  // });
-
-  // const handleFileInputChange = async (e) => {
-  //   const bodyFormData = new FormData();
-  //   bodyFormData.append('file', e.target.files[0]);
-  //   const file = await uploadFile(bodyFormData);
-
-  //   if (file?.status === 200) {
-  //     methods.setValue('company_logo_url', file.data.url);
-  //     methods.setValue('filename', file.data.filename);
-  //   }
-  // };
 
   const onSubmitSection = async (formData, cb) => {
     setIsLoading(true);
-    console.info(action, formData, '<<<< apa actionn ya????');
     if (action === 'create') {
       const submit = await addSection({
-        ...formData,
+        data: {
+          ...formData,
+        },
       });
       if (submit?.status === 200) {
         setOpenPopup(false);
@@ -107,9 +108,11 @@ export const useHomeStore = () => {
         reFetch();
       }
     } else if (action === 'update') {
-      console.info('masuk sini');
       const update = await updateSection({
-        ...formData,
+        data: {
+          ...formData,
+          section_id: sectionId,
+        },
       });
       if (update?.status === 200) {
         setOpenPopup(false);
@@ -117,7 +120,6 @@ export const useHomeStore = () => {
           variant: 'successSnackbar',
         });
         reFetch();
-        console.info(cb, '<<< apa dia');
         cb(false);
       }
     }
@@ -128,43 +130,16 @@ export const useHomeStore = () => {
     onSubmitSection(payload, cb);
   };
 
-  // const handleClose = () => {
-  //   setOpenPopup(false);
-  //   setTimeout(() => {
-  //     setAction('');
-  //     methods.reset();
-  //   }, 500);
-  // };
-
-  // const handleDelete = async (cb) => {
-  //   const deleteAct = await deleteUser();
-  //   if (deleteAct.status === 200) {
-  //     enqueueSnackbar('User deleted successfully.', {
-  //       variant: 'successSnackbar',
-  //     });
-  //     reFetch();
-  //     cb(false);
-  //   }
-  // };
-
   return {
-    // methods,
-    // handleFileInputChange,
     handleClick,
-    // handleClose,
     openPopup,
     action,
     setAction,
     setOpenPopup,
     isLoading,
     setUserId,
-    // setSortDir,
-    // setSortBy,
-    // userDetail: userDetail?.data,
-    // loadingUser,
-    sectionList: response,
+    sectionList: response?.data,
     sectionMetaList: response?.meta,
-    // loading,
     page,
     pageSize,
     setPage,
@@ -175,10 +150,9 @@ export const useHomeStore = () => {
     handleChangeAxis,
     setChartSelectedId,
     chartSelectedId,
-    // setSearch,
     loading,
-    // search,
-    // handleDelete,
+    setIsLoading,
+    reFetch,
   };
 };
 

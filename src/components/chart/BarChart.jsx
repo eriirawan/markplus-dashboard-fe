@@ -17,7 +17,8 @@ const BarChart = ({
   isStackedChart,
   isFullStackedChart,
   legendClassName,
-  showAxisValue = true,
+  showAxisValue,
+  className,
 }) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
@@ -109,7 +110,6 @@ const BarChart = ({
   //       ctx,
   //       chartArea: { left, right, top, bottom, width, height },
   //     } = chart;
-  //     // console.info(left, right, top, bottom, width, height, '<<<< apa dia');
   //     ctx.save();
   //     ctx.font = 'bolder 12px sans-serif';
   //     ctx.fillStyle = 'rgba(102, 102, 102, 1)';
@@ -211,7 +211,7 @@ const BarChart = ({
   };
   const renderMain = useMemo(() => {
     return (
-      <Box sx={{ height: '100%' }}>
+      <Box sx={{ height: '100%' }} className={className}>
         <Box
           sx={{
             height: '100%',
@@ -231,7 +231,19 @@ const BarChart = ({
         <Box id={legendClassName} display={'flex'} justifyContent={'center'} sx={{ marginTop: '24px' }} />
       </Box>
     );
-  }, [chartData, refChart, width, height, width, defaultOptions, htmlLegendPlugin, isStackedChart, isFullStackedChart]);
+  }, [
+    chartData,
+    refChart,
+    width,
+    height,
+    width,
+    defaultOptions,
+    htmlLegendPlugin,
+    isStackedChart,
+    isFullStackedChart,
+    showAxisValue,
+    className,
+  ]);
   return renderMain;
 };
 

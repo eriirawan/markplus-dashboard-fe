@@ -25,8 +25,8 @@ import useSidebarMenus from '../SidebarMenu';
 import Sidebar from './Sidebar';
 import SidebarSmall from './SidebarSmall';
 import useAfterLoginStartup from '@/hooks/useAfterLogin';
-import Dialog from '../../Dialog/Dialog';
 import useAxios from 'axios-hooks';
+import DialogFormContainer from '../../Dialog/DialogForm';
 import { useUserStore } from '../../../pages/user/UserContext';
 
 const ProtectedLayout = () => {
@@ -125,7 +125,7 @@ const ProtectedLayout = () => {
               </Stack>
             </Box>
           </Stack>
-          <Dialog
+          <DialogFormContainer
             open={store.openPopupClient}
             setOpen={store.setOpenPopupClient}
             option={data?.data}
@@ -149,7 +149,7 @@ const ProtectedLayout = () => {
                 ))}
               </RadioGroup>
             </FormControl>
-          </Dialog>
+          </DialogFormContainer>
         </Grid>
       </Grid>
     </AppBarContext.Provider>
