@@ -25,7 +25,7 @@ const useSidebarMenus = () => {
       ],
     },
     {
-      group: 'result',
+      group: 'results',
       menus: [
         {
           icon: {
@@ -33,7 +33,7 @@ const useSidebarMenus = () => {
             inActive: 'ResultNormal',
           },
           name: 'Result',
-          path: 'result',
+          path: 'results',
         },
       ],
     },
