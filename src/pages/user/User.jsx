@@ -315,6 +315,11 @@ const User = () => {
                 enableColumnFilters={false}
                 enableBottomToolbar={false}
                 enableTopToolbar={false}
+                renderEmptyRowsFallback={() => (
+                  <Stack minHeight={400} justifyContent="center" fontStyle="italic">
+                    <Typography sx={{ textAlign: 'center' }}>No records to display</Typography>
+                  </Stack>
+                )}
                 muiTableHeadCellProps={{
                   sx: {
                     border: 1,

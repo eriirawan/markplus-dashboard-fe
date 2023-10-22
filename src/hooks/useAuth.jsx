@@ -79,6 +79,7 @@ export const AuthProvider = ({ children }) => {
 
       const userDetail = result?.data?.data;
       setMe(userDetail);
+      return userDetail;
     } catch (err) {
       setIsLoading(false);
       enqueueSnackbar(err?.response?.data?.message, {

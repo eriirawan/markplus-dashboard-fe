@@ -26,6 +26,7 @@ export const useHomeStore = () => {
       manual: true,
     }
   );
+
   const callbackGetList = useCallback(() => {
     if (userId && sectionType) {
       return reFetch();
@@ -153,6 +154,7 @@ export const useHomeStore = () => {
     loading,
     setIsLoading,
     reFetch,
+    sectionType,
   };
 };
 

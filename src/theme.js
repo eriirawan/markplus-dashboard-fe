@@ -67,6 +67,10 @@ const createTheme = (color) =>
 
             // text transform to `none`
             textTransform: 'capitalize',
+            ':hover': {
+              backgroundColor: `${color?.color3} !important`,
+              opacity: 0.9,
+            },
           }),
         },
       },
@@ -211,7 +215,7 @@ const createTheme = (color) =>
       /** Customize typography / font  */
       MuiTypography: {
         defaultProps: {
-          color: '#006CB7',
+          color: color?.color3 || '#006CB7',
         },
       },
     },

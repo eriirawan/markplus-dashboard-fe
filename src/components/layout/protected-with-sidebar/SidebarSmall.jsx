@@ -1,12 +1,14 @@
 // @ts-nocheck
 import { Box, List, ListItem, ListItemButton, Stack, Typography, alpha } from '@mui/material';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 // import CustomTooltip from '@/components/CustomTooltip';
 import { MPlusIcon } from '../../Icon';
 import Logo from '@/assets/logo-light.png';
+import { AppContext } from '../../../context/AppContext';
 
 const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
+  const { me } = useContext(AppContext);
   const location = useLocation();
   const paths = location.pathname.split('/');
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
                 px: 1.5,
               })}
             >
-              <Box component="img" src={Logo} height={40} my={2} />
+              <Box component="img" src={me?.company_logo_url ? me?.company_logo_url : Logo} height={40} my={2} />
             </ListItemButton>
             {/* </CustomTooltip> */}
           </ListItem>
