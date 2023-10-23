@@ -488,7 +488,10 @@ const Home = () => {
                     </Box>
                     <Box>
                       <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
-                        10.638
+                        {(
+                          data.chart.tabular.datasets.flatMap((el) => el.data).reduce((a, b) => a + b, 0) /
+                          data.chart.tabular.datasets.flatMap((el) => el.data).length
+                        ).toFixed(2)}
                       </Typography>
                       <Box display="flex" alignItems={'center'}>
                         <ChevronDownRed />
@@ -500,7 +503,7 @@ const Home = () => {
                     </Box>
                   </Stack>
                   <Box sx={{ width: '100%' }} display={'flex'} justifyContent={'flex-end'} alignItems={'flex-end'}>
-                    <img src={DefaultImageInformationCard} />
+                    <img src={data?.chart.image_url || DefaultImageInformationCard} width={40} />
                     {/* <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
                   10.638
                 </Typography>
@@ -711,11 +714,15 @@ const Home = () => {
             <Typography fontSize="16px" fontWeight={400} lineHeight={'24px'}>
               No chart created yet.
             </Typography>
-            {!appCtxStore?.isUserRole && (
-              <Button color={'primary'} onClick={() => setOpenPopup(true)}>
-                Create Chart
-              </Button>
-            )}
+            <Button
+              color={'primary'}
+              onClick={() => {
+                setAction('create');
+                setOpenPopup(true);
+              }}
+            >
+              Create Chart
+            </Button>
           </Stack>
         )}
         {sectionList?.length && !appCtxStore?.isUserRole ? (

@@ -100,6 +100,20 @@ export const useAddOrEditChartStore = () => {
       manual: true,
     }
   );
+  const [, uploadImageInformationChart] = useAxios(
+    {
+      url: '/dashboard/v1/users/upload-image',
+      method: 'post',
+      options: {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    },
+    {
+      manual: true,
+    }
+  );
 
   const defaultForm = {
     chartType: '',
@@ -109,6 +123,8 @@ export const useAddOrEditChartStore = () => {
     horizontalAxisLabel: '',
     showAxisLabels: true,
     chartDataDonutOrPie: {},
+    imageUrl: '',
+    imageFile: '',
   };
 
   const methods = useForm({
@@ -203,7 +219,17 @@ export const useAddOrEditChartStore = () => {
           datasets: formData.chartData.datasets.map((chart) => ({ data: chart.data, label: chart.label })),
         },
       };
-
+      if (formData.chartType === 'Information Chart') {
+        console.info(formData, '<<<< formData');
+        const payloadUpload = new FormData();
+        payloadUpload.append('file', formData.imageFile);
+        const uploadImage = await uploadImageInformationChart({
+          data: payloadUpload,
+        });
+        if (uploadImage.status === 200) {
+          payloadChart.image_url = uploadImage.data.data.url;
+        }
+      }
       const submit = await addChart({
         data: {
           ...payloadChart,
@@ -255,6 +281,16 @@ export const useAddOrEditChartStore = () => {
         },
       };
       const dataDetail = await response;
+      if (formData.chartType === 'Information Chart') {
+        const payloadUpload = new FormData();
+        payloadUpload.append('file', formData.imageFile);
+        const uploadImage = await uploadImageInformationChart({
+          data: payloadUpload,
+        });
+        if (uploadImage.status === 200) {
+          payloadChart.image_url = uploadImage.data.data.url;
+        }
+      }
       const update = await updateChart({
         data: {
           ...payloadChart,

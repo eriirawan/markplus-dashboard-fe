@@ -1,4 +1,4 @@
-import { CancelOutlined } from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
 import { Box, Button, Dialog, IconButton, Radio, Stack, Typography } from '@mui/material';
 import React, { useMemo } from 'react';
 const ModalLayout = ({
@@ -33,14 +33,14 @@ const ModalLayout = ({
             <IconButton
               aria-label="close"
               onClick={() => setIsLayoutModalOpen((prev) => !prev)}
-              sx={{
-                // position: 'absolute',
-                // right: 8,
-                // top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
+              // aria-label="delete"
+              sx={{ border: 1.5, color: 'primary.main', height: '44px', width: '44px' }}
+              // sx={{
+
+              //   color: (theme) => theme.palette.grey[500],
+              // }}
             >
-              <CancelOutlined />
+              <Close />
             </IconButton>
           </Stack>
           {/* <DialogContent> */}
@@ -70,7 +70,7 @@ const ModalLayout = ({
                 onClick={(e) => setSelectedLayout(index)}
                 sx={{
                   cursor: 'pointer',
-                  backgroundColor: (theme) => (index === selectedLayout ? theme.palette.primary.light : '#fff'),
+                  // backgroundColor: (theme) => (index === selectedLayout ? theme.palette.primary.light : '#fff'),
                   '&:hover': {
                     background: (theme) => theme.palette.primary.light,
                   },
