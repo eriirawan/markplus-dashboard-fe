@@ -85,6 +85,7 @@ const AddChart = (props) => {
   const [colorSelected, setColorSelected] = useState('#FFFFFF');
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const chartRef = useRef();
+
   const [codeColor, setCodeColor] = useState({
     hsv: {
       h: 0,
@@ -110,6 +111,7 @@ const AddChart = (props) => {
   const [openDialogStatusImport, setOpenDialogStatusImport] = useState(openDialog);
   // const [typeDialog, setTypeDialog] = useState('loading');
   const refInputFileImport = useRef(null);
+  const refInputFileImage = useRef(null);
   const [fileImport, setFileImport] = useState(null);
   const [errorImportForm, setErrorImportForm] = useState({
     linkField: false,
@@ -393,7 +395,7 @@ const AddChart = (props) => {
                 >
                   <Stack
                     direction="column"
-                    // justifyContent={'space-between'}
+                    justifyContent={'space-between'}
                     // sx={{ marginBottom: '16px' }}
                     gap="61px"
                     // sx={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}
@@ -413,19 +415,23 @@ const AddChart = (props) => {
                     </Box>
                     <Box>
                       <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
-                        10.638
+                        {(
+                          methods
+                            .getValues('chartData')
+                            .datasets.flatMap((el) => el.data)
+                            .reduce((a, b) => a + b, 0) /
+                          methods.getValues('chartData').datasets.flatMap((el) => el.data).length
+                        ).toFixed(2)}
                       </Typography>
-                      <Box display="flex" alignItems={'center'}>
-                        <ChevronDownRed />
-                        <Typography fontSize={'24px'} fontWeight={400} lineHeight="31px">
-                          {' '}
-                          1045
-                        </Typography>
-                      </Box>
+                      {/* <Box display="flex" alignItems={'center'}> */}
+                      {/* <ChevronDownRed /> */}
+                      {/* <Typography fontSize={'24px'} fontWeight={400} lineHeight="31px"> */} {/* 1045 */}
+                      {/* </Typography> */}
+                      {/* </Box> */}
                     </Box>
                   </Stack>
                   <Box sx={{ width: '100%' }} display={'flex'} justifyContent={'flex-end'} alignItems={'flex-end'}>
-                    <img src={DefaultImageInformationCard} />
+                    <img src={methods.getValues('imageUrl') || DefaultImageInformationCard} width={40} />
                   </Box>
                 </Box>
               </Box>
@@ -458,6 +464,7 @@ const AddChart = (props) => {
     methods.getValues('chartLabel'),
     methods.getValues('verticalAxisLabel'),
     methods.getValues('horizontalAxisLabel'),
+    methods.getValues('imageUrl'),
     displayColorPicker,
     colorSelected,
     methods.getValues('showAxisLabels'),
@@ -512,6 +519,7 @@ const AddChart = (props) => {
         verticalAxisLabel: chartDetail?.label_vertical,
         horizontalAxisLabel: chartDetail?.label_horizontal,
         showAxisLabels: chartDetail.show_axis_labels,
+        ...(chartDetail.chart_type_name === 'Information Chart' ? { imageUrl: chartDetail.image_url } : {}),
       };
       for (let obj in mappingDataFormDetail) {
         handleChangeForm(obj, mappingDataFormDetail[obj]);
@@ -875,6 +883,7 @@ const AddChart = (props) => {
                       <Button
                         onClick={() => {
                           if (methods.getValues('chartType') === 'Information Chart') {
+                            refInputFileImage.current.click();
                           } else {
                             setOpenDialogColorPicker((prev) => !prev);
                           }
@@ -928,6 +937,28 @@ const AddChart = (props) => {
               handleFileInputChange(e);
               parseFile(e.target.files[0]);
               setFileImport(e.target.files[0]);
+              // setOpenDialogStatusImport((prev) => ({ ...prev, error: true }));
+            }}
+          />
+          <input
+            type="file"
+            style={{ display: 'none' }}
+            ref={refInputFileImage}
+            accept=".png, .jpg, .svg"
+            // value={fileImport}
+            onClick={(event) => {
+              const { target = {} } = event || {};
+              target.value = '';
+            }}
+            onChange={(e) => {
+              const urlImage = URL.createObjectURL(e.target.files[0]);
+              methods.setValue('imageUrl', urlImage);
+              methods.setValue('imageFile', e.target.files[0]);
+              // setTypeDialog('loading');
+              // setOpenDialogStatusImport((prev) => ({ ...prev, loading: true }));
+              // handleFileInputChange(e);
+              // parseFile(e.target.files[0]);
+              // setFileImport(e.target.files[0]);
               // setOpenDialogStatusImport((prev) => ({ ...prev, error: true }));
             }}
           />
