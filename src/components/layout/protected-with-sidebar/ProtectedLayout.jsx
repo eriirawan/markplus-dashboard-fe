@@ -31,7 +31,7 @@ import { useUserStore } from '../../../pages/user/UserContext';
 
 const ProtectedLayout = () => {
   const { refreshMeData } = useAuth();
-  const { userToken: token, me, setClientSelected } = useContext(AppContext);
+  const { userToken: token, me, setClientSelected, isUserRole } = useContext(AppContext);
   const store = useStore();
   const menus = useSidebarMenus();
   const outlet = useOutlet();
@@ -73,10 +73,21 @@ const ProtectedLayout = () => {
   };
 
   const handleOpenSidebar = (state) => setOpenSidebar(state);
-  const [{ data, loading }] = useAxios({
-    url: `/dashboard/v1/users/list?page=${pageClientList}&page_size=${10}&sort_by=${'id'}&sort_dir=${'ASC'}`,
-    method: 'get',
-  });
+  const [{ data, loading }, reFetch] = useAxios(
+    {
+      url: `/dashboard/v1/users/list?page=${pageClientList}&page_size=${10}&sort_by=${'id'}&sort_dir=${'ASC'}`,
+      method: 'get',
+    },
+    {
+      manual: true,
+    }
+  );
+
+  useEffect(() => {
+    if (!isUserRole && me?.id) {
+      reFetch();
+    }
+  }, [isUserRole, me?.id]);
 
   useEffect(() => {
     if (data?.meta?.totalData > 10) setPageClientList(data?.meta?.totalData);
@@ -84,8 +95,13 @@ const ProtectedLayout = () => {
 
   window.onload = async () => {
     if (token) {
-      await refreshMeData();
-      await refreshMasterData();
+      const me = await refreshMeData();
+      if (me?.role?.toLowerCase() !== 'user') {
+        await refreshMasterData();
+      } else {
+        store.setClientSelected(me);
+        setClientSelected(me);
+      }
     } else {
       window.location.href = `/login`;
     }
@@ -95,6 +111,7 @@ const ProtectedLayout = () => {
     setClientSelected(clientValue);
     store.setOpenPopupClient(false);
   };
+
   return (
     <AppBarContext.Provider value={store}>
       <Grid container>
@@ -110,7 +127,13 @@ const ProtectedLayout = () => {
               <Stack sx={{ ':-webkit-scrollbar': { display: 'none' } }}>
                 <Box sx={styles.appBarContainer} width="100%">
                   <Appbar
-                    title={store.clientSelected?.company_name ? store.clientSelected?.company_name : 'Choose a Client'}
+                    title={
+                      me?.role?.toLowerCase() === 'user'
+                        ? `${me.first_name} ${me?.last_name}`
+                        : store.clientSelected?.company_name
+                        ? store.clientSelected?.company_name
+                        : 'Choose a Client'
+                    }
                     openNotification={openNotification}
                     openTaskList={openTaskList}
                     openProfileBar={openProfileBar}
@@ -119,6 +142,7 @@ const ProtectedLayout = () => {
                     setOpenProfileBar={setOpenProfileBar}
                     setShowDrawerBackground={setShowDrawerBackground}
                     setShowDialogClient={store.setOpenPopupClient}
+                    isUser={me?.role?.toLowerCase() === 'user'}
                   />
                 </Box>
                 <Stack sx={{ px: 2, overflow: 'auto' }}>{outlet}</Stack>

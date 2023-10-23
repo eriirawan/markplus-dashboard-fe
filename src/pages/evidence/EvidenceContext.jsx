@@ -10,11 +10,13 @@ export const useEvidenceStore = () => {
   const { clientSelected } = useContext(AppContext);
   const [isLoading, setIsLoading] = useState(false);
   const [evidenceId, setEvidenceId] = useState(null);
+  const [selectedEvidence, setSelectedEvidence] = useState(null);
   const [sortDir, setSortDir] = useState('ASC');
   const [sortBy, setSortBy] = useState('created_at');
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [folder, setFolder] = useState([]);
 
   const data = {
     page,
@@ -22,13 +24,14 @@ export const useEvidenceStore = () => {
     sort_by: sortBy || 'id',
     sort_dir: sortDir,
     search: search,
+    folder_id: folder?.length > 0 ? folder[folder?.length - 1]?.id : undefined,
   };
 
   const querystring = encodeQueryData(data);
 
   const [{ data: response, loading }, reFetch] = useAxios(
     {
-      url: `/dashboard/v1/evidences/user/${clientSelected?.id}/list?${querystring}`,
+      url: `/dashboard/v1/evidences/user/${clientSelected?.id}/folder/list?${querystring}`,
       method: 'get',
     },
     {
@@ -67,6 +70,26 @@ export const useEvidenceStore = () => {
     }
   );
 
+  const [, renameFolder] = useAxios(
+    {
+      url: `/dashboard/v1/folders/update`,
+      method: 'put',
+    },
+    {
+      manual: true,
+    }
+  );
+
+  const [, addFolder] = useAxios(
+    {
+      url: `/dashboard/v1/folders/add`,
+      method: 'post',
+    },
+    {
+      manual: true,
+    }
+  );
+
   const handleFileInputChange = async (inputFile) => {
     setIsLoading(true);
     try {
@@ -74,10 +97,14 @@ export const useEvidenceStore = () => {
         data: {
           file: inputFile[0],
           user_id: clientSelected?.id,
+          folder_id: folder[folder?.length - 1]?.id || undefined,
         },
       });
 
       if (file?.status === 200) {
+        enqueueSnackbar('Evidence created successfully.', {
+          variant: 'successSnackbar',
+        });
         reFetch();
       }
       setIsLoading(false);
@@ -89,20 +116,50 @@ export const useEvidenceStore = () => {
   const handleRenameFile = async (fileName, cb) => {
     setIsLoading(true);
     try {
-      const file = await renameFile({
-        data: {
-          name: fileName,
-          evidence_id: evidenceId,
-        },
-      });
+      let file;
+      if (selectedEvidence?.isFolder) {
+        file = await renameFolder({
+          data: {
+            name: fileName,
+            folder_id: evidenceId,
+          },
+        });
+      } else {
+        file = await renameFile({
+          data: {
+            name: fileName,
+            evidence_id: evidenceId,
+          },
+        });
+      }
 
       if (file?.status === 200) {
+        enqueueSnackbar('Evidence updated successfully.', {
+          variant: 'successSnackbar',
+        });
         reFetch();
       }
       cb(false);
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddFolder = async (fileName, cb) => {
+    const addFolderAct = await addFolder({
+      data: {
+        user_id: clientSelected?.id,
+        name: fileName,
+        parent_id: folder[folder?.length - 1]?.id || undefined,
+      },
+    });
+    if (addFolderAct.status === 200) {
+      enqueueSnackbar('Folder created successfully.', {
+        variant: 'successSnackbar',
+      });
+      reFetch();
+      cb(false);
     }
   };
 
@@ -137,6 +194,11 @@ export const useEvidenceStore = () => {
     clientSelected,
     handleDelete,
     handleRenameFile,
+    setFolder,
+    folder,
+    setSelectedEvidence,
+    selectedEvidence,
+    handleAddFolder,
   };
 };
 

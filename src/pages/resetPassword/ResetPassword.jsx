@@ -1,4 +1,4 @@
-import { Box, Button, Card, TextField } from '@mui/material';
+import { Box, Button, Card, TextField, Typography } from '@mui/material';
 import React from 'react';
 import styled from 'styled-components';
 import Logo from '../../assets/logo-light.png';
@@ -25,6 +25,7 @@ const ResetPassword = () => {
                 textAlign: 'center',
               },
             }}
+            InputLabelProps={{ shrink: true }}
             sx={(theme) => ({
               '& .Mui-focused': {
                 color: theme.palette.primary.lightBlue,
@@ -41,6 +42,7 @@ const ResetPassword = () => {
                 textAlign: 'center',
               },
             }}
+            InputLabelProps={{ shrink: true }}
             sx={(theme) => ({
               '& .Mui-focused': {
                 color: theme.palette.primary.lightBlue,
@@ -77,7 +79,7 @@ const CardContainer = styled(Card)`
 const Image = styled.img`
   margin-bottom: 32px;
 `;
-const HeaderCard = styled.p`
+const HeaderCard = styled(Typography)`
   ${media.phone`
     font-size: 24px;
     line-height: 31px;
@@ -86,7 +88,6 @@ const HeaderCard = styled.p`
   font-size: 30px;
   line-height: 39px;
   text-align: center;
-  color: #2e459a;
   margin-top: 0;
   margin-bottom: 41px;
 `;

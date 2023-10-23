@@ -64,6 +64,7 @@ const Home = () => {
   // const appBarStore = useStore();
   const location = useLocation();
   const appBarStore = useContext(AppBarContext);
+  const appCtxStore = useContext(AppContext);
   const { clientSelected } = appBarStore;
   // const storeCallback = useMemo(() => {
 
@@ -85,6 +86,7 @@ const Home = () => {
     chartSelectedId,
     reFetchSectionList,
     reFetch,
+    sectionType,
   } = store;
   const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -110,12 +112,13 @@ const Home = () => {
         return '20%';
     }
   };
+
   useEffect(() => {
-    if (clientSelected?.id) {
+    if (clientSelected?.id || appCtxStore?.clientSelected?.id) {
       setSectionType(location?.pathname?.slice(1));
-      setUserId(clientSelected?.id);
+      setUserId(clientSelected?.id || appCtxStore?.clientSelected?.id);
     }
-  }, [clientSelected, location?.pathname?.slice(1)]);
+  }, [clientSelected, appCtxStore?.clientSelected, location?.pathname?.slice(1)]);
   // useEffect(() => {
   //   reFetch({ test: 2 });
   // }, [store.userId, store.sectionType]);
@@ -602,57 +605,69 @@ const Home = () => {
                       // flexDirection={'column'}
                       gap="24px"
                     >
-                      {JSON.stringify(el.chart) === '{}'
-                        ? !el?.hide && (
-                            <Box
-                              display={'flex'}
-                              flexDirection={'column'}
-                              justifyContent={'center'}
-                              alignItems={'center'}
-                              sx={{ height: '100%' }}
+                      {JSON.stringify(el.chart) === '{}' ? (
+                        !el?.hide && !appCtxStore?.isUserRole ? (
+                          <Box
+                            display={'flex'}
+                            flexDirection={'column'}
+                            justifyContent={'center'}
+                            alignItems={'center'}
+                            sx={{ height: '100%' }}
+                          >
+                            <Button
+                              onClick={() => {
+                                localStorage.setItem('indexChart', `{parent: "${index}", child: "${indexChild}"}`);
+                                localStorage.setItem('sectionId', el.id);
+                                localStorage.setItem('optionChart', el.layout + '%');
+                                // if (el === 3) {
+                                //   localStorage.setItem('option25', true);
+                                // } else {
+                                //   if (localStorage.option25) {
+                                //     localStorage.removeItem('option25');
+                                //   }
+                                // }
+                                navigate('/home/add-chart');
+                              }}
                             >
-                              <Button
+                              <BarChartIcon></BarChartIcon>
+                              <Typography fontWeight={400} fontSize={'14px'} lineHeight={'21px'} color={'white'}>
+                                Add Chart
+                              </Typography>
+                            </Button>
+                            <Box display={'flex'} gap="4px">
+                              <Typography fontWeight={400} fontSize="12px" lineHeight={'18px'}>
+                                or{' '}
+                              </Typography>
+                              <Typography
+                                fontWeight={400}
+                                fontSize="12px"
+                                lineHeight={'18px'}
+                                sx={{ textDecoration: 'underline', color: '#E56363', cursor: 'pointer' }}
                                 onClick={() => {
-                                  localStorage.setItem('indexChart', `{parent: "${index}", child: "${indexChild}"}`);
-                                  localStorage.setItem('sectionId', el.id);
-                                  localStorage.setItem('optionChart', el.layout + '%');
-                                  // if (el === 3) {
-                                  //   localStorage.setItem('option25', true);
-                                  // } else {
-                                  //   if (localStorage.option25) {
-                                  //     localStorage.removeItem('option25');
-                                  //   }
-                                  // }
-                                  navigate('/home/add-chart');
+                                  setAction('update');
+                                  setSectionId(el.id);
+                                  // setSectionType('')
+                                  setOpenPopupDelete(true);
                                 }}
                               >
-                                <BarChartIcon></BarChartIcon>
-                                <Typography fontWeight={400} fontSize={'14px'} lineHeight={'21px'} color={'white'}>
-                                  Add Chart
-                                </Typography>
-                              </Button>
-                              <Box display={'flex'} gap="4px">
-                                <Typography fontWeight={400} fontSize="12px" lineHeight={'18px'}>
-                                  or{' '}
-                                </Typography>
-                                <Typography
-                                  fontWeight={400}
-                                  fontSize="12px"
-                                  lineHeight={'18px'}
-                                  sx={{ textDecoration: 'underline', color: '#E56363', cursor: 'pointer' }}
-                                  onClick={() => {
-                                    setAction('update');
-                                    setSectionId(el.id);
-                                    // setSectionType('')
-                                    setOpenPopupDelete(true);
-                                  }}
-                                >
-                                  delete this section
-                                </Typography>
-                              </Box>
+                                delete this section
+                              </Typography>
                             </Box>
-                          )
-                        : renderChart(el, index, indexChild)}
+                          </Box>
+                        ) : (
+                          <Box
+                            display={'flex'}
+                            flexDirection={'column'}
+                            justifyContent={'center'}
+                            alignItems={'center'}
+                            sx={{ height: '100%' }}
+                          >
+                            <Typography>No chart created yet.</Typography>
+                          </Box>
+                        )
+                      ) : (
+                        renderChart(el, index, indexChild)
+                      )}
                     </Grid>
                   );
                 })}
@@ -669,7 +684,7 @@ const Home = () => {
           getTextLayout={getTextLayout}
           onSave={onSaveLayoutOption}
         />
-        {!clientSelected && (
+        {!clientSelected && !appCtxStore?.isUserRole && (
           <Stack
             direction={'column'}
             justifyContent={'center'}
@@ -694,7 +709,7 @@ const Home = () => {
             </Box>
           </Stack>
         )}
-        {!sectionList?.length && clientSelected && (
+        {!sectionList?.length && (clientSelected || appCtxStore?.clientSelected) && (
           <Stack direction={'column'} justifyContent={'center'} alignItems={'center'} height={'100%'} gap={'8px'}>
             <Typography fontSize="16px" fontWeight={400} lineHeight={'24px'}>
               No chart created yet.
@@ -710,7 +725,7 @@ const Home = () => {
             </Button>
           </Stack>
         )}
-        {sectionList?.length ? (
+        {sectionList?.length && !appCtxStore?.isUserRole ? (
           <Paper
             sx={{
               borderRadius: 1.25,
@@ -859,11 +874,13 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
   // })(Tooltip);
   return (
     <Paper
+      key={location?.pathname?.slice(1)}
       sx={{
         borderRadius: 1.25,
         p: 4,
         height: '100%',
       }}
+      // key={sectionType}
       // className={className}
     >
       <Box display={'flex'} gap={'16px'} justifyContent="space-between" marginBottom={'24px'}>

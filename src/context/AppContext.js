@@ -10,6 +10,8 @@ export const useStore = () => {
   const [roles, setRoles] = useLocalStorage(rolesDataString, []);
   const [clientSelected, setClientSelected] = useState(null);
 
+  const isUserRole = useMemo(() => me?.role?.toLowerCase() === 'user', [me]);
+
   const theme = useMemo(() => {
     return createTheme(me?.colorway);
   }, [me]);
@@ -24,6 +26,7 @@ export const useStore = () => {
     theme,
     setClientSelected,
     clientSelected,
+    isUserRole,
   };
 };
 
