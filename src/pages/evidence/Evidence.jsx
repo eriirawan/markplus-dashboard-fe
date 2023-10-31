@@ -428,12 +428,13 @@ const Evidence = () => {
                           <Grid item xs={3}>
                             <Paper
                               sx={{ p: 2, bgcolor: '#f3f6fb', cursor: 'pointer' }}
-                              onClick={() =>
+                              onDoubleClick={(e) => {
+                                e.stopPropagation();
                                 store.setFolder((prevState) => {
                                   store.setPage(1);
                                   return [...prevState, item];
-                                })
-                              }
+                                });
+                              }}
                             >
                               <Stack
                                 direction="row"
@@ -463,7 +464,8 @@ const Evidence = () => {
                                     menus={[
                                       {
                                         label: 'Edit',
-                                        onClick: () => {
+                                        onClick: (e) => {
+                                          e.preventDefault();
                                           store?.setEvidenceId(item?.id);
                                           setFileName(item?.name);
                                           setOpenPopupRename(true);
