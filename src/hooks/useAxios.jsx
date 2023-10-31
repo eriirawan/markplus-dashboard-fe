@@ -41,7 +41,7 @@ axios.interceptors.response.use(
   }
 );
 
-const makeUseAxios = () => configure({ axios });
+const makeUseAxios = () => configure({ axios, cache: false });
 
 export { axios };
 export default makeUseAxios;

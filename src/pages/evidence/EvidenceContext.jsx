@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
 import useAxios from 'axios-hooks';
-import { axios } from '../../hooks/useAxios';
 import { enqueueSnackbar } from 'notistack';
 
 import { encodeQueryData } from '@/helpers/Utils';
@@ -90,6 +89,16 @@ export const useEvidenceStore = () => {
     }
   );
 
+  const [, deleteFolder] = useAxios(
+    {
+      url: `/dashboard/v1/folders/${evidenceId}`,
+      method: 'delete',
+    },
+    {
+      manual: true,
+    }
+  );
+
   const handleFileInputChange = async (inputFile) => {
     setIsLoading(true);
     try {
@@ -164,13 +173,24 @@ export const useEvidenceStore = () => {
   };
 
   const handleDelete = async (cb) => {
-    const deleteAct = await deleteEvidence();
-    if (deleteAct.status === 200) {
-      enqueueSnackbar('Evidence deleted successfully.', {
-        variant: 'successSnackbar',
-      });
-      reFetch();
-      cb(false);
+    if (!selectedEvidence?.isFolder) {
+      const deleteAct = await deleteEvidence();
+      if (deleteAct.status === 200) {
+        enqueueSnackbar('Evidence deleted successfully.', {
+          variant: 'successSnackbar',
+        });
+        reFetch();
+        cb(false);
+      }
+    } else {
+      const deleteAct = await deleteFolder();
+      if (deleteAct.status === 200) {
+        enqueueSnackbar('Folder deleted successfully.', {
+          variant: 'successSnackbar',
+        });
+        reFetch();
+        cb(false);
+      }
     }
   };
 

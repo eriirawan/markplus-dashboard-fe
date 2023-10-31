@@ -70,6 +70,7 @@ const Evidence = () => {
             onClick={() => {
               if (params?.row?.original?.isFolder) {
                 store.setFolder((prevState) => {
+                  store.setPage(1);
                   return [...prevState, params?.row?.original];
                 });
               } else {
@@ -137,6 +138,7 @@ const Evidence = () => {
             sx={{ color: '#E56363', fontSize: 20, cursor: 'pointer' }}
             onClick={() => {
               store?.setEvidenceId(params?.row?.original?.id);
+              store?.setSelectedEvidence(params?.row?.original);
               setOpenPopupDelete(true);
             }}
           />
@@ -428,6 +430,7 @@ const Evidence = () => {
                               sx={{ p: 2, bgcolor: '#f3f6fb', cursor: 'pointer' }}
                               onClick={() =>
                                 store.setFolder((prevState) => {
+                                  store.setPage(1);
                                   return [...prevState, item];
                                 })
                               }
