@@ -714,15 +714,17 @@ const Home = () => {
             <Typography fontSize="16px" fontWeight={400} lineHeight={'24px'}>
               No chart created yet.
             </Typography>
-            <Button
-              color={'primary'}
-              onClick={() => {
-                setAction('create');
-                setOpenPopup(true);
-              }}
-            >
-              Create Chart
-            </Button>
+            {!appCtxStore?.isUserRole && (
+              <Button
+                color={'primary'}
+                onClick={() => {
+                  setAction('create');
+                  setOpenPopup(true);
+                }}
+              >
+                Create Chart
+              </Button>
+            )}
           </Stack>
         )}
         {sectionList?.length && !appCtxStore?.isUserRole ? (

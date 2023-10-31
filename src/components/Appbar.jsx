@@ -12,9 +12,10 @@ const Appbar = ({
   setShowDrawerBackground,
   setShowDialogClient,
   isUser,
+  path,
 }) => (
   <Stack flexDirection="row" alignItems="center" justifyContent="space-between" sx={{ py: 1, width: '100%' }}>
-    {isUser ? (
+    {isUser || path.includes('add-chart') ? (
       <Typography variant="h2" sx={{ textTransform: 'uppercase', color: 'primary.main' }}>
         {title}
       </Typography>

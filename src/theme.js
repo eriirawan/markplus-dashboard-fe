@@ -12,11 +12,11 @@ const createTheme = (color) =>
         styleOverrides: {
           root: () => ({
             '& fieldset': {
-              borderColor: color?.color3 || '#006CB7',
+              borderColor: color?.color2 || '#006CB7',
               borderWidth: '1px',
             },
             ':hover': {
-              borderColor: color?.color3 || '#006CB7',
+              borderColor: color?.color2 || '#006CB7',
             },
           }),
         },
@@ -62,15 +62,42 @@ const createTheme = (color) =>
                 borderColor: currentTheme.palette.neutral.lightGrey,
               }),
 
+            ...(ownerState.variant === 'contained' && {
+              ':hover': {
+                backgroundColor: `${color?.color2} !important`,
+                opacity: 0.8,
+              },
+            }),
+
+            ...(ownerState.variant === 'outlined' && {
+              ':hover': {
+                opacity: 0.8,
+                // backgroundColor: 'white',
+                borderColor: color?.color2,
+              },
+            }),
+
+            ...(ownerState.color === 'error' &&
+              ownerState.variant === 'contained' && {
+                ':hover': {
+                  backgroundColor: `${currentTheme.palette.error.main} !important`,
+                  opacity: 0.8,
+                },
+              }),
+
+            ...(ownerState.color === 'error' &&
+              ownerState.variant === 'outlined' && {
+                ':hover': {
+                  borderColor: `${currentTheme.palette.error.main}`,
+                  opacity: 0.8,
+                },
+              }),
+
             // radius
             borderRadius: 5,
 
             // text transform to `none`
             textTransform: 'capitalize',
-            ':hover': {
-              backgroundColor: `${color?.color3} !important`,
-              opacity: 0.9,
-            },
           }),
         },
       },
@@ -84,7 +111,7 @@ const createTheme = (color) =>
       MuiPaper: {
         styleOverrides: {
           root: {
-            backgroundColor: color?.color4 || '#f0f0f0',
+            backgroundColor: '#FFFFFF',
           },
         },
       },
@@ -104,11 +131,11 @@ const createTheme = (color) =>
         styleOverrides: {
           root: () => ({
             '& fieldset': {
-              borderColor: color?.color3 || '#006CB7',
+              borderColor: color?.color2 || '#006CB7',
               borderWidth: '1px',
             },
             ':hover': {
-              borderColor: color?.color3 || '#006CB7',
+              borderColor: color?.color2 || '#006CB7',
             },
           }),
         },
@@ -118,7 +145,7 @@ const createTheme = (color) =>
       MuiDivider: {
         styleOverrides: {
           root: {
-            borderColor: color?.color3 || '#006CB7',
+            borderColor: color?.color2 || '#006CB7',
           },
         },
       },
@@ -132,7 +159,7 @@ const createTheme = (color) =>
             color: '#F75D4F',
           },
           root: {
-            color: color?.color3 || '#006CB7',
+            color: color?.color2 || '#006CB7',
           },
         },
       },
@@ -159,11 +186,11 @@ const createTheme = (color) =>
         styleOverrides: {
           root: () => ({
             '& fieldset': {
-              borderColor: color?.color3 || '#006CB7',
+              borderColor: color?.color2 || '#006CB7',
               borderWidth: '1px',
             },
             ':hover': {
-              borderColor: color?.color3 || '#006CB7',
+              borderColor: `${color?.color2 || '#006CB7'} !important`,
             },
             color: '#002245',
           }),
@@ -202,11 +229,11 @@ const createTheme = (color) =>
         styleOverrides: {
           root: () => ({
             '& fieldset': {
-              borderColor: color?.color3 || '#006CB7',
+              borderColor: color?.color2 || '#006CB7',
               borderWidth: '1px',
             },
             ':hover': {
-              borderColor: color?.color3 || '#006CB7',
+              borderColor: color?.color2 || '#006CB7',
             },
           }),
         },
@@ -215,7 +242,7 @@ const createTheme = (color) =>
       /** Customize typography / font  */
       MuiTypography: {
         defaultProps: {
-          color: color?.color3 || '#006CB7',
+          color: color?.color2 || '#006CB7',
         },
       },
     },
@@ -247,15 +274,16 @@ const createTheme = (color) =>
         600: '#0067E7', // Main Blue | 80%
         700: '#023C9B', // Main Blue | 100%
         light: '#CCE8FA',
-        main: color?.color3 || '#006CB7',
+        main: color?.color2 || '#006CB7',
         container: color?.color2 || '#006CB7',
+        table: color?.color5 || '#00000',
       },
       secondary: {
-        main: color?.color5 || '#000000',
+        main: color?.color3 || '#000000',
       },
       bgcolor: {
         main: color?.color1 || '#F5F5F5',
-        header: color?.color2 || '#F5F5F5',
+        header: color?.color1 || '#F5F5F5',
         card: color?.color4 || '#f0f0f0',
       },
       success: {

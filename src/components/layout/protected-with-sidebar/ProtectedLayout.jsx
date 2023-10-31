@@ -143,6 +143,7 @@ const ProtectedLayout = () => {
                     setShowDrawerBackground={setShowDrawerBackground}
                     setShowDialogClient={store.setOpenPopupClient}
                     isUser={me?.role?.toLowerCase() === 'user'}
+                    path={location?.pathname?.split('/')}
                   />
                 </Box>
                 <Stack sx={{ px: 2, overflow: 'auto' }}>{outlet}</Stack>

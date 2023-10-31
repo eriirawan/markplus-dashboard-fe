@@ -23,6 +23,7 @@ export const CardContainer = styled(Card)`
   max-height: 577px;
   max-width: 384px;
   width: 100%;
+  background-color: white !important;
 `;
 
 export const LoginButton = styled(LoadingButton)``;

@@ -334,7 +334,7 @@ const User = () => {
                     bgcolor: '#EEF0F5',
                     border: 1,
                     borderColor: 'white',
-                    color: 'secondary.main',
+                    color: 'primary.table',
                   },
                 }}
                 initialState={{ columnPinning: { right: ['action'] } }}

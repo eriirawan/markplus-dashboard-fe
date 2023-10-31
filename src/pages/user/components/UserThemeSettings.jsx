@@ -81,13 +81,13 @@ const UserThemeSettings = (props) => {
     },
     {
       id: 2,
-      backgroundColor: color4,
-      fontColor: color3,
+      backgroundColor: 'white',
+      fontColor: color2,
     },
     {
       id: 3,
-      backgroundColor: color4,
-      fontColor: color5,
+      backgroundColor: 'white',
+      fontColor: color3,
     },
   ];
 
@@ -99,7 +99,7 @@ const UserThemeSettings = (props) => {
           <Stack
             justifyContent="center"
             alignItems="center"
-            sx={{ backgroundColor: color4, borderRadius: '6px', height: '60px' }}
+            sx={{ backgroundColor: 'white', borderRadius: '6px', height: '60px' }}
           >
             <Typography sx={{ color: color3 }}>Card</Typography>
           </Stack>
@@ -309,7 +309,7 @@ const UserThemeSettings = (props) => {
                     direction="row"
                     wrap="nowrap"
                   >
-                    <Grid item xs={2} sx={{ backgroundColor: color4, borderRadius: '6px', marginRight: '16px' }}>
+                    <Grid item xs={2} sx={{ backgroundColor: 'white', borderRadius: '6px', marginRight: '16px' }}>
                       <Stack sx={{ alignItems: 'center', padding: '6px' }} spacing={1}>
                         <Box
                           sx={{ backgroundColor: color2, width: '1.5vw', height: '1.5vw', borderRadius: '0.75vw' }}
@@ -324,11 +324,11 @@ const UserThemeSettings = (props) => {
                         direction="row"
                         justifyContent="space-between"
                         alignItems="center"
-                        sx={{ backgroundColor: color2, borderRadius: '6px', padding: '8px' }}
+                        sx={{ backgroundColor: 'white', borderRadius: '6px', padding: '8px' }}
                       >
-                        <Typography sx={{ color: color4 }}>Navbar</Typography>
+                        <Typography sx={{ color: color2 }}>Navbar</Typography>
                         <Box
-                          sx={{ backgroundColor: color4, width: '1.5vw', height: '1.5vw', borderRadius: '0.75vw' }}
+                          sx={{ backgroundColor: color2, width: '1.5vw', height: '1.5vw', borderRadius: '0.75vw' }}
                         />
                       </Stack>
                       <Grid container spacing={2} sx={{ paddingTop: '10px' }}>
