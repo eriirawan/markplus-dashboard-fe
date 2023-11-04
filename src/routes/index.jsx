@@ -16,7 +16,7 @@ const Loading = lazy(() => import('../components/Loading'));
 const Home = lazy(() => import('../pages/home'));
 const User = lazy(() => import('../pages/user'));
 const Evidence = lazy(() => import('../pages/evidence'));
-const UserManagement = lazy(() => import('../pages/user-management'));
+const ActivityLog = lazy(() => import('../pages/activity-log'));
 const Login = lazy(() => import('../pages/login'));
 const ForgotPassword = lazy(() => import('../pages/forgotPassword'));
 const ForgotPasswordSuccess = lazy(() => import('../pages/forgotPasswordSuccess'));
@@ -74,6 +74,11 @@ const router = createBrowserRouter(
         <Route path="fieldwork" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
         <Route path="evidence" element={<LazyComponent children={<Evidence />} />} errorElement={<ErrorBoundary />} />
         <Route path="user-list" element={<LazyComponent children={<User />} />} errorElement={<ErrorBoundary />} />
+        <Route
+          path="activity-log"
+          element={<LazyComponent children={<ActivityLog />} />}
+          errorElement={<ErrorBoundary />}
+        />
       </Route>
     </>
   )

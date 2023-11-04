@@ -77,19 +77,20 @@ const useSidebarMenus = () => {
         },
       ],
     },
-    // {
-    //   group: 'management',
-    //   menus: [
-    //     {
-    //       icon: {
-    //         active: 'SettingActive',
-    //         inActive: 'SettingNormal',
-    //       },
-    //       name: 'User Management',
-    //       path: 'user-management',
-    //     },
-    //   ],
-    // },
+    {
+      group: 'activityLog',
+      hidden: me?.role?.toLowerCase() !== 'master admin',
+      menus: [
+        {
+          icon: {
+            active: 'History',
+            inActive: 'History',
+          },
+          name: 'Activity',
+          path: 'activity-log',
+        },
+      ],
+    },
   ];
 };
 

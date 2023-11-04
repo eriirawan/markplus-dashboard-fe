@@ -104,7 +104,13 @@ const User = () => {
       muiTableHeadCellProps: { align: 'center' },
       muiTableBodyCellProps: { align: 'center' },
     },
-    { accessorKey: 'role', header: 'Role', size: 127 },
+    {
+      accessorKey: 'role',
+      header: 'Role',
+      size: 127,
+      muiTableHeadCellProps: { align: 'center' },
+      muiTableBodyCellProps: { align: 'center' },
+    },
     {
       accessorKey: 'created_at',
       header: 'Active Date',
@@ -335,6 +341,11 @@ const User = () => {
                     border: 1,
                     borderColor: 'white',
                     color: 'primary.table',
+                  },
+                }}
+                muiTableProps={{
+                  sx: {
+                    tableLayout: 'fixed',
                   },
                 }}
                 initialState={{ columnPinning: { right: ['action'] } }}

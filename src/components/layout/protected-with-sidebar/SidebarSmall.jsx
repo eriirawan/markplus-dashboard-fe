@@ -116,7 +116,7 @@ const SidebarSmall = ({ menus, height, handleOpenSidebar }) => {
                         {hoveredPath === mainMenu.path || mainMenu.path === paths[1] ? (
                           <MPlusIcon name={mainMenu.icon.active} sx={{ fontSize: 28 }} />
                         ) : (
-                          <MPlusIcon name={mainMenu.icon.inActive} sx={{ fontSize: 28 }} />
+                          <MPlusIcon name={mainMenu.icon.inActive} sx={{ fontSize: 28 }} style={{ fill: '#808080' }} />
                         )}
                         <Typography
                           variant="body2"
