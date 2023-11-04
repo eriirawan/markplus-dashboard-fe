@@ -1,6 +1,6 @@
 import { AppContext } from '@/context/AppContext';
 import { AccountCircle } from '@mui/icons-material';
-import { Stack, Box, IconButton, Typography, Menu, MenuItem } from '@mui/material';
+import { Stack, Box, IconButton, Typography, Menu, MenuItem, Avatar } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useContext, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
@@ -53,7 +53,9 @@ const ProfileBarButton = ({
             {me ? me.role : ''}
           </Typography>
         </Stack>
-        <AccountCircle sx={{ color: openProfileBar ? 'black' : 'primary.main', fontSize: 30 }} />
+        <Avatar sx={{ bgcolor: 'primary.main', width: 34, height: 34, fontSize: 14 }}>
+          {`${me?.first_name.split('')[0]?.toUpperCase()}${me?.last_name.split('')[0]?.toUpperCase()}`}
+        </Avatar>
       </IconButton>
       <Menu
         id="basic-menu"
