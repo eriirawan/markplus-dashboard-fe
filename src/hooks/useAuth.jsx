@@ -57,10 +57,30 @@ export const AuthProvider = ({ children }) => {
 
   const resetPassword = async (email) => {
     try {
+      setIsLoading(true);
       const result = await axios.post(`${import.meta.env.VITE_API_URL}/dashboard/v1/auth/password/reset`, { email });
 
       if (result.error) throw new Error('Error');
 
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setIsLoading(false);
+      throw new Error(err.response.data.message);
+    }
+  };
+
+  const setPassword = async (data) => {
+    try {
+      setIsLoading(true);
+      const result = await axios.post(
+        `${import.meta.env.VITE_API_URL}/dashboard/v1/auth/password/reset/set-password`,
+        data
+      );
+
+      if (result.error) throw new Error('Error');
+
+      setIsLoading(false);
       return result;
     } catch (err) {
       setIsLoading(false);
@@ -123,6 +143,7 @@ export const AuthProvider = ({ children }) => {
       userId,
       isLoading,
       resetPassword,
+      setPassword,
     }),
     [userToken, isLoading]
   );

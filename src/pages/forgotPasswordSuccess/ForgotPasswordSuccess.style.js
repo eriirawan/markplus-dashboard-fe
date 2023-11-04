@@ -33,7 +33,6 @@ export const HeaderCard = styled.p`
   font-size: 24px;
   line-height: 31px;
 `}
-  font-family: 'Poppins';
   font-weight: 700;
   font-size: 30px;
   line-height: 39px;
@@ -48,8 +47,6 @@ export const DescriptionCard = styled.p`
   font-size: 12px;
   line-height: 18px;
 `}
-  font-family: 'Poppins';
-  font-weight: 700;
   font-size: 14px;
   line-height: 21px;
   text-align: center;

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Button, TextField, Card, Box, Typography } from '@mui/material';
+import { Button, TextField, Card, Box, Typography, CircularProgress } from '@mui/material';
 import styled from 'styled-components';
 import Logo from '@/assets/logo-light.png';
 import { ChevronLeft } from '@mui/icons-material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 
@@ -12,7 +13,7 @@ import { useAuth } from '../../hooks/useAuth';
 const ForgotPassword = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const { resetPassword } = useAuth();
+  const { resetPassword, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [isError, setIsError] = useState(false);
 
@@ -50,10 +51,16 @@ const ForgotPassword = () => {
         <CardContainer>
           <Image src={Logo} />
           <HeaderCard>Recover your password</HeaderCard>
-          <DesctiptionCard>
-            Enter the email that you used when register to recover your password. You will receive a password reset
-            link.
-          </DesctiptionCard>
+          <DescriptionCard>
+            <Box component="span" fontWeight="700">
+              Enter the email{' '}
+            </Box>
+            that you used when register to recover your password. You will receive a
+            <Box component="span" fontWeight="700">
+              {' '}
+              password reset link.
+            </Box>
+          </DescriptionCard>
           <EmailField
             value={email}
             size="small"
@@ -76,7 +83,17 @@ const ForgotPassword = () => {
               setIsError(false);
             }}
           />
-          <SendLinkButton color="primary" variant="contained" onClick={() => handleForgetPassword()}>
+          <SendLinkButton
+            loading={isLoading}
+            disabled={isLoading}
+            color="primary"
+            variant="contained"
+            onClick={() => handleForgetPassword()}
+            {...(isLoading && {
+              loadingPosition: 'start',
+              startIcon: <CircularProgress size={16} />,
+            })}
+          >
             Send Link
           </SendLinkButton>
         </CardContainer>
@@ -123,12 +140,11 @@ const HeaderCard = styled(Typography)`
   margin-bottom: 16px;
 `;
 
-const DesctiptionCard = styled(Typography)`
+const DescriptionCard = styled(Typography)`
   ${media.phone`
     font-size: 12px;
     line-height: 18px;
   `}
-  font-weight: 700;
   font-size: 14px;
   line-height: 21px;
   text-align: center;
@@ -144,9 +160,8 @@ const EmailField = styled(TextField)`
   margin-bottom: 35px !important;
 `;
 
-const SendLinkButton = styled(Button)`
+const SendLinkButton = styled(LoadingButton)`
   width: 100%;
-  max-width: 256px;
 `;
 
 export default ForgotPassword;
