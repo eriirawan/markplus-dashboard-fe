@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,10 +10,13 @@ import {
   Stack,
   Box,
   Button,
+  InputAdornment,
+  TextField,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { FormProvider, useForm } from 'react-hook-form';
+import MPlusIcon from '@/components/Icon';
 
 import CheckBox from '@/components/CheckBox';
 import MPTextField from '@/components/TextField';
@@ -37,10 +40,20 @@ const VisuallyHiddenInput = styled('input')`
 
 const ModalUserDetail = ({}) => {
   const { roles } = useContext(AppContext);
+  const [error, setError] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [showPassword, setShowPassword] = useState({ newPass: false });
   const { methods, handleFileInputChange, handleClose, handleClick, openPopup, action, isLoading } =
     useContext(UserContext);
 
+  const onChangeNewPass = (val) => {
+    const passValue = val.replace(/\s/g, ''); // remove whitespace
+    const passCheck = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    setError(passCheck.test(passValue) ? '' : 'invalid');
+    methods?.setValue('password', passValue);
+  };
   const imgUrl = methods.watch('company_logo_url');
+  const password = methods.watch('password');
 
   return (
     <Dialog maxWidth="md" open={openPopup} PaperProps={{ sx: { p: 3 } }} transitionDuration={500}>
@@ -118,15 +131,48 @@ const ModalUserDetail = ({}) => {
                   User Details
                 </Typography>
                 <MPTextField required label="Email" name="email" placeholder="companyemail@emaildomain.com" />
+                {action !== 'edit' && (
+                  <TextField
+                    error={error !== '' && error !== 'unmatch'}
+                    helperText={
+                      error === 'invalid'
+                        ? 'Password must consist of at least 8 characters, capital letter and number.'
+                        : null
+                    }
+                    FormHelperTextProps={{ style: { margin: '4px 0px 0px' } }}
+                    size="small"
+                    label={action === 'edit' ? 'New Password' : 'Password'}
+                    placeholder="Your new password"
+                    type={showPassword.newPass ? 'text' : 'password'}
+                    value={password}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Box
+                            width={24}
+                            height={24}
+                            sx={{ cursor: 'pointer' }}
+                            onClick={() => setShowPassword({ ...showPassword, newPass: !showPassword.newPass })}
+                          >
+                            <MPlusIcon name={showPassword.newPass ? 'EyeHide' : 'EyeShow'} />
+                          </Box>
+                        </InputAdornment>
+                      ),
+                      style: {
+                        height: '44px',
+                        textAlign: 'center',
+                      },
+                    }}
+                    InputLabelProps={{ shrink: true }}
+                    sx={(theme) => ({
+                      '& .Mui-focused': {
+                        color: theme.palette.primary.lightBlue,
+                      },
+                    })}
+                    onChange={(e) => onChangeNewPass(e.target.value)}
+                  />
+                )}
                 <Stack direction="row" spacing={2} sx={{ py: 2 }}>
-                  {/* <MPTextField
-                    fullWidth
-                    required
-                    label="Username"
-                    name="username"
-                    placeholder="Company Name"
-                    size="normal"
-                  /> */}
                   <MPSelect
                     options={roles}
                     label="Role"

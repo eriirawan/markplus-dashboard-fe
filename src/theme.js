@@ -285,6 +285,7 @@ const createTheme = (color) =>
         main: color?.color1 || '#F5F5F5',
         header: color?.color1 || '#F5F5F5',
         card: color?.color4 || '#f0f0f0',
+        sideBar: color?.colorSideBar || '#ffffff',
       },
       success: {
         100: '#ECFBF5', // Success  10%

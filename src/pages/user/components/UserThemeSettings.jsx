@@ -28,6 +28,7 @@ const UserThemeSettings = (props) => {
   const [currentColorId, setCurrentColorId] = useState(0);
   const [colorSelected, setColorSelected] = useState('');
   const [pickerPosition, setPickerPosition] = useState({ x: 0, y: 0 });
+  const [colorSideBar, setColorSideBar] = useState('#ffffff');
   const [color1, setColor1] = useState('#EEF0F5');
   const [color2, setColor2] = useState('#2e459a');
   const [color3, setColor3] = useState('#2e459a');
@@ -37,6 +38,7 @@ const UserThemeSettings = (props) => {
   useEffect(() => {
     if (colorway) {
       setUserTheme(colorway.theme || 'light');
+      setColorSideBar(colorway?.color4 || '#ffffff');
       setColor1(colorway?.color1 || '#EEF0F5');
       setColor2(colorway?.color2 || '#2e459a');
       setColor3(colorway?.color3 || '#2e459a');
@@ -48,26 +50,31 @@ const UserThemeSettings = (props) => {
   const colorPreviews = [
     {
       id: 1,
+      color: colorSideBar,
+      setColor: setColorSideBar,
+    },
+    {
+      id: 2,
       color: color1,
       setColor: setColor1,
     },
     {
-      id: 2,
+      id: 3,
       color: color2,
       setColor: setColor2,
     },
     {
-      id: 3,
+      id: 4,
       color: color3,
       setColor: setColor3,
     },
     {
-      id: 4,
+      id: 5,
       color: color4,
       setColor: setColor4,
     },
     {
-      id: 5,
+      id: 6,
       color: color5,
       setColor: setColor5,
     },
@@ -172,6 +179,7 @@ const UserThemeSettings = (props) => {
   const handleSave = async () => {
     const values = {
       theme: userTheme,
+      colorSideBar,
       color1,
       color2,
       color3,
@@ -217,9 +225,6 @@ const UserThemeSettings = (props) => {
           >
             <MenuItem key={1} value="light">
               Light Mode
-            </MenuItem>
-            <MenuItem key={2} value="dark">
-              Dark Mode
             </MenuItem>
             <MenuItem key={3} value="custom">
               Custom
@@ -309,7 +314,7 @@ const UserThemeSettings = (props) => {
                     direction="row"
                     wrap="nowrap"
                   >
-                    <Grid item xs={2} sx={{ backgroundColor: 'white', borderRadius: '6px', marginRight: '16px' }}>
+                    <Grid item xs={2} sx={{ backgroundColor: colorSideBar, borderRadius: '6px', marginRight: '16px' }}>
                       <Stack sx={{ alignItems: 'center', padding: '6px' }} spacing={1}>
                         <Box
                           sx={{ backgroundColor: color2, width: '1.5vw', height: '1.5vw', borderRadius: '0.75vw' }}

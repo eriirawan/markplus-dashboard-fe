@@ -238,9 +238,11 @@ const Evidence = () => {
             <Typography variant="h2" color="primary.main" textTransform="capitalize" pb={2}>
               {location.pathname.replace(/[^a-z0-9]/g, ' ').trim()} Page
             </Typography>
-            <Button size="medium" startIcon={<Add />} onClick={() => setOpenAddFolder(true)}>
-              New Folder
-            </Button>
+            {!isUserRole && (
+              <Button size="medium" startIcon={<Add />} onClick={() => setOpenAddFolder(true)}>
+                New Folder
+              </Button>
+            )}
           </Stack>
           <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
             <Link to="/home" style={{ textDecoration: 'none' }}>

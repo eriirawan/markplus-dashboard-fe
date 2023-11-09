@@ -36,16 +36,13 @@ export const useUserStore = () => {
     {
       url: `/dashboard/v1/users/upload-image`,
       method: 'post',
-      options: {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     },
     {
       manual: true,
     }
   );
+
   const [, addUser] = useAxios(
     {
       url: `/dashboard/v1/users/add`,
@@ -91,13 +88,15 @@ export const useUserStore = () => {
   });
 
   const handleFileInputChange = async (e) => {
-    const bodyFormData = new FormData();
-    bodyFormData.append('file', e.target.files[0]);
-    const file = await uploadFile(bodyFormData);
+    const file = await uploadFile({
+      data: {
+        file: e.target.files[0],
+      },
+    });
 
     if (file?.status === 200) {
-      methods.setValue('company_logo_url', file.data.url);
-      methods.setValue('filename', file.data.filename);
+      methods.setValue('company_logo_url', file?.data?.data.url);
+      methods.setValue('filename', file?.data?.data.filename);
     }
   };
 
@@ -112,7 +111,7 @@ export const useUserStore = () => {
           last_name: formData?.last_name || undefined,
           company_name: `${formData.first_name} ${formData.last_name}`,
           company_logo_url: formData?.company_logo_url || undefined,
-          password: 'password',
+          password: formData?.password || undefined,
           colorway: {
             theme: 'light',
             color1: '#EEF0F5',
@@ -135,6 +134,7 @@ export const useUserStore = () => {
         data: {
           user_id: userId,
           role_id: formData.role_id,
+          password: formData?.password || undefined,
           email: formData.email,
           first_name: formData.first_name,
           last_name: formData.last_name,
