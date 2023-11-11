@@ -772,6 +772,7 @@ const Home = () => {
 const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButtonGroupAxis = false, className }) => {
   const { dashboardContent, setDashboardContent } = useDashboard();
   const [anchorElDownload, setAnchorElDownload] = useState(false);
+  const { clientSelected } = useContext(AppBarContext);
   const navigate = useNavigate();
   const { handleChangeAxis } = store;
   const MuiCustomToggleButton = styled(ToggleButton)(({ theme }) => ({
@@ -808,7 +809,7 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
         const pdfHeight = data.layout > 25 ? (imgProps.height * pdfWidth) / imgProps.width : input.clientHeight;
 
         pdf.addImage(img, 'png', 0, 10, pdfWidth, pdfHeight);
-        pdf.save(data?.chart?.tabular?.filename.split('.')[0] || 'chart.pdf');
+        pdf.save(clientSelected?.company_name + ' - ' + data?.chart?.title + '.pdf');
         but.style.display = 'block';
         store.setIsLoading(false);
         if (isAll) {
@@ -833,7 +834,7 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
       const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
       const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
       const finalData = new Blob([excelBuffer], { type: '.xlsx' });
-      const filename = data?.chart?.tabular?.filename || 'sheet.xlsx';
+      const filename = clientSelected?.company_name + ' - ' + data?.chart?.title + '.xlsx';
       let url = window.URL.createObjectURL(finalData);
       let a = document.createElement('a');
       a.href = url;
@@ -886,10 +887,15 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
       // className={className}
     >
       <Box display={'flex'} gap={'16px'} justifyContent="space-between" marginBottom={'24px'}>
-        <Typography color={'primary'} fontSize={24} fontWeight="700" lineHeight="31px">
-          {data?.chart?.title}
-        </Typography>
-        <Box display={'flex'} gap="16px">
+        <Box>
+          <Typography color={'primary'} fontSize={24} fontWeight="700" lineHeight="31px">
+            {data?.chart?.title}
+          </Typography>
+          <Typography color={'primary'} fontSize={16} fontWeight="500" lineHeight="24px">
+            {data?.chart?.sub_title}
+          </Typography>
+        </Box>
+        <Box display={'flex'} alignItems={'center'} gap="16px">
           {useButtonGroupAxis && (
             <ToggleButtonGroup
               value={data?.chart?.show_axis_labels}
@@ -994,23 +1000,29 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
               </Box>
             </Popover>
           </Box>
-          <Tooltip title="Edit" sx={(theme) => ({ backgroundColor: theme.palette.primary.main, color: 'white' })} arrow>
-            <IconButton
-              onClick={() => {
-                localStorage.setItem(
-                  'indexChart',
-                  `{parent: "${indexContent.parent}", child: "${indexContent.child}"}`
-                );
-                navigate(`/home/edit-chart/${data?.chart?.id}`);
-              }}
-              sx={(theme) => ({
-                border: `1px solid ${theme.palette.primary.main}`,
-                borderRadius: '4px',
-              })}
+          <Box>
+            <Tooltip
+              title="Edit"
+              sx={(theme) => ({ backgroundColor: theme.palette.primary.main, color: 'white' })}
+              arrow
             >
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
+              <IconButton
+                onClick={() => {
+                  localStorage.setItem(
+                    'indexChart',
+                    `{parent: "${indexContent.parent}", child: "${indexContent.child}"}`
+                  );
+                  navigate(`/home/edit-chart/${data?.chart?.id}`);
+                }}
+                sx={(theme) => ({
+                  border: `1px solid ${theme.palette.primary.main}`,
+                  borderRadius: '4px',
+                })}
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
       </Box>
       {/* <chartElement /> */}
