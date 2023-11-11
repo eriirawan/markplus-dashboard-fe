@@ -207,6 +207,7 @@ export const useAddOrEditChartStore = () => {
         user_id: userId,
         section_id: +formData.section_id,
         title: formData.chartLabel,
+        sub_title: formData.chartSubLabel,
         chart_type_id: formData.chartTypeId,
         label_vertical: formData.verticalAxisLabel || 'null',
         label_horizontal: formData.horizontalAxisLabel || 'null',
@@ -220,7 +221,6 @@ export const useAddOrEditChartStore = () => {
         },
       };
       if (formData.chartType === 'Information Chart') {
-        console.info(formData, '<<<< formData');
         const payloadUpload = new FormData();
         payloadUpload.append('file', formData.imageFile);
         const uploadImage = await uploadImageInformationChart({
@@ -267,6 +267,7 @@ export const useAddOrEditChartStore = () => {
 
       const payloadChart = {
         title: formData.chartLabel,
+        sub_title: formData.chartSubLabel,
         chart_type_id: formData.chartTypeId,
         label_vertical: formData.verticalAxisLabel,
         label_horizontal: formData.horizontalAxisLabel,

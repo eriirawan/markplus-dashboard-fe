@@ -494,6 +494,7 @@ const AddChart = (props) => {
         chartType: chartDetail?.chart_type_name,
         chartTypeId: chartDetail?.chart_type_id,
         chartLabel: chartDetail.title,
+        chartSubLabel: chartDetail.sub_title,
         chartData: {
           labels: chartDetail?.tabular?.labels,
           datasets: chartDetail?.tabular?.datasets.map((el) => {
@@ -807,13 +808,35 @@ const AddChart = (props) => {
                           methods.getValues('chartType') === 'Table Chart'
                             ? 'Type table label'
                             : methods.getValues('chartType') === 'Information Chart'
-                            ? 'Type information label'
-                            : 'Type chart label'
+                            ? 'Information label'
+                            : 'Chart label'
                         }
                         // value={methods.getValues('chartLabel')}
                         InputProps={{ style: { height: '44px' } }}
                         InputLabelProps={{ shrink: true }}
                         onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
+                        sx={{ padding: '9px 0px 19px 0px' }}
+                      ></TextField>
+                      <TextField
+                        {...methods.register('chartSubLabel')}
+                        label={
+                          methods.getValues('chartType') === 'Table'
+                            ? 'Table Label'
+                            : methods.getValues('chartType') === 'Information Chart'
+                            ? 'Information Sub Label'
+                            : 'Chart Sub Label'
+                        }
+                        placeholder={
+                          methods.getValues('chartType') === 'Table Chart'
+                            ? 'Type table label'
+                            : methods.getValues('chartType') === 'Information Chart'
+                            ? 'Information label'
+                            : 'Chart sub label'
+                        }
+                        // value={methods.getValues('chartLabel')}
+                        InputProps={{ style: { height: '44px' } }}
+                        InputLabelProps={{ shrink: true }}
+                        onChange={(e) => handleChangeForm('chartSubLabel', e.target.value)}
                         sx={{ padding: '9px 0px 19px 0px' }}
                       ></TextField>
                       {displayInputLabel && (
