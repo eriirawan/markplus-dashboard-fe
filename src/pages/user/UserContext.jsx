@@ -134,12 +134,12 @@ export const useUserStore = () => {
         data: {
           user_id: userId,
           role_id: formData.role_id,
-          password: formData?.password || undefined,
           email: formData.email,
           first_name: formData.first_name,
           last_name: formData.last_name,
           company_name: `${formData.first_name} ${formData.last_name}`,
           company_logo_url: formData?.company_logo_url || undefined,
+          new_password: formData?.password,
         },
       });
       if (update?.status === 200) {
