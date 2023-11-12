@@ -131,47 +131,45 @@ const ModalUserDetail = ({}) => {
                   User Details
                 </Typography>
                 <MPTextField required label="Email" name="email" placeholder="companyemail@emaildomain.com" />
-                {action !== 'edit' && (
-                  <TextField
-                    error={error !== '' && error !== 'unmatch'}
-                    helperText={
-                      error === 'invalid'
-                        ? 'Password must consist of at least 8 characters, capital letter and number.'
-                        : null
-                    }
-                    FormHelperTextProps={{ style: { margin: '4px 0px 0px' } }}
-                    size="small"
-                    label={action === 'edit' ? 'New Password' : 'Password'}
-                    placeholder="Your new password"
-                    type={showPassword.newPass ? 'text' : 'password'}
-                    value={password}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <Box
-                            width={24}
-                            height={24}
-                            sx={{ cursor: 'pointer' }}
-                            onClick={() => setShowPassword({ ...showPassword, newPass: !showPassword.newPass })}
-                          >
-                            <MPlusIcon name={showPassword.newPass ? 'EyeHide' : 'EyeShow'} />
-                          </Box>
-                        </InputAdornment>
-                      ),
-                      style: {
-                        height: '44px',
-                        textAlign: 'center',
-                      },
-                    }}
-                    InputLabelProps={{ shrink: true }}
-                    sx={(theme) => ({
-                      '& .Mui-focused': {
-                        color: theme.palette.primary.lightBlue,
-                      },
-                    })}
-                    onChange={(e) => onChangeNewPass(e.target.value)}
-                  />
-                )}
+                <TextField
+                  error={error !== '' && error !== 'unmatch'}
+                  helperText={
+                    error === 'invalid'
+                      ? 'Password must consist of at least 8 characters, capital letter and number.'
+                      : null
+                  }
+                  FormHelperTextProps={{ style: { margin: '4px 0px 0px' } }}
+                  size="small"
+                  label={action === 'edit' ? 'New Password' : 'Password'}
+                  placeholder="Your new password"
+                  type={showPassword.newPass ? 'text' : 'password'}
+                  value={password}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Box
+                          width={24}
+                          height={24}
+                          sx={{ cursor: 'pointer' }}
+                          onClick={() => setShowPassword({ ...showPassword, newPass: !showPassword.newPass })}
+                        >
+                          <MPlusIcon name={showPassword.newPass ? 'EyeHide' : 'EyeShow'} />
+                        </Box>
+                      </InputAdornment>
+                    ),
+                    style: {
+                      height: '44px',
+                      textAlign: 'center',
+                    },
+                  }}
+                  InputLabelProps={{ shrink: true }}
+                  sx={(theme) => ({
+                    '& .Mui-focused': {
+                      color: theme.palette.primary.lightBlue,
+                    },
+                  })}
+                  onChange={(e) => onChangeNewPass(e.target.value)}
+                />
                 <Stack direction="row" spacing={2} sx={{ py: 2 }}>
                   <MPSelect
                     options={roles}
