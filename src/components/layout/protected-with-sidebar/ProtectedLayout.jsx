@@ -19,15 +19,13 @@ import { getWindowDimensions } from '@/helpers/Utils';
 import { AppContext } from '@/context/AppContext';
 import { AppBarContext, useStore } from '@/context/AppBarContext';
 import { useAuth } from '@/hooks/useAuth';
+import useAfterLoginStartup from '@/hooks/useAfterLogin';
+import useAxios from 'axios-hooks';
 import { appBarHeight, sideBarContentWidth } from '../../../helpers/Constants';
 import Appbar from '../../Appbar';
 import useSidebarMenus from '../SidebarMenu';
-import Sidebar from './Sidebar';
 import SidebarSmall from './SidebarSmall';
-import useAfterLoginStartup from '@/hooks/useAfterLogin';
-import useAxios from 'axios-hooks';
 import DialogFormContainer from '../../Dialog/DialogForm';
-import { useUserStore } from '../../../pages/user/UserContext';
 
 const ProtectedLayout = () => {
   const { refreshMeData } = useAuth();
@@ -54,14 +52,14 @@ const ProtectedLayout = () => {
       height: appBarHeight,
       layout: 'fixed',
       m: 0,
+      mb: 1,
       overflow: 'hidden',
       pl: 2.5,
       pr: 1.5,
       py: 0.5,
-      mb: 1,
       // width: `calc(100% - ${sideBarContentWidth}px)`,
     },
-    appContainer: { height: '100%', layout: 'fixed', bgcolor: 'bgcolor.main' },
+    appContainer: { bgcolor: 'bgcolor.main', height: '100%', layout: 'fixed' },
     outletContainer: {
       height: windowDimensions.height,
       overflow: 'auto',
@@ -75,8 +73,8 @@ const ProtectedLayout = () => {
   const handleOpenSidebar = (state) => setOpenSidebar(state);
   const [{ data, loading }, reFetch] = useAxios(
     {
-      url: `/dashboard/v1/users/list?page=${pageClientList}&page_size=${10}&sort_by=${'id'}&sort_dir=${'ASC'}`,
       method: 'get',
+      url: `/dashboard/v1/users/list?page=${pageClientList}&page_size=${10}&sort_by=${'id'}&sort_dir=${'ASC'}`,
     },
     {
       manual: true,
@@ -93,6 +91,25 @@ const ProtectedLayout = () => {
     if (data?.meta?.totalData > 10) setPageClientList(data?.meta?.totalData);
   }, [data]);
 
+  useEffect(() => {
+    const init = async () => {
+      if (token && token !== 'undefined' && token !== 'null') {
+        const me = await refreshMeData();
+        if (me?.role?.toLowerCase() !== 'user') {
+          await refreshMasterData();
+        } else {
+          store.setClientSelected(me);
+          setClientSelected(me);
+        }
+      } else {
+        window.location.href = `/login`;
+      }
+    };
+    if (!import.meta.env.SSR) {
+      init();
+    }
+  }, [location]);
+
   window.onload = async () => {
     if (token) {
       const me = await refreshMeData();
@@ -106,6 +123,7 @@ const ProtectedLayout = () => {
       window.location.href = `/login`;
     }
   };
+
   const onSaveClient = () => {
     store.setClientSelected(clientValue);
     setClientSelected(clientValue);
@@ -146,7 +164,7 @@ const ProtectedLayout = () => {
                     path={location?.pathname?.split('/')}
                   />
                 </Box>
-                <Stack sx={{ px: 2, overflow: 'auto' }}>{outlet}</Stack>
+                <Stack sx={{ overflow: 'auto', px: 2 }}>{outlet}</Stack>
               </Stack>
             </Box>
           </Stack>
