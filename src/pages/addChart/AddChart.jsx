@@ -1,5 +1,4 @@
 import React, { useMemo, useState, useContext, useEffect, useRef } from 'react';
-import { DashboardContext } from '../home/Home';
 import {
   Breadcrumbs,
   Paper,
@@ -9,16 +8,8 @@ import {
   TextField,
   Autocomplete,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  ListItemText,
-  Checkbox,
-  OutlinedInput,
   Grid,
   Dialog,
-  DialogTitle,
   DialogContent,
   IconButton,
   CircularProgress,
@@ -26,35 +17,26 @@ import {
   Switch,
 } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import { Close, ErrorOutline } from '@mui/icons-material';
+import { Close, ErrorOutline, WarningOutlined } from '@mui/icons-material';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
-import { Saturation } from 'react-color/lib/components/common';
-import { CustomPicker, SketchPicker } from 'react-color';
 import { Box } from '@mui/system';
 import { useNavigate, useParams } from 'react-router-dom';
-import LineChart from '../../components/chart/LineChart';
-import { defaultColorChart, defaultDataChartBar, defaultDataChartLine } from '../../helpers/DummyDataChart';
-import BarChart from '../../components/chart/BarChart';
-import DonutChart from '../../components/chart/DonutChart';
 import PieChart from '@/components/chart/PieChart.jsx';
-import AreaChart from '../../components/chart/AreaChart';
-import { useDashboard } from '../../hooks/useDashboard';
-import { ConnectingAirportsOutlined, LinkOffTwoTone, WarningOutlined } from '@mui/icons-material';
-import MPlusIcon from '@/components/Icon';
 import SuccessImage from '@/assets/images/success-image.png';
 import ErrorImage from '@/assets/images/error-image.png';
 import * as XLSX from 'xlsx';
-import tinycolor from 'tinycolor2';
 import CustomColorPicker from '@/components/Dialog/CustomColorPicker.jsx';
 import DialogColorPicker from '@/components/Dialog/DialogColorPicker.jsx';
-import TableChart from '../../components/chart/TableChart';
-import { BarChartIcon, ChevronDownRed, DeleteFill, DragIndicator, ExportFiles, Gear } from '../../helpers/Icons';
 import DefaultImageInformationCard from '@/assets/images/default-image-infomation-card.png';
-import ExampleFileEdit from '@/assets/file_example_XLS_10.xlsx';
-import { AddOrEditChartContext, useAddOrEditChartStore } from './addChartContext';
 import { AppBarContext } from '@/context/AppBarContext';
-import XlsxPopulate from 'xlsx-populate';
+import { AddOrEditChartContext, useAddOrEditChartStore } from './addChartContext';
+import { DeleteFill } from '../../helpers/Icons';
+import { useDashboard } from '../../hooks/useDashboard';
+import AreaChart from '../../components/chart/AreaChart';
+import DonutChart from '../../components/chart/DonutChart';
+import BarChart from '../../components/chart/BarChart';
+import LineChart from '../../components/chart/LineChart';
+import TableChart from '../../components/chart/TableChart';
 import DialogConfirmation from '../../components/Dialog/DialogConfirmation';
 
 const AddChart = (props) => {
@@ -87,15 +69,15 @@ const AddChart = (props) => {
   const chartRef = useRef();
 
   const [codeColor, setCodeColor] = useState({
+    hsl: {
+      h: 0,
+      l: 0,
+      s: 0,
+    },
     hsv: {
       h: 0,
       s: 0,
       v: 0,
-    },
-    hsl: {
-      h: 0,
-      s: 0,
-      l: 0,
     },
   });
   const [openDialogDelete, setOpenDialogDelete] = useState(false);
@@ -136,21 +118,15 @@ const AddChart = (props) => {
     }
     if (localStorage.optionChart) {
       if (localStorage.optionChart === '100%' || localStorage.optionChart === '75%') {
-        setOptionDataChartType((prev) => {
-          return prev.filter(
-            (el) => el.name !== 'Information Chart' && el.name !== 'Pie Chart' && el.name !== 'Donut Chart'
-          );
-        });
+        setOptionDataChartType((prev) =>
+          prev.filter((el) => el.name !== 'Information Chart' && el.name !== 'Pie Chart' && el.name !== 'Donut Chart')
+        );
       } else if (localStorage.optionChart === '50%') {
-        setOptionDataChartType((prev) => {
-          return prev?.filter((el) => el.name !== 'Information Chart');
-        });
+        setOptionDataChartType((prev) => prev?.filter((el) => el.name !== 'Information Chart'));
       } else {
-        setOptionDataChartType((prev) => {
-          return prev.filter(
-            (el) => el.name === 'Information Chart' || el.name === 'Pie Chart' || el.name === 'Donut Chart'
-          );
-        });
+        setOptionDataChartType((prev) =>
+          prev.filter((el) => el.name === 'Information Chart' || el.name === 'Pie Chart' || el.name === 'Donut Chart')
+        );
       }
       // if(localStorage.)
       // setDisplayInputLabel(false);
@@ -162,16 +138,17 @@ const AddChart = (props) => {
     methods.setValue(key, value);
   };
   const [showAxisValue, setShowAxisValue] = useState(true);
-  const breadcrumbs = useMemo(() => {
-    return [
+  const breadcrumbs = useMemo(
+    () => [
       <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/home')} sx={{ cursor: 'pointer' }}>
         Dashboard
       </Link>,
       <Typography key="2" color="text.lightPrimary">
         {id ? 'Edit Chart' : 'Add Chart'}
       </Typography>,
-    ];
-  }, [id]);
+    ],
+    [id]
+  );
   const SettingContent = useMemo(() => {
     if (methods.getValues('chartType') && JSON.stringify(watchAllField.chartData) !== '{}') {
       switch (methods.getValues('chartType')) {
@@ -179,21 +156,21 @@ const AddChart = (props) => {
           setDisplayInputLabel(true);
           return (
             <Box>
-              <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
+              <Typography fontSize="18px" lineHeight="27px" fontWeight={700} marginBottom="24px">
                 {methods.getValues('chartLabel')}
               </Typography>
               <LineChart
                 refChart={chartRef}
-                width={'549px'}
-                height={'335px'}
-                maxWidthLegend={'369px'}
+                width="549px"
+                height="335px"
+                maxWidthLegend="369px"
                 labelX={methods.getValues('verticalAxisLabel')}
                 labelY={methods.getValues('horizontalAxisLabel')}
-                legendClassName={'legend-container-line'}
+                legendClassName="legend-container-line"
                 options={{}}
                 chartData={methods.getValues('chartData')}
                 showAxisValue={methods.getValues('showAxisLabels')}
-              ></LineChart>
+              />
             </Box>
           );
         }
@@ -201,16 +178,16 @@ const AddChart = (props) => {
           setDisplayInputLabel(true);
           return (
             <Box>
-              <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
+              <Typography fontSize="18px" lineHeight="27px" fontWeight={700} marginBottom="24px">
                 {methods.getValues('chartLabel')}
               </Typography>
               <BarChart
                 refChart={chartRef}
-                maxWidthLegend={'369px'}
+                maxWidthLegend="369px"
                 chartData={methods.getValues('chartData')}
                 labelX={methods.getValues('verticalAxisLabel')}
                 labelY={methods.getValues('horizontalAxisLabel')}
-                legendClassName={'legend-container-column-chart'}
+                legendClassName="legend-container-column-chart"
                 options={{}}
                 showAxisValue={methods.getValues('showAxisLabels')}
               />
@@ -221,14 +198,14 @@ const AddChart = (props) => {
           setDisplayInputLabel(true);
           return (
             <Box>
-              <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
+              <Typography fontSize="18px" lineHeight="27px" fontWeight={700} marginBottom="24px">
                 {methods.getValues('chartLabel')}
               </Typography>
               <BarChart
                 refChart={chartRef}
-                maxWidthLegend={'369px'}
-                legendClassName={'legend-container-bar-chart'}
-                indexAxis={'y'}
+                maxWidthLegend="369px"
+                legendClassName="legend-container-bar-chart"
+                indexAxis="y"
                 labelX={methods.getValues('verticalAxisLabel')}
                 labelY={methods.getValues('horizontalAxisLabel')}
                 chartData={{
@@ -245,15 +222,15 @@ const AddChart = (props) => {
           setDisplayInputLabel(false);
           return (
             <Box sx={{ marginTop: '16px' }}>
-              <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'16px'}>
+              <Typography fontSize="18px" lineHeight="27px" fontWeight={700} marginBottom="16px">
                 {methods.getValues('chartLabel')}
               </Typography>
               <DonutChart
                 refChart={chartRef}
-                width={'240px'}
-                height={'240px'}
+                width="240px"
+                height="240px"
                 chartData={methods.getValues('chartDataDonutOrPie')}
-                legendClassName={'legend-container-donut-chart'}
+                legendClassName="legend-container-donut-chart"
                 options={{}}
               />
             </Box>
@@ -263,14 +240,14 @@ const AddChart = (props) => {
           setDisplayInputLabel(false);
           return (
             <Box sx={{ marginTop: '16px' }}>
-              <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'16px'}>
+              <Typography fontSize="18px" lineHeight="27px" fontWeight={700} marginBottom="16px">
                 {methods.getValues('chartLabel')}
               </Typography>
               <PieChart
                 refChart={chartRef}
-                width={'240px'}
-                height={'240px'}
-                legendClassName={'legend-container-pie-chart'}
+                width="240px"
+                height="240px"
+                legendClassName="legend-container-pie-chart"
                 chartData={methods.getValues('chartDataDonutOrPie')}
                 options={{}}
               />
@@ -281,14 +258,14 @@ const AddChart = (props) => {
           setDisplayInputLabel(true);
           return (
             <Box>
-              <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
+              <Typography fontSize="18px" lineHeight="27px" fontWeight={700} marginBottom="24px">
                 {methods.getValues('chartLabel')}
               </Typography>
               <AreaChart
                 refChart={chartRef}
-                width={'549px'}
-                height={'335px'}
-                legendClassName={'legend-container-area-chart'}
+                width="549px"
+                height="335px"
+                legendClassName="legend-container-area-chart"
                 labelX={methods.getValues('verticalAxisLabel')}
                 labelY={methods.getValues('horizontalAxisLabel')}
                 chartData={{
@@ -297,32 +274,33 @@ const AddChart = (props) => {
                     ...el,
                     // data: [0, ...el.data],
                     fill: {
-                      target: 'origin', // 3. Set the fill options
+                      // 3. Set the fill options
                       above: el.backgroundColor?.replace('1)', '0.3)') || el?.backgroundColor,
+                      target: 'origin',
                     },
                   })),
                 }}
-                isAreaChart={true}
+                isAreaChart
                 options={{}}
                 showAxisValue={methods.getValues('showAxisLabels')}
-              ></AreaChart>
+              />
             </Box>
           );
         }
         case 'Stacked Chart': {
           setDisplayInputLabel(true);
           return (
-            <Box sx={{ maxWidth: '549px', marginTop: '20px' }}>
+            <Box sx={{ marginTop: '20px', maxWidth: '549px' }}>
               <BarChart
                 refChart={chartRef}
-                width={'549px'}
-                height={'335px'}
-                maxWidthLegend={'369px'}
+                width="549px"
+                height="335px"
+                maxWidthLegend="369px"
                 chartData={methods.getValues('chartData')}
-                legendClassName={'legend-container-bar-chart'}
+                legendClassName="legend-container-bar-chart"
                 labelX={methods.getValues('verticalAxisLabel')}
                 labelY={methods.getValues('horizontalAxisLabel')}
-                isStackedChart={true}
+                isStackedChart
                 options={{}}
                 // showAxisValue={showAxisValue}
                 showAxisValue={methods.getValues('showAxisLabels')}
@@ -333,18 +311,18 @@ const AddChart = (props) => {
         case '100% Stacked Chart': {
           setDisplayInputLabel(true);
           return (
-            <Box sx={{ maxWidth: '549px', marginTop: '20px' }}>
+            <Box sx={{ marginTop: '20px', maxWidth: '549px' }}>
               <BarChart
                 refChart={chartRef}
-                width={'549px'}
-                height={'335px'}
-                maxWidthLegend={'369px'}
+                width="549px"
+                height="335px"
+                maxWidthLegend="369px"
                 chartData={methods.getValues('chartData')}
-                legendClassName={'legend-container-bar-chart'}
+                legendClassName="legend-container-bar-chart"
                 labelX={methods.getValues('verticalAxisLabel')}
                 labelY={methods.getValues('horizontalAxisLabel')}
-                isFullStackedChart={true}
-                isStackedChart={true}
+                isFullStackedChart
+                isStackedChart
                 options={{}}
                 showAxisValue={methods.getValues('showAxisLabels')}
               />
@@ -355,7 +333,7 @@ const AddChart = (props) => {
           setDisplayInputLabel(false);
           return (
             <Box sx={{ marginTop: '20px' }}>
-              <Typography fontSize={'18px'} lineHeight={'27px'} fontWeight={700} marginBottom={'24px'}>
+              <Typography fontSize="18px" lineHeight="27px" fontWeight={700} marginBottom="24px">
                 {methods.getValues('chartLabel')}
               </Typography>
               <TableChart chartData={methods.getValues('chartData')} />
@@ -382,20 +360,20 @@ const AddChart = (props) => {
             >
               <Box sx={{ height: '100%' }} display="flex" justifyContent="center">
                 <Box
-                  display={'flex'}
+                  display="flex"
                   sx={{
+                    border: '1px solid rgba(229, 229, 229, 1)',
+                    borderRadius: '10px',
+                    boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+                    minHeight: '211px',
+                    minWidth: '311px',
                     my: 'auto',
                     p: 3,
-                    boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
-                    minWidth: '311px',
-                    minHeight: '211px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(229, 229, 229, 1)',
                   }}
                 >
                   <Stack
                     direction="column"
-                    justifyContent={'space-between'}
+                    justifyContent="space-between"
                     // sx={{ marginBottom: '16px' }}
                     gap="61px"
                     // sx={{ boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)' }}
@@ -405,7 +383,7 @@ const AddChart = (props) => {
                         // sx={(theme) => ({
                         //   color: theme.palette.text.primary,
                         // })}
-                        color={'primary'}
+                        color="primary"
                         fontSize={24}
                         fontWeight="700"
                         lineHeight="31px"
@@ -414,7 +392,7 @@ const AddChart = (props) => {
                       </Typography>
                     </Box>
                     <Box>
-                      <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
+                      <Typography fontSize="36px" fontWeight={400} lineHeight="47px">
                         {(
                           methods
                             .getValues('chartData')
@@ -430,7 +408,7 @@ const AddChart = (props) => {
                       {/* </Box> */}
                     </Box>
                   </Stack>
-                  <Box sx={{ width: '100%' }} display={'flex'} justifyContent={'flex-end'} alignItems={'flex-end'}>
+                  <Box sx={{ width: '100%' }} display="flex" justifyContent="flex-end" alignItems="flex-end">
                     <img src={methods.getValues('imageUrl') || DefaultImageInformationCard} width={40} />
                   </Box>
                 </Box>
@@ -441,8 +419,8 @@ const AddChart = (props) => {
         default: {
           setDisplayInputLabel(false);
           return (
-            <Box sx={{ width: '100%', height: '100%' }} display="flex" justifyContent={'center'} alignItems="center">
-              <Typography fontSize={'18px'} lineHeight="27px" fontWeight={400} color="#BFBFBF">
+            <Box sx={{ height: '100%', width: '100%' }} display="flex" justifyContent="center" alignItems="center">
+              <Typography fontSize="18px" lineHeight="27px" fontWeight={400} color="#BFBFBF">
                 No available
               </Typography>
             </Box>
@@ -451,8 +429,8 @@ const AddChart = (props) => {
       }
     } else {
       return (
-        <Box sx={{ width: '100%', height: '100%' }} display="flex" justifyContent={'center'} alignItems="center">
-          <Typography fontSize={'18px'} lineHeight="27px" fontWeight={400} color="#BFBFBF">
+        <Box sx={{ height: '100%', width: '100%' }} display="flex" justifyContent="center" alignItems="center">
+          <Typography fontSize="18px" lineHeight="27px" fontWeight={400} color="#BFBFBF">
             No available
           </Typography>
         </Box>
@@ -477,11 +455,11 @@ const AddChart = (props) => {
         data[i][element.label] = el;
       });
     });
-    let header = ['', ...chartDetail?.tabular?.datasets?.map((el) => el.label)];
+    const header = ['', ...chartDetail?.tabular?.datasets?.map((el) => el.label)];
     const ws = XLSX.utils.book_new();
     XLSX.utils.sheet_add_aoa(ws, [header]);
     XLSX.utils.sheet_add_json(ws, data, { origin: 'A2', skipHeader: true });
-    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+    const wb = { SheetNames: ['data'], Sheets: { data: ws } };
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
     const finalData = new Blob([excelBuffer], { type: '.xlsx' });
     const file = new File([finalData], chartDetail?.tabular?.filename, { lastModified: new Date() });
@@ -491,38 +469,34 @@ const AddChart = (props) => {
     if (id && chartDetail) {
       saveAsExcel();
       const mappingDataFormDetail = {
-        chartType: chartDetail?.chart_type_name,
-        chartTypeId: chartDetail?.chart_type_id,
-        chartLabel: chartDetail.title,
-        chartSubLabel: chartDetail.sub_title,
         chartData: {
+          datasets: chartDetail?.tabular?.datasets.map((el) => ({
+            backgroundColor: chartDetail?.colorway?.[el.label]?.backgroundColor || null,
+            borderColor: chartDetail?.colorway?.[el.label]?.borderColor || null,
+            data: el.data,
+            label: el.label,
+          })),
           labels: chartDetail?.tabular?.labels,
-          datasets: chartDetail?.tabular?.datasets.map((el) => {
-            return {
-              data: el.data,
-              label: el.label,
-              backgroundColor: chartDetail?.colorway?.[el.label]?.backgroundColor || null,
-              borderColor: chartDetail?.colorway?.[el.label]?.borderColor || null,
-            };
-          }),
         },
         chartDataDonutOrPie: {
+          datasets: chartDetail?.tabular?.datasets.map((el) => ({
+            backgroundColor: chartDetail?.colorway?.[el.label]?.backgroundColor || null,
+            borderColor: chartDetail?.colorway?.[el.label]?.borderColor || null,
+            data: el.data,
+            label: el.label,
+          })),
           labels: chartDetail?.tabular?.labels,
-          datasets: chartDetail?.tabular?.datasets.map((el) => {
-            return {
-              data: el.data,
-              label: el.label,
-              backgroundColor: chartDetail?.colorway?.[el.label]?.backgroundColor || null,
-              borderColor: chartDetail?.colorway?.[el.label]?.borderColor || null,
-            };
-          }),
         },
-        verticalAxisLabel: chartDetail?.label_vertical,
+        chartLabel: chartDetail.title,
+        chartSubLabel: chartDetail.sub_title,
+        chartType: chartDetail?.chart_type_name,
+        chartTypeId: chartDetail?.chart_type_id,
         horizontalAxisLabel: chartDetail?.label_horizontal,
         showAxisLabels: chartDetail.show_axis_labels,
+        verticalAxisLabel: chartDetail?.label_vertical,
         ...(chartDetail.chart_type_name === 'Information Chart' ? { imageUrl: chartDetail.image_url } : {}),
       };
-      for (let obj in mappingDataFormDetail) {
+      for (const obj in mappingDataFormDetail) {
         handleChangeForm(obj, mappingDataFormDetail[obj]);
       }
 
@@ -550,14 +524,14 @@ const AddChart = (props) => {
         case 'loading':
           return (
             // <Box display={'flex'} gap={'10px'} flexDirection={'column'} sx={{ maxWidth: '512px', width: '100%' }}>
-            <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
+            <Stack display="flex" justifyContent="center" sx={{ padding: '32px 96px' }}>
               <CircularProgress />
             </Stack>
           );
         case 'success':
           return (
-            <Box display={'flex'} flexDirection={'column'} gap={'16px'}>
-              <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
+            <Box display="flex" flexDirection="column" gap="16px">
+              <Stack display="flex" justifyContent="center" sx={{ padding: '32px 96px' }}>
                 <img src={SuccessImage} />
               </Stack>
               <Button onClick={() => setOpenDialogImport((prev) => ({ ...prev, success: false }))}>OK</Button>
@@ -565,7 +539,7 @@ const AddChart = (props) => {
           );
         case 'deleteChart':
           return (
-            <Box display={'flex'} flexDirection={'column'} gap={'16px'}>
+            <Box display="flex" flexDirection="column" gap="16px">
               <Button onClick={() => setOpenDialogImport((prev) => ({ ...prev, success: false }))}>
                 <WarningOutlined />
                 <Typography>Delete</Typography>
@@ -577,8 +551,8 @@ const AddChart = (props) => {
           return <></>;
         default:
           return (
-            <Box display={'flex'} flexDirection={'column'}>
-              <Stack display={'flex'} justifyContent={'center'} sx={{ padding: '32px 96px' }}>
+            <Box display="flex" flexDirection="column">
+              <Stack display="flex" justifyContent="center" sx={{ padding: '32px 96px' }}>
                 <img src={ErrorImage} />
               </Stack>
               <Button onClick={() => setOpenDialogImport((prev) => ({ ...prev, error: false }))}>OK</Button>
@@ -591,22 +565,22 @@ const AddChart = (props) => {
         open={openDialogImport[typeDialog]}
         PaperProps={{
           style: {
-            width: '100%',
             maxWidth: '320px',
             padding: '32px',
+            width: '100%',
           },
         }}
       >
         <Stack
-          direction={'row'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
           // paddingX={'32px'}
           // paddingTop={'32px'}
-          marginBottom={'16px'}
-          minWidth={'252px'}
+          marginBottom="16px"
+          minWidth="252px"
         >
-          <Typography sx={{ fontWeight: 700, fontSize: '18px', lineHeight: '27px' }}>Import Data</Typography>
+          <Typography sx={{ fontSize: '18px', fontWeight: 700, lineHeight: '27px' }}>Import Data</Typography>
           <IconButton
             aria-label="close"
             onClick={() => setOpenDialogImport((prev) => !prev)}
@@ -616,7 +590,7 @@ const AddChart = (props) => {
           </IconButton>
         </Stack>
         <DialogContent sx={{ padding: 0 }}>
-          <Stack display={'flex'} direction="column" gap={'16px'}>
+          <Stack display="flex" direction="column" gap="16px">
             <Typography>{getLayoutContentText(typeDialog)}</Typography>
             {getLayoutContentAction()}
           </Stack>
@@ -647,15 +621,15 @@ const AddChart = (props) => {
   const handleDeleteChart = () => {
     handleDelete(setOpenDialogDelete);
   };
-  const renderMain = useMemo(() => {
-    return (
+  const renderMain = useMemo(
+    () => (
       <AddOrEditChartContext.Provider value={store}>
         <Stack
           sx={{
             height: '100%',
             width: '100%',
           }}
-          gap={'20px'}
+          gap="20px"
           //   onClick={() => handleClickCover()}
         >
           <Paper sx={{ padding: '32px' }}>
@@ -667,7 +641,7 @@ const AddChart = (props) => {
                   <Typography
                     fontWeight={700}
                     fontSize="30px"
-                    lineHeight={'39px'}
+                    lineHeight="39px"
                     color="primary"
                     sx={{ marginTop: '16px' }}
                   >
@@ -682,8 +656,8 @@ const AddChart = (props) => {
               >
                 Chart Settings
               </Typography> */}
-                  <Box display={'flex'} flexDirection="column">
-                    <Box display={'flex'} alignItems={'center'} gap="10px" sx={{ py: '32px' }}>
+                  <Box display="flex" flexDirection="column">
+                    <Box display="flex" alignItems="center" gap="10px" sx={{ py: '32px' }}>
                       <Button
                         aria-label="close"
                         color="primary"
@@ -695,22 +669,22 @@ const AddChart = (props) => {
                             refInputFileImport.current.click();
                           }
                         }}
-                        disabled={fileImport ? true : false}
+                        disabled={!!fileImport}
                       >
                         <FileOpenOutlinedIcon color="white" />
                         <Typography
                           sx={{ marginLeft: '5px' }}
-                          fontSize={'14px'}
+                          fontSize="14px"
                           fontWeight={400}
-                          lineHeight={'21px'}
-                          color={'#FFFFFF'}
+                          lineHeight="21px"
+                          color="#FFFFFF"
                         >
                           Import
                         </Typography>
                       </Button>
                       {fileImport ? (
-                        <Box display={'flex'} alignItems={'center'}>
-                          <Typography textAlign={'center'} maxWidth={'350px'}>
+                        <Box display="flex" alignItems="center">
+                          <Typography textAlign="center" maxWidth="350px">
                             {fileImport?.name}
                           </Typography>
                           <IconButton
@@ -726,7 +700,7 @@ const AddChart = (props) => {
                         <Typography>No data imported yet.</Typography>
                       )}
                     </Box>
-                    <Box display={'flex'} flexDirection={'column'} gap="16px">
+                    <Box display="flex" flexDirection="column" gap="16px">
                       <Autocomplete
                         fullWidth
                         // freeSolo
@@ -742,11 +716,11 @@ const AddChart = (props) => {
                           <Paper
                             sx={(theme) => ({
                               border: `${theme.palette.primary.main} 1px solid`,
-                              marginTop: '4px',
                               borderRadius: '10px',
+                              marginTop: '4px',
                             })}
                             {...props}
-                          ></Paper>
+                          />
                         )}
                         renderInput={(params) => (
                           <TextField
@@ -762,23 +736,23 @@ const AddChart = (props) => {
                           handleChangeForm('chartType', newValue?.name || '');
                         }}
                         sx={{ padding: '9px 0px 19px 0px' }}
-                      ></Autocomplete>
+                      />
                       {methods.getValues('chartType') === 'Information Chart' && (
                         <Autocomplete
                           fullWidth
                           disablePortal
                           options={[{ label: 'Median', value: 'Median' }]}
-                          value={'Median'}
-                          inputValue={'Median'}
+                          value="Median"
+                          inputValue="Median"
                           PaperComponent={(props) => (
                             <Paper
                               sx={(theme) => ({
                                 border: `${theme.palette.primary.main} 1px solid`,
-                                marginTop: '4px',
                                 borderRadius: '10px',
+                                marginTop: '4px',
                               })}
                               {...props}
-                            ></Paper>
+                            />
                           )}
                           renderInput={(params) => (
                             <TextField
@@ -793,7 +767,7 @@ const AddChart = (props) => {
                           //   handleChangeForm('chartType', newValue?.value || '');
                           // }}
                           sx={{ padding: '9px 0px 19px 0px' }}
-                        ></Autocomplete>
+                        />
                       )}
                       <TextField
                         {...methods.register('chartLabel')}
@@ -816,7 +790,7 @@ const AddChart = (props) => {
                         InputLabelProps={{ shrink: true }}
                         onChange={(e) => handleChangeForm('chartLabel', e.target.value)}
                         sx={{ padding: '9px 0px 19px 0px' }}
-                      ></TextField>
+                      />
                       <TextField
                         {...methods.register('chartSubLabel')}
                         label={
@@ -838,20 +812,20 @@ const AddChart = (props) => {
                         InputLabelProps={{ shrink: true }}
                         onChange={(e) => handleChangeForm('chartSubLabel', e.target.value)}
                         sx={{ padding: '9px 0px 19px 0px' }}
-                      ></TextField>
+                      />
                       {displayInputLabel && (
                         <>
                           <Box
-                            display={'flex'}
-                            justifyContent={'space-between'}
-                            alignItems={'center'}
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
                             sx={{ marginBottom: '16px' }}
                           >
                             <Box>
-                              <Typography fontWeight={400} size="14px" lineHeight={'21px'} color={'#000000'}>
+                              <Typography fontWeight={400} size="14px" lineHeight="21px" color="#000000">
                                 Hide or Show Axis Value
                               </Typography>
-                              <Typography fontWeight={400} size="12px" lineHeight={'16px'} color={'#808080'}>
+                              <Typography fontWeight={400} size="12px" lineHeight="16px" color="#808080">
                                 Switch OFF to make the axis X and Y value hide, and Switch ON to show the axis
                               </Typography>
                             </Box>
@@ -863,7 +837,7 @@ const AddChart = (props) => {
                               }}
                             />
                           </Box>
-                          <Stack direction={'row'} gap="16px">
+                          <Stack direction="row" gap="16px">
                             <TextField
                               {...methods.register('verticalAxisLabel')}
                               label="Vertical Axis Label"
@@ -873,7 +847,7 @@ const AddChart = (props) => {
                               // value={methods.getValues('verticalAxisLabel')}
                               onChange={(e) => handleChangeForm('verticalAxisLabel', e.target.value)}
                               sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                            ></TextField>
+                            />
                             <TextField
                               {...methods.register('horizontalAxisLabel')}
                               label="Horizontal Axis Label"
@@ -883,7 +857,7 @@ const AddChart = (props) => {
                               // value={methods.getValues('horizontalAxisLabel')}
                               onChange={(e) => handleChangeForm('horizontalAxisLabel', e.target.value)}
                               sx={{ padding: '9px 0px 19px 0px', width: '100%' }}
-                            ></TextField>
+                            />
                           </Stack>
                         </>
                       )}
@@ -892,14 +866,14 @@ const AddChart = (props) => {
                 </Box>
                 {/* </Paper> */}
               </Grid>
-              <Grid item xl={1} lg={0.5} justifyContent={'center'} display={'flex'}>
+              <Grid item xl={1} lg={0.5} justifyContent="center" display="flex">
                 <Divider light orientation={+window.innerWidth >= 1200 ? 'vertical' : 'horizontal'} />
               </Grid>
               <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
                 {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', minWidth: '548px', mt: 1 }}> */}
                 <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
-                  <Box display={'flex'} justifyContent={'space-between'}>
-                    <Typography fontSize="24px" fontWeight={700} lineHeight="31px" color={'primary'}>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography fontSize="24px" fontWeight={700} lineHeight="31px" color="primary">
                       Preview
                     </Typography>
                     {JSON.stringify(methods.getValues('chartData')) !== '{}' && (
@@ -922,21 +896,21 @@ const AddChart = (props) => {
                     <Box
                       sx={{
                         position: 'absolute',
-                        zIndex: '2',
                         top: '100px',
+                        zIndex: '2',
                       }}
                     >
                       <Box
                         sx={{
-                          position: 'fixed',
-                          top: '0px',
-                          right: '0px',
                           bottom: '0px',
                           left: '0px',
+                          position: 'fixed',
+                          right: '0px',
+                          top: '0px',
                         }}
                         onClick={handleClickCover}
-                      ></Box>
-                      <CustomColorPicker codeColor={codeColor} onChange={() => {}}></CustomColorPicker>
+                      />
+                      <CustomColorPicker codeColor={codeColor} onChange={() => {}} />
                     </Box>
                   )}
                 </Box>
@@ -998,7 +972,7 @@ const AddChart = (props) => {
             }}
             typeChart={methods.getValues('chartType')}
             onCancel={() => setOpenDialogColorPicker((prev) => !prev)}
-          ></DialogColorPicker>
+          />
           <DialogStatusImport
             openDialogImport={openDialog}
             setOpenDialogImport={setOpenDialog}
@@ -1009,32 +983,32 @@ const AddChart = (props) => {
             open={openDialogDelete}
             setOpen={() => setOpenDialogDelete((prev) => !prev)}
             IconConfrim={() => <ErrorOutline />}
-            cancelButonText={'Cancel'}
-            confrimButtonText={'Delete'}
-            header={'Delete Chart'}
-            text={'Are you sure you want to delete this chart?'}
-            typeButtonConfrim={'error'}
+            cancelButonText="Cancel"
+            confrimButtonText="Delete"
+            header="Delete Chart"
+            text="Are you sure you want to delete this chart?"
+            typeButtonConfrim="error"
             onConfrimOk={handleDeleteChart}
           />
           <Paper
             sx={{ borderRadius: 1.25, display: 'flex', justifyContent: 'space-between', maxHeight: '105px', mt: 1 }}
           >
             {id && (
-              <Box sx={{ width: '100%', my: 'auto', p: 4 }}>
+              <Box sx={{ my: 'auto', p: 4, width: '100%' }}>
                 <Button
-                  variant={'outlined'}
+                  variant="outlined"
                   color="error"
                   sx={{
+                    backgroundColor: '#E563630D',
                     maxWidth: '286px',
                     width: '100%',
-                    backgroundColor: '#E563630D',
                   }}
                   onClick={() => {
                     setChartId(id);
                     setOpenDialogDelete((prev) => !prev);
                   }}
                 >
-                  <Box display={'flex'} gap={'8px'} alignItems={'center'}>
+                  <Box display="flex" gap="8px" alignItems="center">
                     <DeleteFill />
                     <Typography sx={(theme) => ({ color: theme.palette.error.light })}>Delete Chart</Typography>
                   </Box>
@@ -1042,11 +1016,11 @@ const AddChart = (props) => {
               </Box>
             )}
             <Box
-              sx={{ width: '100%', my: 'auto', p: 4 }}
+              sx={{ my: 'auto', p: 4, width: '100%' }}
               display="flex"
-              justifyContent={'flex-end'}
+              justifyContent="flex-end"
               alignItems="center"
-              gap={'16px'}
+              gap="16px"
             >
               {/* <Typography fontWeight={700} fontSize="18px" lineHeight="27px" color="primary">
             Create column?
@@ -1075,8 +1049,9 @@ const AddChart = (props) => {
           </Paper>
         </Stack>
       </AddOrEditChartContext.Provider>
-    );
-  }, [store, methods.getValues()]);
+    ),
+    [store, methods.getValues()]
+  );
   return renderMain;
 };
 

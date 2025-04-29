@@ -1,4 +1,4 @@
-import { Box, InputAdornment, TextField, CircularProgress } from '@mui/material';
+import { Box, InputAdornment, TextField, CircularProgress, Stack, Alert } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import Logo from '@/assets/logo-light.png';
 import MPlusIcon from '@/components/Icon';
@@ -38,6 +38,13 @@ const Login = () => {
         })}
       >
         <CardContainer>
+          {error && (
+            <Stack sx={{ mb: 3 }}>
+              <Alert severity="error" sx={{ alignItems: 'center' }}>
+                Your email or password is incorrect!
+              </Alert>
+            </Stack>
+          )}
           <Image src={Logo} />
           <HeaderCard>Log in</HeaderCard>
           <Content>

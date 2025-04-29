@@ -10,7 +10,7 @@ const axios = Axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-axios.interceptors.request.use(function (config) {
+axios.interceptors.request.use((config) => {
   const token = localStorage.getItem(tokenString);
   config.headers.Authorization = token.replaceAll('"', '');
 
@@ -18,7 +18,7 @@ axios.interceptors.request.use(function (config) {
 });
 
 axios.interceptors.response.use(
-  function (res) {
+  (res) => {
     if (res?.data?.error) {
       enqueueSnackbar(String(res?.data?.error), {
         variant: 'errorSnackbar',
@@ -28,7 +28,7 @@ axios.interceptors.response.use(
     return res;
   },
   (err) => {
-    enqueueSnackbar(err?.response?.data?.message, {
+    enqueueSnackbar(String(err?.response?.data?.data?.[0]?.message || err?.response?.data?.message), {
       variant: 'errorSnackbar',
     });
 

@@ -1,31 +1,12 @@
 import { AppContext } from '@/context/AppContext';
-import { sideBarContentWidth } from '@/helpers/Constants';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import {
   Stack,
   Box,
   Typography,
   Paper,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  tableCellClasses,
   IconButton,
-  TablePagination,
   Button,
-  Pagination,
-  TextField,
-  Autocomplete,
-  Dialog,
-  DialogContent,
-  Radio,
-  FormControlLabel,
   Grid,
-  RadioGroup,
-  Backdrop,
   ToggleButton,
   ToggleButtonGroup,
   styled,
@@ -33,27 +14,25 @@ import {
   MenuItem,
   Tooltip,
 } from '@mui/material';
-import { useState, createContext, useMemo, Fragment, useCallback, useEffect, useContext } from 'react';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import BarChart from '../../components/chart/BarChart';
-import LineChart from '../../components/chart/LineChart';
-import { BarData, LineData } from '../../helpers/DummyDataChart';
-import { BarChartIcon, ChevronDownRed, DragIndicator, EditIcon, ExportFiles, Gear } from '../../helpers/Icons';
+import { useState, createContext, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDashboard } from '../../hooks/useDashboard';
-import DonutChart from '../../components/chart/DonutChart';
-import PieChart from '../../components/chart/PieChart';
 import DefaultImageInformationCard from '@/assets/images/default-image-infomation-card.png';
-import TableChart from '../../components/chart/TableChart';
-import AreaChart from '../../components/chart/AreaChart';
-import { useHomeStore, HomeContext } from './HomeContext';
 import { AppBarContext } from '@/context/AppBarContext';
-import ModalLayout from './components/ModalLayout';
-import Loading from '../../components/Loading';
-import GeneralDeletePopup from '../../components/DeletePopup';
 import html2canvas from 'html2canvas';
 import pdfConverter from 'jspdf';
 import * as XLSX from 'xlsx';
+import BarChart from '../../components/chart/BarChart';
+import LineChart from '../../components/chart/LineChart';
+import { BarChartIcon, ChevronDownRed, EditIcon, ExportFiles } from '../../helpers/Icons';
+import { useDashboard } from '../../hooks/useDashboard';
+import DonutChart from '../../components/chart/DonutChart';
+import PieChart from '../../components/chart/PieChart';
+import TableChart from '../../components/chart/TableChart';
+import AreaChart from '../../components/chart/AreaChart';
+import { useHomeStore, HomeContext } from './HomeContext';
+import ModalLayout from './components/ModalLayout';
+import Loading from '../../components/Loading';
+import GeneralDeletePopup from '../../components/DeletePopup';
 
 // import { useDashboard } from '../../hooks/useDashboard';
 
@@ -124,41 +103,38 @@ const Home = () => {
   // }, [store.userId, store.sectionType]);
   const renderChart = (data, indexParent, indexChild) => {
     const mappingDataChart = (data, type) => ({
-      labels: [...data?.tabular?.labels],
       datasets:
         type === 'Pie Chart' || type === 'Donut Chart'
-          ? data.tabular.datasets?.map((el, i) => {
-              return {
-                data: el.data,
-                label: el.label,
-                backgroundColor: data.colorway[el.label]?.backgroundColor,
-                borderColor: data.colorway[el.label]?.borderColor,
-                // data: data?.tabular?.datasets.reduce((flatArray, element) => {
-                //   return flatArray.concat(element?.data);
-                // }, []),
-                // label: data?.tabular?.datasets[0].label,
-                // backgroundColor: data?.colorway[data.tabular.labels[0]]?.backgroundColor,
-                // borderColor: data?.colorway[data.tabular.labels[0]]?.borderColor,
-              };
-            })
-          : data.tabular.datasets?.map((el, i) => {
-              return {
-                data: el.data,
-                label: el.label,
-                backgroundColor: data.colorway[el.label]?.backgroundColor,
-                borderColor: data.colorway[el.label]?.borderColor,
-                ...(type === 'Area Chart'
-                  ? {
-                      fill: {
-                        target: 'origin', // 3. Set the fill options
-                        above:
-                          data.colorway[el.label]?.backgroundColor?.replace('1)', '0.3)') ||
-                          data.colorway[el.label]?.backgroundColor,
-                      },
-                    }
-                  : {}),
-              };
-            }),
+          ? data.tabular.datasets?.map((el, i) => ({
+              backgroundColor: data.colorway[el.label]?.backgroundColor,
+              borderColor: data.colorway[el.label]?.borderColor,
+              data: el.data,
+              label: el.label,
+              // data: data?.tabular?.datasets.reduce((flatArray, element) => {
+              //   return flatArray.concat(element?.data);
+              // }, []),
+              // label: data?.tabular?.datasets[0].label,
+              // backgroundColor: data?.colorway[data.tabular.labels[0]]?.backgroundColor,
+              // borderColor: data?.colorway[data.tabular.labels[0]]?.borderColor,
+            }))
+          : data.tabular.datasets?.map((el, i) => ({
+              backgroundColor: data.colorway[el.label]?.backgroundColor,
+              borderColor: data.colorway[el.label]?.borderColor,
+              data: el.data,
+              label: el.label,
+              ...(type === 'Area Chart'
+                ? {
+                    fill: {
+                      // 3. Set the fill options
+                      above:
+                        data.colorway[el.label]?.backgroundColor?.replace('1)', '0.3)') ||
+                        data.colorway[el.label]?.backgroundColor,
+                      target: 'origin',
+                    },
+                  }
+                : {}),
+            })),
+      labels: [...data?.tabular?.labels],
     });
     switch (data.chart?.chart_type_name) {
       case 'Donut Chart': {
@@ -169,7 +145,7 @@ const Home = () => {
             store={store}
             chartElement={
               <DonutChart
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
                 chartData={mappingDataChart(data.chart, data.chart.chart_type_name)}
                 labelX={data?.chart.label_vertical}
                 labelY={data?.chart?.label_horizontal}
@@ -178,9 +154,9 @@ const Home = () => {
                   maintainAspectRatio: false,
                 }}
                 layoutWidth={data?.layout}
-              ></DonutChart>
+              />
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
         );
       }
@@ -189,11 +165,11 @@ const Home = () => {
           <HeaderContainerChart
             data={data}
             store={store}
-            className={'container-chart' + data.chart.id}
+            className={`container-chart${data.chart.id}`}
             chartElement={
               <PieChart
                 // className={'pie' + data.chart.id}
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
                 chartData={mappingDataChart(data.chart, data.chart.chart_type_name)}
                 labelX={data?.chart.label_vertical}
                 labelY={data?.chart?.label_horizontal}
@@ -203,21 +179,21 @@ const Home = () => {
                 }}
                 // isWidth25={data.layout === 25 ? true : false}
                 layoutWidth={data?.layout}
-              ></PieChart>
+              />
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
         );
       }
       case 'Line Chart': {
         return (
           <HeaderContainerChart
-            useButtonGroupAxis={true}
+            useButtonGroupAxis
             data={data}
             store={store}
             chartElement={
               <LineChart
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
                 chartData={mappingDataChart(data.chart, data.chart.chart_type_name)}
                 labelX={data?.chart.label_vertical}
                 labelY={data?.chart?.label_horizontal}
@@ -226,9 +202,9 @@ const Home = () => {
                   maintainAspectRatio: false,
                 }}
                 showAxisValue={data?.chart?.show_axis_labels}
-              ></LineChart>
+              />
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
         );
       }
@@ -236,23 +212,23 @@ const Home = () => {
         return (
           <HeaderContainerChart
             data={data}
-            useButtonGroupAxis={true}
+            useButtonGroupAxis
             store={store}
             chartElement={
               <BarChart
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
                 chartData={mappingDataChart(data.chart, data.chart.chart_type_name)}
                 labelX={data?.chart.label_vertical}
                 labelY={data?.chart?.label_horizontal}
                 options={{
                   maintainAspectRatio: false,
                 }}
-                indexAxis={'y'}
+                indexAxis="y"
                 legendClassName={`legend-container-bar-chart-${indexParent}${indexChild}`}
                 showAxisValue={data?.chart?.show_axis_labels}
-              ></BarChart>
+              />
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
         );
       }
@@ -260,11 +236,11 @@ const Home = () => {
         return (
           <HeaderContainerChart
             data={data}
-            useButtonGroupAxis={true}
+            useButtonGroupAxis
             store={store}
             chartElement={
               <BarChart
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
                 chartData={mappingDataChart(data.chart, data.chart.chart_type_name)}
                 labelX={data?.chart.label_vertical}
                 labelY={data?.chart?.label_horizontal}
@@ -276,9 +252,9 @@ const Home = () => {
                 legendClassName={`legend-container-column-chart-${indexParent}${indexChild}`}
                 // labelY={data.horizontalAxisLabel}
                 showAxisValue={data?.chart?.show_axis_labels}
-              ></BarChart>
+              />
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
         );
       }
@@ -287,10 +263,10 @@ const Home = () => {
           <HeaderContainerChart
             data={data}
             store={store}
-            useButtonGroupAxis={true}
+            useButtonGroupAxis
             chartElement={
               <BarChart
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
                 chartData={mappingDataChart(data.chart, data.chart.chart_type_name)}
                 labelX={data?.chart.label_vertical}
                 labelY={data?.chart?.label_horizontal}
@@ -298,14 +274,14 @@ const Home = () => {
                 options={{
                   maintainAspectRatio: false,
                 }}
-                isStackedChart={true}
+                isStackedChart
                 // labelX={data.verticalAxisLabel}
                 legendClassName={`legend-container-stacked-chart-${indexParent}${indexChild}`}
                 // labelY={data.horizontalAxisLabel}
                 showAxisValue={data?.chart?.show_axis_labels}
-              ></BarChart>
+              />
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
         );
       }
@@ -314,10 +290,10 @@ const Home = () => {
           <HeaderContainerChart
             data={data}
             store={store}
-            useButtonGroupAxis={true}
+            useButtonGroupAxis
             chartElement={
               <BarChart
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
                 chartData={mappingDataChart(data.chart, data.chart.chart_type_name)}
                 labelX={data?.chart.label_vertical}
                 labelY={data?.chart?.label_horizontal}
@@ -325,15 +301,15 @@ const Home = () => {
                 options={{
                   maintainAspectRatio: false,
                 }}
-                isFullStackedChart={true}
-                isStackedChart={true}
+                isFullStackedChart
+                isStackedChart
                 // labelX={data.verticalAxisLabel}
                 legendClassName={`legend-container-stacked-full-chart-${indexParent}${indexChild}`}
                 // labelY={data.horizontalAxisLabel}
                 showAxisValue={data?.chart?.show_axis_labels}
-              ></BarChart>
+              />
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
         );
       }
@@ -346,10 +322,10 @@ const Home = () => {
             chartElement={
               <TableChart
                 chartData={data?.chart}
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
-              ></TableChart>
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
+              />
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
           // <Paper
           //   sx={{
@@ -413,10 +389,10 @@ const Home = () => {
           <HeaderContainerChart
             data={data}
             store={store}
-            useButtonGroupAxis={true}
+            useButtonGroupAxis
             chartElement={
               <AreaChart
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
                 chartData={mappingDataChart(data.chart, data.chart.chart_type_name)}
                 labelX={data?.chart.label_vertical}
                 labelY={data?.chart?.label_horizontal}
@@ -432,10 +408,10 @@ const Home = () => {
                 // width={setWidthChart(index, data.chartType)}
                 // height={309}
 
-                isAreaChart={true}
-              ></AreaChart>
+                isAreaChart
+              />
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
         );
       }
@@ -450,20 +426,20 @@ const Home = () => {
                 sx={{ height: '100%' }}
                 display="flex"
                 justifyContent="center"
-                className={data?.chart?.chart_type_name.replace(' ', '-') + '-' + data.chart.id}
+                className={`${data?.chart?.chart_type_name.replace(' ', '-')}-${data.chart.id}`}
               >
                 <Box
-                  display={'flex'}
+                  display="flex"
                   sx={{
+                    boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
                     my: 'auto',
                     p: 3,
-                    boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
                     ...(data?.layout > 20
-                      ? { minWidth: '280px', minHeight: '211px' }
-                      : { minWidth: '230px', minHeight: '211px' }),
+                      ? { minHeight: '211px', minWidth: '280px' }
+                      : { minHeight: '211px', minWidth: '230px' }),
 
-                    borderRadius: '10px',
                     border: '1px solid rgba(229, 229, 229, 1)',
+                    borderRadius: '10px',
                   }}
                 >
                   <Stack
@@ -478,7 +454,7 @@ const Home = () => {
                         // sx={(theme) => ({
                         //   color: theme.palette.text.primary,
                         // })}
-                        color={'primary'}
+                        color="primary"
                         fontSize={24}
                         fontWeight="700"
                         lineHeight="31px"
@@ -487,22 +463,22 @@ const Home = () => {
                       </Typography>
                     </Box>
                     <Box>
-                      <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
+                      <Typography fontSize="36px" fontWeight={400} lineHeight="47px">
                         {(
                           data.chart.tabular.datasets.flatMap((el) => el.data).reduce((a, b) => a + b, 0) /
                           data.chart.tabular.datasets.flatMap((el) => el.data).length
                         ).toFixed(2)}
                       </Typography>
-                      <Box display="flex" alignItems={'center'}>
+                      <Box display="flex" alignItems="center">
                         <ChevronDownRed />
-                        <Typography fontSize={'24px'} fontWeight={400} lineHeight="31px">
+                        <Typography fontSize="24px" fontWeight={400} lineHeight="31px">
                           {' '}
                           1045
                         </Typography>
                       </Box>
                     </Box>
                   </Stack>
-                  <Box sx={{ width: '100%' }} display={'flex'} justifyContent={'flex-end'} alignItems={'flex-end'}>
+                  <Box sx={{ width: '100%' }} display="flex" justifyContent="flex-end" alignItems="flex-end">
                     <img src={data?.chart.image_url || DefaultImageInformationCard} width={40} />
                     {/* <Typography fontSize={'36px'} fontWeight={400} lineHeight="47px">
                   10.638
@@ -518,7 +494,7 @@ const Home = () => {
                 </Box>
               </Box>
             }
-            indexContent={{ parent: indexParent, child: indexChild }}
+            indexContent={{ child: indexChild, parent: indexParent }}
           />
         );
       }
@@ -546,10 +522,10 @@ const Home = () => {
   // }, [store]);
   const onSaveLayoutOption = async () => {
     const payload = {
+      section_type: location?.pathname?.slice(1),
       sections: sizeLayoutData[selectedLayout]?.map((data) => ({
         layout: +getTextLayout(data)?.slice(0, -1),
       })),
-      section_type: location?.pathname?.slice(1),
       user_id: clientSelected?.id,
     };
     handleClick(payload);
@@ -565,7 +541,7 @@ const Home = () => {
         message="Are you sure you want to delete this section?"
       />
       <Stack
-        direction={'column'}
+        direction="column"
         sx={{
           height: '100vh',
           // overflow: 'auto',
@@ -575,109 +551,105 @@ const Home = () => {
       >
         {/* {renderDashboard} */}
         <Stack direction="column" gap="20px">
-          {sectionList?.map((data, index) => {
-            return (
-              <Grid container gap={'20px'} flexWrap={'nowrap'}>
-                {!data.every((element) => element.hide) &&
-                  data.map((el, indexChild) => {
-                    return (
-                      <Grid
-                        item
-                        xl={getGridNumber(el.layout)}
-                        lg={getGridNumber(el.layout)}
-                        sx={{
-                          border: (theme) =>
-                            JSON.stringify(el.chart) === '{}'
-                              ? !el.hide || (data.some((el) => !el.hide) && el.hide)
-                                ? `3px dashed ${theme.palette.primary.main}`
-                                : 0
-                              : 0,
-                          width: getTextLayout(el),
-                          ...(JSON.stringify(el.chart) === '{}'
-                            ? {
-                                minHeight: '434px',
-                                height: '100%',
-                              }
-                            : {}),
-                        }}
-                        // display={'flex'}
-                        // justifyContent={'center'}
-                        // alignItems={'center'}
-                        // flexDirection={'column'}
-                        gap="24px"
-                      >
-                        {JSON.stringify(el.chart) === '{}' ? (
-                          (!el?.hide && !appCtxStore?.isUserRole) ||
-                          (data.some((el) => !el.hide) && !appCtxStore?.isUserRole) ? (
-                            <Box
-                              display={'flex'}
-                              flexDirection={'column'}
-                              justifyContent={'center'}
-                              alignItems={'center'}
-                              sx={{ height: '100%' }}
-                            >
-                              <Button
+          {sectionList?.map((data, index) => (
+            <Grid container gap="20px" flexWrap="nowrap">
+              {!data.every((element) => element.hide) &&
+                data.map((el, indexChild) => (
+                  <Grid
+                    item
+                    xl={getGridNumber(el.layout)}
+                    lg={getGridNumber(el.layout)}
+                    sx={{
+                      border: (theme) =>
+                        JSON.stringify(el.chart) === '{}'
+                          ? !el.hide || (data.some((el) => !el.hide) && el.hide)
+                            ? `3px dashed ${theme.palette.primary.main}`
+                            : 0
+                          : 0,
+                      width: getTextLayout(el),
+                      ...(JSON.stringify(el.chart) === '{}'
+                        ? {
+                            height: '100%',
+                            minHeight: '434px',
+                          }
+                        : {}),
+                    }}
+                    // display={'flex'}
+                    // justifyContent={'center'}
+                    // alignItems={'center'}
+                    // flexDirection={'column'}
+                    gap="24px"
+                  >
+                    {JSON.stringify(el.chart) === '{}' ? (
+                      (!el?.hide && !appCtxStore?.isUserRole) ||
+                      (data.some((el) => !el.hide) && !appCtxStore?.isUserRole) ? (
+                        <Box
+                          display="flex"
+                          flexDirection="column"
+                          justifyContent="center"
+                          alignItems="center"
+                          sx={{ height: '100%' }}
+                        >
+                          <Button
+                            onClick={() => {
+                              localStorage.setItem('indexChart', `{parent: "${index}", child: "${indexChild}"}`);
+                              localStorage.setItem('sectionId', el.id);
+                              localStorage.setItem('optionChart', `${el.layout}%`);
+                              // if (el === 3) {
+                              //   localStorage.setItem('option25', true);
+                              // } else {
+                              //   if (localStorage.option25) {
+                              //     localStorage.removeItem('option25');
+                              //   }
+                              // }
+                              navigate('add-chart');
+                            }}
+                          >
+                            <BarChartIcon />
+                            <Typography fontWeight={400} fontSize="14px" lineHeight="21px" color="white">
+                              Add Chart
+                            </Typography>
+                          </Button>
+                          {!el.hide && (
+                            <Box display="flex" gap="4px">
+                              <Typography fontWeight={400} fontSize="12px" lineHeight="18px">
+                                or{' '}
+                              </Typography>
+                              <Typography
+                                fontWeight={400}
+                                fontSize="12px"
+                                lineHeight="18px"
+                                sx={{ color: '#E56363', cursor: 'pointer', textDecoration: 'underline' }}
                                 onClick={() => {
-                                  localStorage.setItem('indexChart', `{parent: "${index}", child: "${indexChild}"}`);
-                                  localStorage.setItem('sectionId', el.id);
-                                  localStorage.setItem('optionChart', el.layout + '%');
-                                  // if (el === 3) {
-                                  //   localStorage.setItem('option25', true);
-                                  // } else {
-                                  //   if (localStorage.option25) {
-                                  //     localStorage.removeItem('option25');
-                                  //   }
-                                  // }
-                                  navigate('/home/add-chart');
+                                  setAction('update');
+                                  setSectionId(el.id);
+                                  // setSectionType('')
+                                  setOpenPopupDelete(true);
                                 }}
                               >
-                                <BarChartIcon></BarChartIcon>
-                                <Typography fontWeight={400} fontSize={'14px'} lineHeight={'21px'} color={'white'}>
-                                  Add Chart
-                                </Typography>
-                              </Button>
-                              {!el.hide && (
-                                <Box display={'flex'} gap="4px">
-                                  <Typography fontWeight={400} fontSize="12px" lineHeight={'18px'}>
-                                    or{' '}
-                                  </Typography>
-                                  <Typography
-                                    fontWeight={400}
-                                    fontSize="12px"
-                                    lineHeight={'18px'}
-                                    sx={{ textDecoration: 'underline', color: '#E56363', cursor: 'pointer' }}
-                                    onClick={() => {
-                                      setAction('update');
-                                      setSectionId(el.id);
-                                      // setSectionType('')
-                                      setOpenPopupDelete(true);
-                                    }}
-                                  >
-                                    delete this section
-                                  </Typography>
-                                </Box>
-                              )}
+                                delete this section
+                              </Typography>
                             </Box>
-                          ) : (
-                            <Box
-                              display={'flex'}
-                              flexDirection={'column'}
-                              justifyContent={'center'}
-                              alignItems={'center'}
-                              sx={{ height: '100%' }}
-                            >
-                              <Typography>No chart created yet.</Typography>
-                            </Box>
-                          )
-                        ) : (
-                          renderChart(el, index, indexChild)
-                        )}
-                      </Grid>
-                    );
-                  })}
-              </Grid>
-            );
-          })}
+                          )}
+                        </Box>
+                      ) : (
+                        <Box
+                          display="flex"
+                          flexDirection="column"
+                          justifyContent="center"
+                          alignItems="center"
+                          sx={{ height: '100%' }}
+                        >
+                          <Typography>No chart created yet.</Typography>
+                        </Box>
+                      )
+                    ) : (
+                      renderChart(el, index, indexChild)
+                    )}
+                  </Grid>
+                ))}
+            </Grid>
+          ))}
         </Stack>
         <ModalLayout
           isLayoutModalOpen={openPopup}
@@ -690,37 +662,31 @@ const Home = () => {
         />
         {!clientSelected && !appCtxStore?.isUserRole && (
           <Stack
-            direction={'column'}
-            justifyContent={'center'}
-            alignItems={'center'}
-            height={'100%'}
-            gap={'24px'}
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
+            height="100%"
+            gap="24px"
             // maxWidth={'265px'}
           >
-            <Box maxWidth={'265px'}>
-              <Typography
-                fontSize="16px"
-                fontWeight={400}
-                lineHeight={'24px'}
-                textAlign={'center'}
-                marginBottom={'24px'}
-              >
+            <Box maxWidth="265px">
+              <Typography fontSize="16px" fontWeight={400} lineHeight="24px" textAlign="center" marginBottom="24px">
                 You haven't selected a client yet, select one to see the chart.
               </Typography>
-              <Button fullWidth color={'primary'} onClick={() => appBarStore.setOpenPopupClient(true)}>
+              <Button fullWidth color="primary" onClick={() => appBarStore.setOpenPopupClient(true)}>
                 Choose Client
               </Button>
             </Box>
           </Stack>
         )}
         {!sectionList?.length && (clientSelected || appCtxStore?.clientSelected) && (
-          <Stack direction={'column'} justifyContent={'center'} alignItems={'center'} height={'100%'} gap={'8px'}>
-            <Typography fontSize="16px" fontWeight={400} lineHeight={'24px'}>
+          <Stack direction="column" justifyContent="center" alignItems="center" height="100%" gap="8px">
+            <Typography fontSize="16px" fontWeight={400} lineHeight="24px">
               No chart created yet.
             </Typography>
             {!appCtxStore?.isUserRole && (
               <Button
-                color={'primary'}
+                color="primary"
                 onClick={() => {
                   setAction('create');
                   setOpenPopup(true);
@@ -734,21 +700,21 @@ const Home = () => {
         {sectionList?.length && !appCtxStore?.isUserRole ? (
           <Paper
             sx={{
+              backgroundColor: 'transparent',
               borderRadius: 1.25,
               display: 'flex',
               maxHeight: '512px',
-              width: '100%',
               mt: 4,
               p: 1,
-              backgroundColor: 'transparent',
+              width: '100%',
             }}
           >
             <Box
-              display={'flex'}
-              gap={'16px'}
+              display="flex"
+              gap="16px"
               justifyContent="center"
-              alignItems={'center'}
-              sx={{ height: '434px', width: '100%', border: (theme) => `3px dashed ${theme.palette.primary.main}` }}
+              alignItems="center"
+              sx={{ border: (theme) => `3px dashed ${theme.palette.primary.main}`, height: '434px', width: '100%' }}
             >
               <Button
                 variant="outlined"
@@ -780,14 +746,14 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
   const navigate = useNavigate();
   const { handleChangeAxis } = store;
   const MuiCustomToggleButton = styled(ToggleButton)(({ theme }) => ({
-    textTransform: 'none',
     '&.Mui-selected': {
-      color: 'white',
       backgroundColor: theme.palette.primary.main,
+      color: 'white',
     },
     '&.Mui-selected:hover': {
       backgroundColor: theme.palette.primary.dark,
     },
+    textTransform: 'none',
   }));
   const [showAxisValue, setShowAxisValue] = useState(
     // dashboardContent[indexContent?.parent][indexContent?.child]?.showAxisValue
@@ -800,8 +766,8 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
       }
       const but = e.target;
       but.style.display = 'none';
-      let input = window.document.getElementsByClassName(
-        data.chart.chart_type_name.replace(' ', '-') + '-' + data.chart.id
+      const input = window.document.getElementsByClassName(
+        `${data.chart.chart_type_name.replace(' ', '-')}-${data.chart.id}`
       )[0];
 
       html2canvas(input).then((canvas) => {
@@ -813,7 +779,7 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
         const pdfHeight = data.layout > 25 ? (imgProps.height * pdfWidth) / imgProps.width : input.clientHeight;
 
         pdf.addImage(img, 'png', 0, 10, pdfWidth, pdfHeight);
-        pdf.save(clientSelected?.company_name + ' - ' + data?.chart?.title + '.pdf');
+        pdf.save(`${clientSelected?.company_name} - ${data?.chart?.title}.pdf`);
         but.style.display = 'block';
         store.setIsLoading(false);
         if (isAll) {
@@ -831,16 +797,16 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
           mapData[i][element.label] = el;
         });
       });
-      let header = ['', ...data.chart?.tabular?.datasets?.map((el) => el.label)];
+      const header = ['', ...data.chart?.tabular?.datasets?.map((el) => el.label)];
       const ws = XLSX.utils.book_new();
       XLSX.utils.sheet_add_aoa(ws, [header]);
       XLSX.utils.sheet_add_json(ws, mapData, { origin: 'A2', skipHeader: true });
-      const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+      const wb = { SheetNames: ['data'], Sheets: { data: ws } };
       const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
       const finalData = new Blob([excelBuffer], { type: '.xlsx' });
-      const filename = clientSelected?.company_name + ' - ' + data?.chart?.title + '.xlsx';
-      let url = window.URL.createObjectURL(finalData);
-      let a = document.createElement('a');
+      const filename = `${clientSelected?.company_name} - ${data?.chart?.title}.xlsx`;
+      const url = window.URL.createObjectURL(finalData);
+      const a = document.createElement('a');
       a.href = url;
       a.download = filename;
       a.click();
@@ -869,9 +835,9 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
   // useEffect(() => {
   // }, [store?.sectionList]);
   const optionMenuDownload = [
-    { value: 'pdf', title: 'Download as Pdf' },
-    { value: 'excel', title: 'Download as Excel' },
-    { value: 'all', title: 'Download All Format' },
+    { title: 'Download as Pdf', value: 'pdf' },
+    { title: 'Download as Excel', value: 'excel' },
+    { title: 'Download All Format', value: 'all' },
   ];
   // const BlueOnGreenTooltip = withStyles({
   //   tooltip: {
@@ -884,22 +850,22 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
       key={location?.pathname?.slice(1)}
       sx={{
         borderRadius: 1.25,
-        p: 4,
         height: '100%',
+        p: 4,
       }}
       // key={sectionType}
       // className={className}
     >
-      <Box display={'flex'} gap={'16px'} justifyContent="space-between" marginBottom={'24px'}>
+      <Box display="flex" gap="16px" justifyContent="space-between" marginBottom="24px">
         <Box>
-          <Typography color={'primary'} fontSize={24} fontWeight="700" lineHeight="31px">
+          <Typography color="primary" fontSize={24} fontWeight="700" lineHeight="31px">
             {data?.chart?.title}
           </Typography>
-          <Typography color={'primary'} fontSize={16} fontWeight="500" lineHeight="24px">
+          <Typography color="primary" fontSize={16} fontWeight="500" lineHeight="24px">
             {data?.chart?.sub_title}
           </Typography>
         </Box>
-        <Box display={'flex'} alignItems={'center'} gap="16px">
+        <Box display="flex" alignItems="center" gap="16px">
           {useButtonGroupAxis && (
             <ToggleButtonGroup
               value={data?.chart?.show_axis_labels}
@@ -910,10 +876,10 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
                   store.setUserId(data?.user_id);
                   store.setSectionType(location.pathname.slice(1));
                   handleChangeAxis({
-                    show_axis_labels: !data?.chart?.show_axis_labels,
-                    user_id: data?.user_id,
                     chart_id: data?.chart?.id,
                     chart_type_id: data?.chart?.chart_id,
+                    show_axis_labels: !data?.chart?.show_axis_labels,
+                    user_id: data?.user_id,
                   });
                 }
               }}
@@ -923,7 +889,7 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
               color="primary"
               exclusive
             >
-              <MuiCustomToggleButton value={true}>
+              <MuiCustomToggleButton value>
                 <Typography color={data?.chart?.show_axis_labels ? 'white' : 'primary'}>Show Axis</Typography>
               </MuiCustomToggleButton>
               <MuiCustomToggleButton value={false}>
@@ -942,30 +908,30 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
                   border: `1px solid ${theme.palette.primary.main}`,
                   borderRadius: '4px',
                 })}
-                aria-describedby={'popover-download'}
+                aria-describedby="popover-download"
                 onClick={(e) => setAnchorElDownload(e.currentTarget)}
               >
                 <ExportFiles />
               </IconButton>
             </Tooltip>
             <Popover
-              id={'popover-download'}
+              id="popover-download"
               open={Boolean(anchorElDownload)}
               anchorEl={anchorElDownload}
               onClose={() => setAnchorElDownload(null)}
               anchorOrigin={{
-                vertical: 'bottom',
                 horizontal: 'right',
+                vertical: 'bottom',
               }}
               transformOrigin={{
-                vertical: 'top',
                 horizontal: 'right',
+                vertical: 'top',
               }}
               sx={{
-                marginTop: '6px',
                 '&.MuiPopover-paper': {
                   borderRadius: '10px',
                 },
+                marginTop: '6px',
               }}
               PaperProps={{ style: { borderRadius: '10px' } }}
             >
@@ -976,31 +942,29 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
                   maxWidth: '248px',
                 })}
               >
-                {optionMenuDownload.map((el, i) => {
-                  return (
-                    <MenuItem
-                      // onMouseEnter={(e) => (e.target.style.background = 'primary.main')}
-                      // onMouseLeave={(e) => (e.target.style.background = '#ffffff')}
-                      sx={(theme) => ({
-                        '&:hover': {
-                          backgroundColor: theme.palette.primary.light,
-                          ...(i === 0 ? { borderRadius: '10px 10px 0 0' } : {}),
-                          ...(i === 2 ? { borderRadius: '0px 0px 10px 10px' } : {}),
-                        },
-                        width: '100%',
-                        display: 'inline-flex',
-                      })}
-                      key={i}
-                      onClick={(e) => {
-                        setAnchorElDownload(null);
-                        if (el.value !== 'all') store.setIsLoading(true);
-                        handleDownload(el.value, data, e);
-                      }}
-                    >
-                      {el?.title}
-                    </MenuItem>
-                  );
-                })}
+                {optionMenuDownload.map((el, i) => (
+                  <MenuItem
+                    // onMouseEnter={(e) => (e.target.style.background = 'primary.main')}
+                    // onMouseLeave={(e) => (e.target.style.background = '#ffffff')}
+                    sx={(theme) => ({
+                      '&:hover': {
+                        backgroundColor: theme.palette.primary.light,
+                        ...(i === 0 ? { borderRadius: '10px 10px 0 0' } : {}),
+                        ...(i === 2 ? { borderRadius: '0px 0px 10px 10px' } : {}),
+                      },
+                      display: 'inline-flex',
+                      width: '100%',
+                    })}
+                    key={i}
+                    onClick={(e) => {
+                      setAnchorElDownload(null);
+                      if (el.value !== 'all') store.setIsLoading(true);
+                      handleDownload(el.value, data, e);
+                    }}
+                  >
+                    {el?.title}
+                  </MenuItem>
+                ))}
               </Box>
             </Popover>
           </Box>
