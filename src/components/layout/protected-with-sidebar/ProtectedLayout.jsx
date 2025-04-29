@@ -92,23 +92,13 @@ const ProtectedLayout = () => {
   }, [data]);
 
   useEffect(() => {
-    const init = async () => {
-      if (token && token !== 'undefined' && token !== 'null') {
-        const me = await refreshMeData();
-        if (me?.role?.toLowerCase() !== 'user') {
-          await refreshMasterData();
-        } else {
-          store.setClientSelected(me);
-          setClientSelected(me);
-        }
-      } else {
-        window.location.href = `/login`;
-      }
-    };
-    if (!import.meta.env.SSR) {
-      init();
+    if (token && token !== 'undefined' && token !== 'null') {
+      refreshMeData();
+      refreshMasterData();
+    } else {
+      window.location.href = `/login`;
     }
-  }, [location]);
+  }, []);
 
   window.onload = async () => {
     if (token) {

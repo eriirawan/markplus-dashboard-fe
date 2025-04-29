@@ -68,10 +68,34 @@ const router = createBrowserRouter(
             path="edit-chart/:id"
             element={<LazyComponent children={<AddChart />} />}
             errorElement={<ErrorBoundary />}
-          ></Route>
+          />
         </Route>
-        <Route path="results" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
-        <Route path="fieldwork" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
+        <Route path="results" errorElement={<ErrorBoundary />}>
+          <Route path="/results" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
+          <Route
+            path="add-chart"
+            element={<LazyComponent children={<AddChart />} />}
+            errorElement={<ErrorBoundary />}
+          />
+          <Route
+            path="edit-chart/:id"
+            element={<LazyComponent children={<AddChart />} />}
+            errorElement={<ErrorBoundary />}
+          />
+        </Route>
+        <Route path="fieldwork" errorElement={<ErrorBoundary />}>
+          <Route path="/fieldwork" element={<LazyComponent children={<Home />} />} errorElement={<ErrorBoundary />} />
+          <Route
+            path="add-chart"
+            element={<LazyComponent children={<AddChart />} />}
+            errorElement={<ErrorBoundary />}
+          />
+          <Route
+            path="edit-chart/:id"
+            element={<LazyComponent children={<AddChart />} />}
+            errorElement={<ErrorBoundary />}
+          />
+        </Route>
         <Route path="evidence" element={<LazyComponent children={<Evidence />} />} errorElement={<ErrorBoundary />} />
         <Route path="user-list" element={<LazyComponent children={<User />} />} errorElement={<ErrorBoundary />} />
         <Route

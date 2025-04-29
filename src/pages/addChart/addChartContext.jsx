@@ -220,7 +220,7 @@ export const useAddOrEditChartStore = () => {
           datasets: formData.chartData.datasets.map((chart) => ({ data: chart.data, label: chart.label })),
         },
       };
-      if (formData.chartType === 'Information Chart') {
+      if (formData.chartType === 'Information Chart' && formData.imageFile) {
         const payloadUpload = new FormData();
         payloadUpload.append('file', formData.imageFile);
         const uploadImage = await uploadImageInformationChart({
