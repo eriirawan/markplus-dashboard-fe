@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { Typography, Box, Stack } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
+import { enqueueSnackbar } from 'notistack';
 
 import MPlusIcon from '@/components/Icon';
 
@@ -19,20 +20,35 @@ const styles = {
   wrapperText: { pt: 1 },
 };
 
-const UploadDropZone = ({ handleSave, isHaveFile, acceptedType, maxSize, noDisplay, children, disabled }) => {
+const UploadDropZone = ({
+  handleSave,
+  isHaveFile,
+  acceptedType,
+  maxSize,
+  noDisplay,
+  children,
+  disabled,
+  maxFiles,
+  isMultiple,
+}) => {
   const onDropAccepted = useCallback((acceptedFiles) => {
     handleSave(acceptedFiles);
   }, []);
 
   const onDropRejected = useCallback((rejectedFiles) => {
-    handleSave(rejectedFiles);
+    if (rejectedFiles?.length > 0) {
+      enqueueSnackbar(rejectedFiles?.[0]?.errors?.[0]?.message, {
+        variant: 'errorSnackbar',
+      });
+    }
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: acceptedType,
     disabled,
+    maxFiles,
     maxSize,
-    multiple: false,
+    multiple: isMultiple,
     noDrag: noDisplay,
     onDropAccepted,
     onDropRejected,
@@ -54,18 +70,18 @@ const UploadDropZone = ({ handleSave, isHaveFile, acceptedType, maxSize, noDispl
         <Stack direction="row" justifyContent="center" spacing={2}>
           <Box
             sx={{
-              borderWidth: 1.5,
-              borderStyle: 'solid',
+              alignItems: 'center',
               borderColor: 'primary.main',
               borderRadius: 1,
-              py: 1,
-              px: 1.3,
+              borderStyle: 'solid',
+              borderWidth: 1.5,
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center',
+              px: 1.3,
+              py: 1,
             }}
           >
-            <MPlusIcon name="Upload" sx={{ fontSize: 28, color: 'primary.main' }} />
+            <MPlusIcon name="Upload" sx={{ color: 'primary.main', fontSize: 28 }} />
           </Box>
           <Stack>
             <Typography variant="h4">
@@ -75,6 +91,12 @@ const UploadDropZone = ({ handleSave, isHaveFile, acceptedType, maxSize, noDispl
               </Typography>
             </Typography>
             <Typography color="#808080">Upload on Image on PNG, JPG, Video MP4, and Audio MP3 Format</Typography>
+            {maxFiles && (
+              <Typography
+                color="#808080"
+                sx={{ fontStyle: 'italic' }}
+              >{`${maxFiles} files are the maximum number of files you can drop here`}</Typography>
+            )}
           </Stack>
         </Stack>
       </Box>
@@ -84,11 +106,11 @@ const UploadDropZone = ({ handleSave, isHaveFile, acceptedType, maxSize, noDispl
 
 UploadDropZone.defaultProps = {
   acceptedType: {
-    'image/png': [],
-    'image/jpg': [],
-    'image/jpeg': [],
-    'video/mp4': [],
     'audio/mp3': [],
+    'image/jpeg': [],
+    'image/jpg': [],
+    'image/png': [],
+    'video/mp4': [],
   },
   maxSize: 2000000,
   noDisplay: false,
