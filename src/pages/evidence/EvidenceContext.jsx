@@ -102,12 +102,15 @@ export const useEvidenceStore = () => {
   const handleFileInputChange = async (inputFile) => {
     setIsLoading(true);
     try {
+      const formData = new FormData();
+      inputFile?.forEach((file) => formData?.append('files', file));
+      formData?.append('user_id', clientSelected?.id);
+      if (folder?.length > 0) {
+        formData?.append('folder_id', folder[folder?.length - 1]?.id || undefined);
+      }
+
       const file = await addEvidence({
-        data: {
-          file: inputFile[0],
-          user_id: clientSelected?.id,
-          folder_id: folder[folder?.length - 1]?.id || undefined,
-        },
+        data: formData,
       });
 
       if (file?.status === 200) {
