@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Box,
   Paper,
@@ -31,15 +31,15 @@ import {
 } from '@mui/icons-material';
 import { MaterialReactTable } from 'material-react-table';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { getWindowDimensions, ISODateToLuxon, formatBytes } from '@/helpers/Utils';
 import { appBarHeight } from '@/helpers/Constants';
 import Loading from '@/components/Loading';
-import Upload from '../../components/UploadFile';
 import GeneralDeletePopup from '@/components/DeletePopup';
-import { EvidenceContext, useEvidenceStore } from './EvidenceContext';
 import MPDropdown from '@/components/mp-dropdown/MPDropdown';
+import Upload from '../../components/UploadFile';
+import { EvidenceContext, useEvidenceStore } from './EvidenceContext';
 import { AppContext } from '../../context/AppContext';
 
 const Evidence = () => {
@@ -59,9 +59,6 @@ const Evidence = () => {
 
   const columns = [
     {
-      accessorKey: 'name',
-      header: 'Name',
-      size: 500,
       Cell: (params) => (
         <Stack direction="row" alignItems="center" gap={0.5}>
           {params?.row?.original?.isFolder ? <FolderOutlined /> : <InsertDriveFileOutlined />}
@@ -82,47 +79,41 @@ const Evidence = () => {
           </Typography>
         </Stack>
       ),
+      accessorKey: 'name',
+      header: 'Name',
+      size: 500,
     },
     {
+      Cell: (params) => (params?.row?.original?.isFolder ? '-' : formatBytes(params?.cell?.getValue())),
       accessorKey: 'size',
       header: 'File Size',
-      size: 142,
-      muiTableHeadCellProps: { align: 'center' },
       muiTableBodyCellProps: { align: 'center' },
-      Cell: (params) => (params?.row?.original?.isFolder ? '-' : formatBytes(params?.cell?.getValue())),
+      muiTableHeadCellProps: { align: 'center' },
+      size: 142,
     },
     {
+      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('MMM dd, yyyy') || '-',
       accessorKey: 'created_at',
       header: 'Date Uploaded',
-      muiTableHeadCellProps: {
-        align: 'center',
-      },
       muiTableBodyCellProps: {
         align: 'center',
       },
-      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('MMM dd, yyyy') || '-',
+      muiTableHeadCellProps: {
+        align: 'center',
+      },
     },
     {
+      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('MMM dd, yyyy') || '-',
       accessorKey: 'updated_at',
       header: 'Last Updated',
-      muiTableHeadCellProps: {
-        align: 'center',
-      },
       muiTableBodyCellProps: {
         align: 'center',
       },
-      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('MMM dd, yyyy') || '-',
+      muiTableHeadCellProps: {
+        align: 'center',
+      },
     },
     {
-      accessorKey: 'action',
-      header: 'Action',
-      muiTableHeadCellProps: {
-        align: 'center',
-      },
-      muiTableBodyCellProps: {
-        align: 'center',
-      },
-
       Cell: (params) => (
         <Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5}>
           <Edit
@@ -135,7 +126,7 @@ const Evidence = () => {
             }}
           />
           <Delete
-            sx={{ color: '#E56363', fontSize: 20, cursor: 'pointer' }}
+            sx={{ color: '#E56363', cursor: 'pointer', fontSize: 20 }}
             onClick={() => {
               store?.setEvidenceId(params?.row?.original?.id);
               store?.setSelectedEvidence(params?.row?.original);
@@ -144,6 +135,15 @@ const Evidence = () => {
           />
         </Stack>
       ),
+      accessorKey: 'action',
+      header: 'Action',
+      muiTableBodyCellProps: {
+        align: 'center',
+      },
+
+      muiTableHeadCellProps: {
+        align: 'center',
+      },
     },
   ];
 
@@ -277,7 +277,7 @@ const Evidence = () => {
               </Typography>
             )}
           </Breadcrumbs>
-          <Stack sx={{ overflowY: 'scroll', pt: 3, flex: 1 }}>
+          <Stack sx={{ flex: 1, overflowY: 'scroll', pt: 3 }}>
             {me.role?.toLowerCase() !== 'user' && (
               <Upload
                 key={store?.folder[store?.folder?.length - 1]?.id || store?.clientSelected?.id}
@@ -285,10 +285,12 @@ const Evidence = () => {
                 isHaveFile={false}
                 maxSize={20000000}
                 disabled={!store?.clientSelected?.id}
+                maxFiles={5}
+                isMultiple
               />
             )}
             {store?.evidenceList?.evidences?.length === 0 && store?.evidenceList?.subFolders?.length === 0 ? (
-              <Stack sx={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+              <Stack sx={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>
                 <Typography color="#000000" variant="h2">
                   No evidence attachment created yet
                 </Typography>
@@ -304,8 +306,10 @@ const Evidence = () => {
                       isHaveFile={false}
                       maxSize={20000000}
                       disabled={!store?.clientSelected?.id}
+                      maxFiles={5}
+                      isMultiple
                     >
-                      <Button disabled={!store?.clientSelected?.id} sx={{ width: 256, mt: 2 }}>
+                      <Button disabled={!store?.clientSelected?.id} sx={{ mt: 2, width: 256 }}>
                         Upload File
                       </Button>
                     </Upload>
@@ -377,8 +381,8 @@ const Evidence = () => {
                             ? [
                                 ...store?.evidenceList?.subFolders?.map((item) => ({
                                   ...item,
-                                  nanoId: item?.id,
                                   isFolder: true,
+                                  nanoId: item?.id,
                                 })),
                                 ...store?.evidenceList?.evidences?.map((item) => ({ ...item, nanoId: item?.id })),
                               ]
@@ -404,12 +408,12 @@ const Evidence = () => {
                         )}
                         muiTableHeadCellProps={{
                           sx: {
-                            border: 1,
-                            fontWeight: 'bold',
                             bgcolor: 'primary.main',
-                            opacity: 0.9,
+                            border: 1,
                             borderColor: 'white',
                             color: 'white',
+                            fontWeight: 'bold',
+                            opacity: 0.9,
                           },
                         }}
                         initialState={{
@@ -429,7 +433,7 @@ const Evidence = () => {
                         {store?.evidenceList?.subFolders?.map((item) => (
                           <Grid item xs={3}>
                             <Paper
-                              sx={{ p: 2, bgcolor: '#f3f6fb', cursor: 'pointer' }}
+                              sx={{ bgcolor: '#f3f6fb', cursor: 'pointer', p: 2 }}
                               onDoubleClick={(e) => {
                                 e.stopPropagation();
                                 store.setFolder((prevState) => {
@@ -447,10 +451,10 @@ const Evidence = () => {
                                 <FolderOutlined sx={{ fontSize: 20 }} />
                                 <Typography
                                   sx={{
-                                    textAlign: 'center',
                                     cursor: 'pointer',
-                                    textOverflow: 'ellipsis',
                                     overflow: 'hidden',
+                                    textAlign: 'center',
+                                    textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap',
                                   }}
                                 >
@@ -496,7 +500,7 @@ const Evidence = () => {
                           store?.evidenceList?.evidences?.map((item) => (
                             <Grid item xs={3}>
                               <Paper
-                                sx={{ display: 'flex', height: 280, p: 2, bgcolor: '#f3f6fb', flexDirection: 'column' }}
+                                sx={{ bgcolor: '#f3f6fb', display: 'flex', flexDirection: 'column', height: 280, p: 2 }}
                               >
                                 <Stack
                                   direction="row"
@@ -508,10 +512,10 @@ const Evidence = () => {
                                   <InsertDriveFileOutlined sx={{ fontSize: 20 }} />
                                   <Typography
                                     sx={{
-                                      textAlign: 'center',
                                       cursor: 'pointer',
-                                      textOverflow: 'ellipsis',
                                       overflow: 'hidden',
+                                      textAlign: 'center',
+                                      textOverflow: 'ellipsis',
                                       whiteSpace: 'nowrap',
                                     }}
                                     onClick={() => window.open(item?.file_url)}
@@ -559,7 +563,7 @@ const Evidence = () => {
                             </Grid>
                           ))
                         ) : (
-                          <Stack sx={{ justifyContent: 'center', alignItems: 'center', flex: 1, minHeight: 300 }}>
+                          <Stack sx={{ alignItems: 'center', flex: 1, justifyContent: 'center', minHeight: 300 }}>
                             <Typography color="#000000" variant="h2">
                               No evidence attachment created yet
                             </Typography>
@@ -575,7 +579,7 @@ const Evidence = () => {
                                   maxSize={20000000}
                                   disabled={!store?.clientSelected?.id}
                                 >
-                                  <Button disabled={!store?.clientSelected?.id} sx={{ width: 256, mt: 2 }}>
+                                  <Button disabled={!store?.clientSelected?.id} sx={{ mt: 2, width: 256 }}>
                                     Upload File
                                   </Button>
                                 </Upload>
@@ -596,23 +600,23 @@ const Evidence = () => {
                 page={store?.page || 1}
                 count={store?.metaList?.total_page || 1}
                 color="primary"
-                sx={{ display: 'flex', flex: 1, justifyContent: 'right', color: 'primary.main' }}
+                sx={{ color: 'primary.main', display: 'flex', flex: 1, justifyContent: 'right' }}
                 onChange={(e, val) => store?.setPage(val)}
               />
               <Box
                 sx={{
                   alignItems: 'center',
-                  flex: 1,
-                  display: 'flex',
-                  justifyContent: 'right',
                   color: 'primary.main',
+                  display: 'flex',
+                  flex: 1,
+                  justifyContent: 'right',
                 }}
               >
                 Show
                 <Select
                   size="small"
                   value={store?.pageSize}
-                  sx={{ mx: 1, color: 'inherit' }}
+                  sx={{ color: 'inherit', mx: 1 }}
                   onChange={(e) => {
                     store?.setPageSize(e.target.value);
                     store?.setPage(

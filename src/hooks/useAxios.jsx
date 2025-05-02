@@ -28,9 +28,14 @@ axios.interceptors.response.use(
     return res;
   },
   (err) => {
-    enqueueSnackbar(String(err?.response?.data?.data?.[0]?.message || err?.response?.data?.message), {
-      variant: 'errorSnackbar',
-    });
+    enqueueSnackbar(
+      String(
+        err?.response?.data?.data?.[0]?.message || err?.response?.data?.message || 'Something wrong, Please try again'
+      ),
+      {
+        variant: 'errorSnackbar',
+      }
+    );
 
     if (err?.response?.data?.status === 401) {
       localStorage.clear();
