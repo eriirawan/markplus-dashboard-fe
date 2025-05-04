@@ -3,6 +3,7 @@ import { createContext, useContext, useMemo, useState } from 'react';
 import { useSnackbar } from 'notistack';
 import { BroadcastChannel } from 'broadcast-channel';
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
 
 import { AppContext } from '@/context/AppContext';
 import { userAvatarString, userIdString } from '@/helpers/Constants';
@@ -34,6 +35,17 @@ export const AuthProvider = ({ children }) => {
     localStorage.clear();
   };
 
+  const encryptData = (data) => {
+    const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), import.meta.env.VITE_AUTH_SECRET_KEY).toString();
+    localStorage.setItem('identifier', encrypted);
+  };
+
+  const decryptData = () => {
+    const encrypted = localStorage.getItem('identifier');
+    const decrypted = CryptoJS.AES.decrypt(encrypted, import.meta.env.VITE_AUTH_SECRET_KEY).toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decrypted);
+  };
+
   const login = async (data) => {
     try {
       setIsLoading(true);
@@ -47,8 +59,13 @@ export const AuthProvider = ({ children }) => {
       const { token = null, ...userData } = result?.data?.data;
 
       setUserToken(token);
+      encryptData({
+        email: data?.userName,
+        password: data?.password,
+      });
       handleSetUserId(userData?.id);
       window.location.href = `/home`;
+      setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
       throw new Error(err.response.data.message);
@@ -77,6 +94,28 @@ export const AuthProvider = ({ children }) => {
         `${import.meta.env.VITE_API_URL}/dashboard/v1/auth/password/reset/set-password`,
         data
       );
+      const oldData = decryptData();
+      encryptData({
+        email: oldData?.email,
+        password: data?.password,
+      });
+
+      if (result.error) throw new Error('Error');
+
+      setIsLoading(false);
+      return result;
+    } catch (err) {
+      setIsLoading(false);
+      throw new Error(err.response.data.message);
+    }
+  };
+
+  const changePassword = async (data) => {
+    try {
+      setIsLoading(true);
+      const result = await axios.post(`${import.meta.env.VITE_API_URL}/dashboard/v1/auth/password/change`, data, {
+        headers: { Authorization: userToken },
+      });
 
       if (result.error) throw new Error('Error');
 
@@ -99,6 +138,7 @@ export const AuthProvider = ({ children }) => {
 
       const userDetail = result?.data?.data;
       setMe(userDetail);
+      setIsLoading(false);
       return userDetail;
     } catch (err) {
       setIsLoading(false);
@@ -129,7 +169,10 @@ export const AuthProvider = ({ children }) => {
 
   const value = useMemo(
     () => ({
+      changePassword,
       clearLocalStorage,
+      decryptData,
+      encryptData,
       handleSetUserAvatar,
       handleSetUserId,
       hasPermission,
