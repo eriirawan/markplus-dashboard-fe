@@ -14,7 +14,7 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();
-  const { setPassword, isLoading } = useAuth();
+  const { setPassword, isLoading, changePassword, decryptData } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
   const [error, setError] = useState('');
@@ -32,11 +32,20 @@ const ResetPassword = () => {
   const checkSetPassword = async () => {
     try {
       setError('');
-      await setPassword({
-        forgot_password_token: token,
-        password: newPass,
-        confirm_password: confirmPass,
-      });
+      if (token) {
+        await setPassword({
+          forgot_password_token: token,
+          password: newPass,
+          confirm_password: confirmPass,
+        });
+      } else {
+        const data = decryptData();
+        await changePassword({
+          current_password: data?.password,
+          password: newPass,
+          confirm_password: confirmPass,
+        });
+      }
       enqueueSnackbar('Password updated successfully', {
         variant: 'successSnackbar',
       });
