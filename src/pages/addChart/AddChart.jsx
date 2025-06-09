@@ -449,20 +449,43 @@ const AddChart = (props) => {
   ]);
 
   const saveAsExcel = async () => {
-    const data = chartDetail?.tabular?.labels?.map((el) => ({ test: el }));
-    chartDetail?.tabular?.datasets?.forEach((element) => {
-      element.data.forEach((el, i) => {
-        data[i][element.label] = el;
-      });
-    });
-    const header = ['', ...chartDetail?.tabular?.datasets?.map((el) => el.label)];
+    // Process the chart data to remove first row and column
+    const labels = JSON.parse(chartDetail?.tabular?.labels || '[]');
+
+    // Create data array without the first row
+    const data = [];
+
+    // Only process if we have labels and datasets
+    if (chartDetail?.tabular?.datasets && labels?.length > 1) {
+      // Skip first label (start from index 1)
+      for (let i = 1; i < labels.length; i += 1) {
+        const rowData = {};
+
+        // Add data from each dataset, skipping first column
+        chartDetail.tabular.datasets.forEach((dataset) => {
+          if (dataset.data && dataset.data.length > i) {
+            rowData[dataset.label] = dataset.data[i];
+          }
+        });
+
+        data.push(rowData);
+      }
+    }
+
+    // Create header without the first column (empty string)
+    const header = chartDetail?.tabular?.datasets?.map((dataset) => dataset.label) || [];
+
+    // Create Excel workbook and sheet
     const ws = XLSX.utils.book_new();
     XLSX.utils.sheet_add_aoa(ws, [header]);
     XLSX.utils.sheet_add_json(ws, data, { origin: 'A2', skipHeader: true });
+
     const wb = { SheetNames: ['data'], Sheets: { data: ws } };
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
     const finalData = new Blob([excelBuffer], { type: '.xlsx' });
-    const file = new File([finalData], chartDetail?.tabular?.filename, { lastModified: new Date() });
+
+    const filename = chartDetail?.tabular?.filename || 'chart_data.xlsx';
+    const file = new File([finalData], filename, { lastModified: new Date() });
     setFileImport(file);
   };
   useEffect(() => {
@@ -476,7 +499,7 @@ const AddChart = (props) => {
             data: el.data,
             label: el.label,
           })),
-          labels: chartDetail?.tabular?.labels,
+          labels: JSON.parse(chartDetail?.tabular?.labels),
         },
         chartDataDonutOrPie: {
           datasets: chartDetail?.tabular?.datasets.map((el) => ({
@@ -485,7 +508,7 @@ const AddChart = (props) => {
             data: el.data,
             label: el.label,
           })),
-          labels: chartDetail?.tabular?.labels,
+          labels: JSON.parse(chartDetail?.tabular?.labels),
         },
         chartLabel: chartDetail.title,
         chartSubLabel: chartDetail.sub_title,
