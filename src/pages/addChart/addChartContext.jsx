@@ -4,6 +4,8 @@ import useAxios from 'axios-hooks';
 import { enqueueSnackbar } from 'notistack';
 import { AppBarContext } from '@/context/AppBarContext';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
+
 export const useAddOrEditChartStore = () => {
   const navigate = useNavigate();
   const appBarStore = useContext(AppBarContext);
@@ -134,11 +136,38 @@ export const useAddOrEditChartStore = () => {
 
   const handleFileInputChange = async (e) => {
     setOpenDialog((prev) => ({ ...prev, loading: true }));
+    const file = e.target.files[0];
+
+    // Step 1: Read as ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+
+    // Step 2: Parse workbook
+    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    // Step 3: Delete only A1 cell
+    delete sheet['A1'];
+
+    // Step 4: Recalculate sheet range
+    const range = XLSX.utils.decode_range(sheet['!ref']);
+    sheet['!ref'] = XLSX.utils.encode_range(range); // optional but safer
+
+    // Step 5: Rebuild workbook into Blob
+    const updatedWorkbookBlob = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
+
+    // Step 6: Upload modified workbook
     const bodyFormData = new FormData();
-    bodyFormData.append('file', e.target.files[0]);
+    bodyFormData.append('file', new Blob([updatedWorkbookBlob], { type: file.type }), file.name);
+
     const { data, status } = await parseFile({ data: bodyFormData });
+
     const colorTheme = Object.values(clientSelected?.colorway)?.filter((el) => el.includes('#'));
     let indexColorTheme = 0;
+
     if (status === 200) {
       const mappingDataChart = {
         labels: data.data.labels,
@@ -148,29 +177,20 @@ export const useAddOrEditChartStore = () => {
             backgroundColor: colorTheme[indexColorTheme],
             borderColor: colorTheme[indexColorTheme],
           };
-          if (indexColorTheme >= data.data.datasets.length - 1) {
-            indexColorTheme = 0;
-          } else {
-            indexColorTheme += 1;
-          }
-          return {
-            ...newData,
-          };
+          indexColorTheme = (indexColorTheme + 1) % colorTheme.length;
+          return newData;
         }),
       };
+
       const mappingDataDonutOrPieChart = {
         labels: data.data.labels,
-        datasets: data.data.datasets?.map((el, i) => {
-          const newData = {
-            ...el,
-            backgroundColor: colorTheme.slice(0, el?.data?.length),
-            borderColor: colorTheme.slice(0, el?.data?.length),
-          };
-          return {
-            ...newData,
-          };
-        }),
+        datasets: data.data.datasets?.map((el) => ({
+          ...el,
+          backgroundColor: colorTheme.slice(0, el?.data?.length),
+          borderColor: colorTheme.slice(0, el?.data?.length),
+        })),
       };
+
       methods.setValue('chartDataDonutOrPie', mappingDataDonutOrPieChart);
       methods.setValue('chartData', mappingDataChart);
       setOpenDialog((prev) => ({ ...prev, loading: false }));
