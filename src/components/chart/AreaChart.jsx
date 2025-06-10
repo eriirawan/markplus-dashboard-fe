@@ -111,6 +111,11 @@ const AreaChart = ({
   const defaultOptions = {
     responsive: true,
     maintainAspectRatio: options?.maintainAspectRatio || true,
+    layout: {
+      padding: {
+        top: 30, // Adjust this value as needed
+      },
+    },
     plugins: {
       htmlLegend: {
         // ID of the container to put the legend in

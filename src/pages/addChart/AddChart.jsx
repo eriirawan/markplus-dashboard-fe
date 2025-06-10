@@ -155,14 +155,13 @@ const AddChart = (props) => {
         case 'Line Chart': {
           setDisplayInputLabel(true);
           return (
-            <Box>
+            <Box sx={{ height: '100%' }}>
               <Typography fontSize="18px" lineHeight="27px" fontWeight={700} marginBottom="24px">
                 {methods.getValues('chartLabel')}
               </Typography>
               <LineChart
                 refChart={chartRef}
                 width="549px"
-                height="335px"
                 maxWidthLegend="369px"
                 labelX={methods.getValues('verticalAxisLabel')}
                 labelY={methods.getValues('horizontalAxisLabel')}

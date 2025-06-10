@@ -107,6 +107,11 @@ const DonutChart = ({
   const defaultOptions = {
     responsive: true,
     maintainAspectRatio: true,
+    layout: {
+      padding: {
+        top: 30, // Adjust this value as needed
+      },
+    },
     plugins: {
       htmlLegend: {
         // ID of the container to put the legend in

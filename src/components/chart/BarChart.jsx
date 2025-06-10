@@ -207,6 +207,12 @@ const BarChart = ({
         ...(isFullStackedChart ? { max: 1000 } : {}),
       },
     },
+    layout: {
+      padding: {
+        top: 30, // Adjust this value as needed
+        right: 30,
+      },
+    },
     ...options,
   };
   const renderMain = useMemo(() => {

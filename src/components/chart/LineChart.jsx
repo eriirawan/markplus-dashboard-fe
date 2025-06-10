@@ -101,6 +101,12 @@ const LineChart = ({
   const defaultOptions = {
     responsive: true,
     maintainAspectRatio: options?.maintainAspectRatio || true,
+    layout: {
+      padding: {
+        top: 30, // Adjust this value as needed
+        right: 30,
+      },
+    },
     plugins: {
       htmlLegend: {
         // ID of the container to put the legend in

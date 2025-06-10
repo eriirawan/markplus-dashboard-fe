@@ -138,28 +138,20 @@ export const useAddOrEditChartStore = () => {
     setOpenDialog((prev) => ({ ...prev, loading: true }));
     const file = e.target.files[0];
 
-    // Step 1: Read as ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
-
-    // Step 2: Parse workbook
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
 
-    // Step 3: Delete only A1 cell
     delete sheet['A1'];
-
-    // Step 4: Recalculate sheet range
     const range = XLSX.utils.decode_range(sheet['!ref']);
-    sheet['!ref'] = XLSX.utils.encode_range(range); // optional but safer
+    sheet['!ref'] = XLSX.utils.encode_range(range);
 
-    // Step 5: Rebuild workbook into Blob
     const updatedWorkbookBlob = XLSX.write(workbook, {
       bookType: 'xlsx',
       type: 'array',
     });
 
-    // Step 6: Upload modified workbook
     const bodyFormData = new FormData();
     bodyFormData.append('file', new Blob([updatedWorkbookBlob], { type: file.type }), file.name);
 
@@ -169,22 +161,30 @@ export const useAddOrEditChartStore = () => {
     let indexColorTheme = 0;
 
     if (status === 200) {
+      // Handle mixed dataset structure (array of numbers OR array of objects with result)
+      const normalizedDatasets = data.data.datasets?.map((el, i) => {
+        const parsedData = el.data.map((item) =>
+          typeof item === 'object' && item.result !== undefined ? item.result : item
+        );
+        const color = colorTheme[indexColorTheme];
+        indexColorTheme = (indexColorTheme + 1) % colorTheme.length;
+
+        return {
+          ...el,
+          data: parsedData,
+          backgroundColor: color,
+          borderColor: color,
+        };
+      });
+
       const mappingDataChart = {
         labels: data.data.labels,
-        datasets: data.data.datasets?.map((el, i) => {
-          const newData = {
-            ...el,
-            backgroundColor: colorTheme[indexColorTheme],
-            borderColor: colorTheme[indexColorTheme],
-          };
-          indexColorTheme = (indexColorTheme + 1) % colorTheme.length;
-          return newData;
-        }),
+        datasets: normalizedDatasets,
       };
 
       const mappingDataDonutOrPieChart = {
         labels: data.data.labels,
-        datasets: data.data.datasets?.map((el) => ({
+        datasets: normalizedDatasets.map((el) => ({
           ...el,
           backgroundColor: colorTheme.slice(0, el?.data?.length),
           borderColor: colorTheme.slice(0, el?.data?.length),
@@ -193,9 +193,8 @@ export const useAddOrEditChartStore = () => {
 
       methods.setValue('chartDataDonutOrPie', mappingDataDonutOrPieChart);
       methods.setValue('chartData', mappingDataChart);
-      setOpenDialog((prev) => ({ ...prev, loading: false }));
+      setOpenDialog((prev) => ({ ...prev, loading: false, success: true }));
       setTypeDialog('success');
-      setOpenDialog((prev) => ({ ...prev, success: true }));
       setIsLoading(false);
     }
   };
