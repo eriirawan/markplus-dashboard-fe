@@ -104,6 +104,11 @@ const PieChart = ({
   const defaultOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 30, // Adjust this value as needed
+      },
+    },
     plugins: {
       htmlLegend: {
         // ID of the container to put the legend in
