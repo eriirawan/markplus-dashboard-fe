@@ -8,7 +8,7 @@ import { configure } from 'axios-hooks';
 // const cache = new LRU({ max: 10 })
 const axios = Axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 8000, // 5 seconds timeout for all requests
+  timeout: 90000, // 1 minute and 30 seconds timeout for all requests
 });
 
 axios.interceptors.request.use((config) => {
