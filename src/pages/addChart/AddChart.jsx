@@ -448,7 +448,10 @@ const AddChart = (props) => {
   ]);
 
   const saveAsExcel = async () => {
-    const labels = JSON.parse(chartDetail?.tabular.labels);
+    const labels =
+      typeof chartDetail?.tabular?.labels === 'string'
+        ? JSON.parse(chartDetail?.tabular?.labels)
+        : chartDetail?.tabular?.labels;
     const data = labels.map((el) => ({ test: el }));
     chartDetail?.tabular?.datasets?.forEach((element) => {
       element.data.forEach((el, i) => {
@@ -476,7 +479,10 @@ const AddChart = (props) => {
             data: el.data,
             label: el.label,
           })),
-          labels: JSON.parse(chartDetail?.tabular?.labels),
+          labels:
+            typeof chartDetail?.tabular?.labels === 'string'
+              ? JSON.parse(chartDetail?.tabular?.labels)
+              : chartDetail?.tabular?.labels,
         },
         chartDataDonutOrPie: {
           datasets: chartDetail?.tabular?.datasets.map((el) => ({
@@ -485,7 +491,10 @@ const AddChart = (props) => {
             data: el.data,
             label: el.label,
           })),
-          labels: JSON.parse(chartDetail?.tabular?.labels),
+          labels:
+            typeof chartDetail?.tabular?.labels === 'string'
+              ? JSON.parse(chartDetail?.tabular?.labels)
+              : chartDetail?.tabular?.labels,
         },
         chartLabel: chartDetail.title,
         chartSubLabel: chartDetail.sub_title,

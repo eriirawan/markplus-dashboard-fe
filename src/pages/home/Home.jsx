@@ -134,7 +134,7 @@ const Home = () => {
                   }
                 : {}),
             })),
-      labels: JSON.parse(data?.tabular?.labels),
+      labels: typeof data?.tabular?.labels === 'string' ? JSON?.parse(data?.tabular?.labels) : data?.tabular?.labels,
     });
     switch (data.chart?.chart_type_name) {
       case 'Donut Chart': {
