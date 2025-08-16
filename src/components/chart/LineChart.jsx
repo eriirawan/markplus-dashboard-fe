@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS } from 'chart.js/auto';
-import { Box } from '@mui/system';
-import { Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 const LineChart = ({
   chartData,
   width,
@@ -20,8 +19,12 @@ const LineChart = ({
 }) => {
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
+    // Return early if legendContainer doesn't exist
+    if (!legendContainer) {
+      return null;
+    }
 
-    let listContainer = legendContainer?.querySelector('ul');
+    let listContainer = legendContainer.querySelector('ul');
 
     if (!listContainer) {
       listContainer = document.createElement('ul');
@@ -42,9 +45,10 @@ const LineChart = ({
   };
 
   const htmlLegendPlugin = {
-    id: 'htmlLegend',
     afterUpdate(chart, args, options) {
       const ul = getOrCreateLegendList(chart, options.containerID);
+      // Skip if ul is null
+      if (!ul) return;
 
       // Remove old legend items
       while (ul.firstChild) {
@@ -76,7 +80,7 @@ const LineChart = ({
         const boxSpan = document.createElement('span');
         boxSpan.style.background = item.fillStyle;
         boxSpan.style.borderColor = item.strokeStyle;
-        boxSpan.style.borderWidth = item.lineWidth + 'px';
+        boxSpan.style.borderWidth = `${item.lineWidth}px`;
         boxSpan.style.display = 'inline-block';
         boxSpan.style.height = '20px';
         boxSpan.style.marginRight = '10px';
@@ -97,90 +101,9 @@ const LineChart = ({
         ul?.appendChild(li);
       });
     },
+    id: 'htmlLegend',
   };
   const defaultOptions = {
-    responsive: true,
-    maintainAspectRatio: options?.maintainAspectRatio || true,
-    layout: {
-      padding: {
-        top: 30, // Adjust this value as needed
-        right: 30,
-      },
-    },
-    plugins: {
-      htmlLegend: {
-        // ID of the container to put the legend in
-        containerID: legendClassName,
-      },
-      legend: {
-        display: false,
-      },
-      datalabels: {
-        display: true,
-        // formatter:  function (value, context) {
-        //     return context.chart.data.labels[context.dataIndex];
-        // },
-        anchor: 'end',
-        align: 'end',
-        offset: showAxisValue ? -2 : -8,
-        color: 'rgba(0, 0, 0, 1.0)',
-        backgroundColor: null,
-        font: {
-          size: 10,
-          weight: '700',
-          lineHeight: '15px',
-          // family: 'Poppins',
-        },
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: labelY,
-          font: {
-            size: '12px',
-            lineHeight: '18px',
-            weight: 700,
-          },
-          color: '#000000',
-        },
-        grid: {
-          // lineWidth: function (context) {
-          //   return context?.index === 0 ? 0 : 1; // <-- this removes the base line
-          // }
-          lineWidth: 0,
-        },
-        ticks: {
-          display: showAxisValue,
-          color: '#000000',
-        },
-      },
-      x: {
-        title: {
-          display: true,
-          text: labelX,
-          font: {
-            size: '12px',
-            lineHeight: '18px',
-            weight: 700,
-          },
-          color: '#000000',
-        },
-        offset: isAreaChart ? false : true,
-        display: true,
-        ticks: {
-          // padding: 20,
-          display: showAxisValue,
-          // borderColor: '1px solid #000000',
-          color: '#000000',
-        },
-        grid: {
-          lineWidth: 0, // <-- this removes vertical lines between bars
-        },
-      },
-    },
     // radius: 10,
     // interaction: {
     //   intersect: false,
@@ -193,13 +116,103 @@ const LineChart = ({
         radius: 4,
       },
     },
+
+    layout: {
+      padding: {
+        // Adjust this value as needed
+        right: 30,
+        top: 30,
+      },
+    },
+
+    maintainAspectRatio: options?.maintainAspectRatio || true,
+
+    plugins: {
+      datalabels: {
+        align: 'end',
+
+        // formatter:  function (value, context) {
+        //     return context.chart.data.labels[context.dataIndex];
+        // },
+        anchor: 'end',
+        backgroundColor: null,
+        color: 'rgba(0, 0, 0, 1.0)',
+        display: true,
+        font: {
+          lineHeight: '15px',
+          size: 10,
+          weight: '700',
+          // family: 'Poppins',
+        },
+        offset: showAxisValue ? -2 : -8,
+      },
+      htmlLegend: {
+        // ID of the container to put the legend in
+        containerID: legendClassName,
+      },
+      legend: {
+        display: false,
+      },
+    },
+
+    responsive: true,
+
+    scales: {
+      x: {
+        display: true,
+        grid: {
+          lineWidth: 0, // <-- this removes vertical lines between bars
+        },
+        offset: !isAreaChart,
+        ticks: {
+          // borderColor: '1px solid #000000',
+          color: '#000000',
+
+          // padding: 20,
+          display: showAxisValue,
+        },
+        title: {
+          color: '#000000',
+          display: true,
+          font: {
+            lineHeight: '18px',
+            size: '12px',
+            weight: 700,
+          },
+          text: labelX,
+        },
+      },
+      y: {
+        beginAtZero: true,
+        grid: {
+          // lineWidth: function (context) {
+          //   return context?.index === 0 ? 0 : 1; // <-- this removes the base line
+          // }
+          lineWidth: 0,
+        },
+        ticks: {
+          color: '#000000',
+          display: showAxisValue,
+        },
+        title: {
+          color: '#000000',
+          display: true,
+          font: {
+            lineHeight: '18px',
+            size: '12px',
+            weight: 700,
+          },
+          text: labelY,
+        },
+      },
+    },
     ...options,
   };
   // useEffect(() => {
 
   // })
-  const renderMain = useMemo(() => {
-    return (
+  const renderMain = useMemo(
+    () => (
       <Box
         sx={{
           height: '100%',
@@ -209,8 +222,8 @@ const LineChart = ({
         <Box
           sx={{
             height: '100%',
-            width: '100%',
             maxHeight: '315px',
+            width: '100%',
           }}
         >
           <Line
@@ -218,30 +231,19 @@ const LineChart = ({
             // width={'100%'}
             // height={'100%'}
             data={{
-              labels: [...chartData.labels],
               datasets: isAreaChart ? chartData.datasets.map((el) => ({ ...el, fill: true })) : [...chartData.datasets],
+              labels: [...chartData.labels],
             }}
             options={defaultOptions}
             plugins={[htmlLegendPlugin, ChartDataLabels]}
           />
         </Box>
-        <Box id={legendClassName} display={'flex'} justifyContent={'center'} sx={{ marginTop: '16px' }} />
+        <Box id={legendClassName} display="flex" justifyContent="center" sx={{ marginTop: '16px' }} />
         {/* <Box id="subLabels" /> */}
       </Box>
-    );
-  }, [
-    chartData,
-    refChart,
-    width,
-    height,
-    labelX,
-    labelY,
-    isAreaChart,
-    options,
-    defaultOptions,
-    showAxisValue,
-    className,
-  ]);
+    ),
+    [chartData, refChart, width, height, labelX, labelY, isAreaChart, options, defaultOptions, showAxisValue, className]
+  );
   return renderMain;
   // return (
   //   <Box sx={{ maxWidth: '1173px' }}>

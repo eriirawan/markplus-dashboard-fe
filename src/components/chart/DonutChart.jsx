@@ -1,7 +1,6 @@
-import { Box } from '@mui/system';
+import { Box } from '@mui/material';
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
-import PropTypes from 'prop-types';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 const DonutChart = ({
@@ -19,7 +18,12 @@ const DonutChart = ({
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
 
-    let listContainer = legendContainer?.querySelector('div');
+    // Return early if legendContainer doesn't exist
+    if (!legendContainer) {
+      return null;
+    }
+
+    let listContainer = legendContainer.querySelector('div');
 
     if (!listContainer) {
       listContainer = document.createElement('div');
@@ -48,9 +52,11 @@ const DonutChart = ({
   };
 
   const htmlLegendPlugin = {
-    id: 'htmlLegend',
     afterUpdate(chart, args, options) {
       const ul = getOrCreateLegendList(chart, options.containerID);
+
+      // Skip if ul is null
+      if (!ul) return;
 
       // Remove old legend items
       while (ul.firstChild) {
@@ -82,7 +88,7 @@ const DonutChart = ({
         const boxSpan = document.createElement('span');
         boxSpan.style.background = item.fillStyle;
         boxSpan.style.borderColor = item.strokeStyle;
-        boxSpan.style.borderWidth = item.lineWidth + 'px';
+        boxSpan.style.borderWidth = `${item.lineWidth}px`;
         boxSpan.style.display = 'inline-block';
         boxSpan.style.height = '20px';
         boxSpan.style.marginRight = '10px';
@@ -103,16 +109,29 @@ const DonutChart = ({
         ul?.appendChild(li);
       });
     },
+    id: 'htmlLegend',
   };
   const defaultOptions = {
-    responsive: true,
-    maintainAspectRatio: true,
     layout: {
       padding: {
         top: 30, // Adjust this value as needed
       },
     },
+    maintainAspectRatio: true,
     plugins: {
+      datalabels: {
+        align: 'center',
+        anchor: 'center',
+        backgroundColor: null,
+        color: 'rgba(0, 0, 0, 1.0)',
+        display: true,
+        font: {
+          lineHeight: '15px',
+          size: 10,
+          weight: '700',
+          // family: 'Poppins',
+        },
+      },
       htmlLegend: {
         // ID of the container to put the legend in
         containerID: legendClassName,
@@ -120,20 +139,8 @@ const DonutChart = ({
       legend: {
         display: false,
       },
-      datalabels: {
-        display: true,
-        anchor: 'center',
-        align: 'center',
-        color: 'rgba(0, 0, 0, 1.0)',
-        backgroundColor: null,
-        font: {
-          size: 10,
-          weight: '700',
-          lineHeight: '15px',
-          // family: 'Poppins',
-        },
-      },
     },
+    responsive: true,
     ...options,
     // scales: {
     //   y: {
@@ -172,9 +179,9 @@ const DonutChart = ({
         ...(layoutWidth > 20
           ? {
               display: 'flex',
-              justifyContent: 'center',
               flexWrap: 'wrap',
               gap: '40px',
+              justifyContent: 'center',
             }
           : {}),
       }}
@@ -184,10 +191,10 @@ const DonutChart = ({
         sx={{
           ...(layoutWidth !== 20
             ? {
+                alignItems: 'center',
+                display: 'flex',
                 height: '100vh',
                 maxHeight: '315px',
-                display: 'flex',
-                alignItems: 'center',
               }
             : {}),
         }}
@@ -203,13 +210,13 @@ const DonutChart = ({
         />
       </Box>
       <Box
-        display={'flex'}
-        justifyContent={'center'}
+        display="flex"
+        justifyContent="center"
         id={legendClassName}
         sx={{
           ...(layoutWidth === 20 ? { marginTop: '32px' } : {}),
         }}
-      ></Box>
+      />
     </Box>
   );
 };

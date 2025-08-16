@@ -10,25 +10,25 @@ export const useActivityStore = () => {
   const [search, setSearch] = useState('');
 
   const [{ data: response, loading }, reFetch] = useAxios({
+    method: 'get',
     url: `/dashboard/v1/users/log/list?page=${page}&page_size=${pageSize}&sort_by=${
       sortBy || 'id'
     }&sort_dir=${sortDir}&search=${search || '%20'}`,
-    method: 'get',
   });
 
   return {
-    isLoading,
-    setSortDir,
-    setSortBy,
     activityList: response?.data || [],
-    metaList: response?.meta,
+    isLoading,
     loading,
+    metaList: response?.meta,
     page,
     pageSize,
+    search,
     setPage,
     setPageSize,
+    setSortBy,
     setSearch,
-    search,
+    setSortDir,
   };
 };
 

@@ -1,8 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS } from 'chart.js/auto';
-import { Box } from '@mui/system';
-import { Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 const AreaChart = ({
@@ -22,7 +20,12 @@ const AreaChart = ({
   const getOrCreateLegendList = (chart, id) => {
     const legendContainer = document.getElementById(id);
 
-    let listContainer = legendContainer?.querySelector('ul');
+    // Return early if legendContainer doesn't exist
+    if (!legendContainer) {
+      return null;
+    }
+
+    let listContainer = legendContainer.querySelector('ul');
 
     if (!listContainer) {
       listContainer = document.createElement('ul');
@@ -43,7 +46,6 @@ const AreaChart = ({
   };
 
   const htmlLegendPlugin = {
-    id: 'htmlLegend',
     afterUpdate(chart, args, options) {
       // var dataset = chart.config.data.datasets[0];
       // var offset = 0;
@@ -55,6 +57,9 @@ const AreaChart = ({
       //   model.controlPointPreviousX += offset;
       // }
       const ul = getOrCreateLegendList(chart, options.containerID);
+
+      // Skip if ul is null
+      if (!ul) return;
 
       // Remove old legend items
       while (ul.firstChild) {
@@ -86,7 +91,7 @@ const AreaChart = ({
         const boxSpan = document.createElement('span');
         boxSpan.style.background = item.fillStyle;
         boxSpan.style.borderColor = item.strokeStyle;
-        boxSpan.style.borderWidth = item.lineWidth + 'px';
+        boxSpan.style.borderWidth = `${item.lineWidth}px`;
         boxSpan.style.display = 'inline-block';
         boxSpan.style.height = '20px';
         boxSpan.style.marginRight = '10px';
@@ -107,16 +112,49 @@ const AreaChart = ({
         ul?.appendChild(li);
       });
     },
+    id: 'htmlLegend',
   };
   const defaultOptions = {
-    responsive: true,
-    maintainAspectRatio: options?.maintainAspectRatio || true,
+    // radius: 10,
+    // interaction: {
+    //   intersect: false,
+    // },
+    elements: {
+      line: {
+        // tension: 0.5,
+      },
+      point: {
+        radius: 4,
+      },
+    },
+
     layout: {
       padding: {
         top: 30, // Adjust this value as needed
       },
     },
+
+    maintainAspectRatio: options?.maintainAspectRatio || true,
+
     plugins: {
+      datalabels: {
+        align: 'end',
+
+        // formatter:  function (value, context) {
+        //     return context.chart.data.labels[context.dataIndex];
+        // },
+        anchor: 'end',
+        backgroundColor: null,
+        color: 'rgba(0, 0, 0, 1.0)',
+        display: true,
+        font: {
+          lineHeight: '15px',
+          size: 10,
+          weight: '700',
+          // family: 'Poppins',
+        },
+        offset: -2,
+      },
       htmlLegend: {
         // ID of the container to put the legend in
         containerID: legendClassName,
@@ -124,38 +162,44 @@ const AreaChart = ({
       legend: {
         display: false,
       },
-      datalabels: {
-        display: true,
-        // formatter:  function (value, context) {
-        //     return context.chart.data.labels[context.dataIndex];
-        // },
-        anchor: 'end',
-        align: 'end',
-        offset: -2,
-        color: 'rgba(0, 0, 0, 1.0)',
-        backgroundColor: null,
-        font: {
-          size: 10,
-          weight: '700',
-          lineHeight: '15px',
-          // family: 'Poppins',
-        },
-      },
     },
 
+    responsive: true,
+
     scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: labelY,
+      x: {
+        display: true,
+        grid: {
+          borderDash: [8, 4],
+          // lineWidth: 0, // <-- this removes vertical lines between bars
+        },
+        offset: true,
+        ticks: {
+          // padding: 20,
+          beginAtZero: true,
+
+          color: '#000000',
+          // display: false,
+          display: showAxisValue,
           font: {
-            size: '12px',
+            size: '14px',
+            weight: 400,
+          },
+          // display: false,
+        },
+        title: {
+          color: '#000000',
+          display: true,
+          font: {
             lineHeight: '18px',
+            size: '12px',
             weight: 700,
           },
-          color: '#000000',
+          text: labelX,
         },
+      },
+      y: {
+        beginAtZero: true,
         grid: {
           // lineWidth: function (context) {
           //   return context?.index === 0 ? 0 : 1; // <-- this removes the base line
@@ -169,48 +213,16 @@ const AreaChart = ({
 
           // display: false,
         },
-      },
-      x: {
         title: {
+          color: '#000000',
           display: true,
-          text: labelX,
           font: {
-            size: '12px',
             lineHeight: '18px',
+            size: '12px',
             weight: 700,
           },
-          color: '#000000',
+          text: labelY,
         },
-        offset: true,
-        display: true,
-        ticks: {
-          // padding: 20,
-          beginAtZero: true,
-          // display: false,
-          display: showAxisValue,
-          color: '#000000',
-          font: {
-            weight: 400,
-            size: '14px',
-          },
-          // display: false,
-        },
-        grid: {
-          borderDash: [8, 4],
-          // lineWidth: 0, // <-- this removes vertical lines between bars
-        },
-      },
-    },
-    // radius: 10,
-    // interaction: {
-    //   intersect: false,
-    // },
-    elements: {
-      line: {
-        // tension: 0.5,
-      },
-      point: {
-        radius: 4,
       },
     },
     ...options,
@@ -218,8 +230,8 @@ const AreaChart = ({
   // useEffect(() => {
 
   // })
-  const renderMain = useMemo(() => {
-    return (
+  const renderMain = useMemo(
+    () => (
       <Box
         sx={{
           height: '100%',
@@ -229,8 +241,8 @@ const AreaChart = ({
         <Box
           sx={{
             height: '100%',
-            width: '100%',
             maxHeight: '315px',
+            width: '100%',
           }}
         >
           <Line
@@ -242,11 +254,12 @@ const AreaChart = ({
             plugins={[htmlLegendPlugin, ChartDataLabels]}
           />
         </Box>
-        <Box id={legendClassName} display={'flex'} justifyContent={'center'} sx={{ marginTop: '16px' }} />
+        <Box id={legendClassName} display="flex" justifyContent="center" sx={{ marginTop: '16px' }} />
         {/* <Box id="subLabels" /> */}
       </Box>
-    );
-  }, [chartData, refChart, width, height, labelX, labelY, isAreaChart, options, defaultOptions, className]);
+    ),
+    [chartData, refChart, width, height, labelX, labelY, isAreaChart, options, defaultOptions, className]
+  );
   return renderMain;
   // return (
   //   <Box sx={{ maxWidth: '1173px' }}>
