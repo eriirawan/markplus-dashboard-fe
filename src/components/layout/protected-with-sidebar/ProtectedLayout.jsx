@@ -8,6 +8,7 @@ import {
   RadioGroup,
   Radio,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 // import { alpha } from '@mui/material/styles';
 import { useContext, useEffect, useState } from 'react';
@@ -26,6 +27,8 @@ import Appbar from '../../Appbar';
 import useSidebarMenus from '../SidebarMenu';
 import SidebarSmall from './SidebarSmall';
 import DialogFormContainer from '../../Dialog/DialogForm';
+import MobileLayout from '../MobileLayout';
+import { useTheme } from '@mui/material/styles';
 
 const ProtectedLayout = () => {
   const { refreshMeData } = useAuth();
@@ -45,6 +48,9 @@ const ProtectedLayout = () => {
   const { refreshMasterData } = useAfterLoginStartup();
   const [clientValue, setClientValue] = useState(null);
   const [pageClientList, setPageClientList] = useState(1);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const styles = {
     appBarContainer: {
       alignItems: 'center',
@@ -122,6 +128,12 @@ const ProtectedLayout = () => {
     store.setOpenPopupClient(false);
   };
 
+  // If mobile view, render the mobile layout
+  if (isMobile) {
+    return <MobileLayout />;
+  }
+
+  // Otherwise render the desktop layout
   return (
     <AppBarContext.Provider value={store}>
       <Grid container>

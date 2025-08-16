@@ -13,7 +13,9 @@ import {
   Popover,
   MenuItem,
   Tooltip,
+  useMediaQuery,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useState, createContext, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DefaultImageInformationCard from '@/assets/images/default-image-infomation-card.png';
@@ -45,7 +47,9 @@ const Home = () => {
   const appBarStore = useContext(AppBarContext);
   const appCtxStore = useContext(AppContext);
   const { clientSelected } = appBarStore;
-  const { isUserRole, me } = appCtxStore;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   // const storeCallback = useMemo(() => {
 
   // })
@@ -77,6 +81,29 @@ const Home = () => {
   const [openPopupDelete, setOpenPopupDelete] = useState(false);
 
   const sizeLayoutData = [[12], [6, 6], [9, 3], [3, 9], [3, 3, 3, 3], [2.4, 2.4, 2.4, 2.4, 2.4]];
+
+  // Mobile-specific styles
+  const mobileStyles = {
+    chartContainer: {
+      padding: isMobile ? theme.spacing(2, 1) : theme.spacing(3),
+      width: '100%',
+    },
+    chartPaper: {
+      margin: isMobile ? theme.spacing(1, 0) : theme.spacing(2),
+      width: '100%',
+    },
+    chartHeader: {
+      flexDirection: isMobile ? 'column' : 'row',
+      alignItems: isMobile ? 'flex-start' : 'center',
+      marginBottom: isMobile ? theme.spacing(2) : theme.spacing(4),
+    },
+    chartActions: {
+      marginTop: isMobile ? theme.spacing(1) : 0,
+    },
+    layoutButton: {
+      marginBottom: isMobile ? theme.spacing(2) : 0,
+    },
+  };
 
   const getTextLayout = (data) => {
     switch (data) {
