@@ -4,12 +4,14 @@ import useAxios from 'axios-hooks';
 import { enqueueSnackbar } from 'notistack';
 import { AppBarContext } from '@/context/AppBarContext';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from '@/context/AppContext';
 import * as XLSX from 'xlsx';
 
 export const useAddOrEditChartStore = () => {
   const navigate = useNavigate();
   const appBarStore = useContext(AppBarContext);
-  const { clientSelected } = appBarStore;
+  const appStoreCtx = useContext(AppContext);
+  const { clientSelected } = appStoreCtx;
   const [isLoading, setIsLoading] = useState(false);
   // popup notif flag
   const [typeDialog, setTypeDialog] = useState('loading');

@@ -46,10 +46,9 @@ const Home = () => {
   const location = useLocation();
   const appBarStore = useContext(AppBarContext);
   const appCtxStore = useContext(AppContext);
-  const { clientSelected } = appBarStore;
+  const { clientSelected } = appCtxStore;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   // const storeCallback = useMemo(() => {
 
   // })
@@ -531,6 +530,9 @@ const Home = () => {
     }
   };
   const getGridNumber = (data) => {
+    if (isMobile) {
+      return 12;
+    }
     switch (data) {
       case 100:
         return 12;
@@ -581,13 +583,26 @@ const Home = () => {
         {/* {renderDashboard} */}
         <Stack direction="column" gap="20px">
           {sectionList?.map((data, index) => (
-            <Grid container gap="20px" flexWrap="nowrap">
+            <Grid
+              container
+              gap="20px"
+              sx={{
+                flexWrap: {
+                  xs: 'wrap', // mobile: boleh turun ke bawah
+                  sm: 'wrap', // tablet kecil: boleh wrap
+                  md: 'nowrap', // mulai desktop: jangan wrap
+                },
+              }}
+            >
               {!data.every((element) => element.hide) &&
                 data.map((el, indexChild) => (
                   <Grid
                     item
+                    md={12}
+                    xs={12}
                     xl={getGridNumber(el.layout)}
                     lg={getGridNumber(el.layout)}
+                    sm={12}
                     sx={{
                       border: (theme) =>
                         JSON.stringify(el.chart) === '{}'
@@ -688,8 +703,9 @@ const Home = () => {
           setIsLayoutModalOpen={setOpenPopup}
           getTextLayout={getTextLayout}
           onSave={onSaveLayoutOption}
+          isMobile={isMobile}
         />
-        {!clientSelected && !appCtxStore?.isUserRole && (
+        {!clientSelected && !isMobile && !appCtxStore?.isUserRole && (
           <Stack
             direction="column"
             justifyContent="center"
@@ -702,7 +718,7 @@ const Home = () => {
               <Typography fontSize="16px" fontWeight={400} lineHeight="24px" textAlign="center" marginBottom="24px">
                 You haven't selected a client yet, select one to see the chart.
               </Typography>
-              <Button fullWidth color="primary" onClick={() => appBarStore.setOpenPopupClient(true)}>
+              <Button fullWidth color="primary" onClick={() => appCtxStore.setOpenPopupClient(true)}>
                 Choose Client
               </Button>
             </Box>
@@ -726,7 +742,7 @@ const Home = () => {
             )}
           </Stack>
         )}
-        {sectionList?.length && !appCtxStore?.isUserRole ? (
+        {!isMobile && sectionList?.length && !appCtxStore?.isUserRole ? (
           <Paper
             sx={{
               backgroundColor: 'transparent',
@@ -750,10 +766,12 @@ const Home = () => {
                 // sx={{ borderColor: '#7E3399', color: '#7E3399', '&:hover': { borderColor: '#7E3399' } }}
                 onClick={() => {
                   setAction('create');
+                  if (isMobile) {
+                  }
                   setOpenPopup((prev) => !prev);
                 }}
               >
-                Add New Section
+                {isMobile ? 'Add Chart' : 'Add New Section'}
               </Button>
             </Box>
           </Paper>

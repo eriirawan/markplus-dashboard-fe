@@ -1,5 +1,4 @@
 import { useState, createContext, useEffect } from 'react';
-import useAxios from '@/hooks/useAxios';
 
 export const useStore = () => {
   const [hasNotification, setHasNotification] = useState(false);
