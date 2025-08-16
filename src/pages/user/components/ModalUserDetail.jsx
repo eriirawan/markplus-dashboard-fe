@@ -1,4 +1,5 @@
-import { useContext, useState } from 'react';
+// @ts-nocheck
+import React, { useContext, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -15,13 +16,12 @@ import {
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider } from 'react-hook-form';
 import MPlusIcon from '@/components/Icon';
 
 import CheckBox from '@/components/CheckBox';
 import MPTextField from '@/components/TextField';
 import DefaultImg from '@/assets/images/default-image.png';
-import useAxios from '@/hooks/useAxios';
 import MPSelect from '@/components/form/mp-select/MPSelect';
 import { AppContext } from '@/context/AppContext';
 import { UserContext } from '../UserContext';
@@ -38,10 +38,9 @@ const VisuallyHiddenInput = styled('input')`
   width: 1px;
 `;
 
-const ModalUserDetail = ({}) => {
+const ModalUserDetail = () => {
   const { roles } = useContext(AppContext);
   const [error, setError] = useState('');
-  const [newPass, setNewPass] = useState('');
   const [showPassword, setShowPassword] = useState({ newPass: false });
   const { methods, handleFileInputChange, handleClose, handleClick, openPopup, action, isLoading } =
     useContext(UserContext);
@@ -52,8 +51,8 @@ const ModalUserDetail = ({}) => {
     setError(passCheck.test(passValue) ? '' : 'invalid');
     methods?.setValue('password', passValue);
   };
-  const imgUrl = methods.watch('company_logo_url');
-  const password = methods.watch('password');
+  const imgUrl = methods?.watch('company_logo_url');
+  const password = methods?.watch('password');
 
   return (
     <Dialog maxWidth="md" open={openPopup} PaperProps={{ sx: { p: 3 } }} transitionDuration={500}>

@@ -1,12 +1,9 @@
-import { FileOpenOutlined, PanoramaOutlined, Search, SettingsOutlined } from '@mui/icons-material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import {
   Box,
   Breadcrumbs,
-  InputAdornment,
   MenuItem,
   Pagination,
-  PaginationItem,
   Paper,
   Select,
   Stack,
@@ -15,13 +12,15 @@ import {
   Link,
 } from '@mui/material';
 import { MaterialReactTable } from 'material-react-table';
-import { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
+import { AppContext } from '@/context/AppContext';
+import { Header } from '@/components/layout/MobileLayout';
 import { ISODateToLuxon } from '../../helpers/Utils';
-import dummyData from './dummy';
 import { useActivityStore, ActivityContext } from './ActivityContext';
 
 const ActivityLog = () => {
+  const { isMobile } = useContext(AppContext);
   const store = useActivityStore();
   const location = useLocation();
   const [sort, setSort] = useState('DESC');
@@ -30,31 +29,31 @@ const ActivityLog = () => {
     {
       accessorKey: 'nanoId',
       header: 'ID',
-      size: 50,
-      muiTableHeadCellProps: { align: 'center' },
       muiTableBodyCellProps: { align: 'center' },
+      muiTableHeadCellProps: { align: 'center' },
+      size: 50,
     },
     {
-      id: 'user',
       accessorFn: (row) => `${row?.user?.first_name} ${row?.user?.last_name}`,
       header: 'user',
-      muiTableHeadCellProps: { align: 'center' },
+      id: 'user',
       muiTableBodyCellProps: { align: 'center' },
+      muiTableHeadCellProps: { align: 'center' },
     },
     {
       // accessorKey: 'action',
       accessorFn: (row) => row?.action,
       header: 'Activity',
-      size: 142,
-      muiTableHeadCellProps: { align: 'center' },
       muiTableBodyCellProps: { align: 'center' },
+      muiTableHeadCellProps: { align: 'center' },
+      size: 142,
     },
     {
       accessorKey: 'target_type',
       header: 'Action Target',
-      size: 141,
-      muiTableHeadCellProps: { align: 'center' },
       muiTableBodyCellProps: { align: 'center' },
+      muiTableHeadCellProps: { align: 'center' },
+      size: 141,
     },
     // { accessorKey: 'role',
     //   header: 'Role',
@@ -63,28 +62,28 @@ const ActivityLog = () => {
     //   muiTableBodyCellProps: { align: 'center' },
     // },
     {
+      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('dd MMMM yyyy') || '-',
       accessorKey: 'created_at',
       header: 'Created Date',
-      size: 171,
-      muiTableHeadCellProps: {
-        align: 'center',
-      },
       muiTableBodyCellProps: {
         align: 'center',
       },
-      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('dd MMMM yyyy') || '-',
+      muiTableHeadCellProps: {
+        align: 'center',
+      },
+      size: 171,
     },
     {
+      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('dd MMMM yyyy') || '-',
       accessorKey: 'updated_at',
       header: 'Last Modified',
-      size: 171,
-      muiTableHeadCellProps: {
-        align: 'center',
-      },
       muiTableBodyCellProps: {
         align: 'center',
       },
-      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('dd MMMM yyyy') || '-',
+      muiTableHeadCellProps: {
+        align: 'center',
+      },
+      size: 171,
     },
   ];
 
@@ -110,52 +109,62 @@ const ActivityLog = () => {
 
   return (
     <ActivityContext.Provider value={store}>
-      <Paper sx={{ display: 'flex', height: '100%', p: 4 }}>
+      <Paper sx={{ display: 'flex', height: '100%', p: isMobile ? 0 : 4 }}>
         <Stack width="100%">
-          <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
-            <Link to="/home" style={{ textDecoration: 'none' }}>
-              <Typography variant="body2" color="text.primary">
-                Home
+          {!isMobile && (
+            <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
+              <Link to="/home" style={{ textDecoration: 'none' }}>
+                <Typography variant="body2" color="text.primary">
+                  Home
+                </Typography>
+              </Link>
+              <Typography variant="body2" color="primary.main" textTransform="capitalize">
+                {location.pathname.replace(/[^a-z0-9]/g, ' ').trim()}
               </Typography>
-            </Link>
-            <Typography variant="body2" color="primary.main" textTransform="capitalize">
-              {location.pathname.replace(/[^a-z0-9]/g, ' ').trim()}
-            </Typography>
-          </Breadcrumbs>
-          <Box pt={2}>
-            <Typography variant="h1" textTransform="capitalize" color="primary.main">
-              {location.pathname.replace(/[^a-z0-9]/g, ' ').trim()}
-            </Typography>
-          </Box>
-          <Stack direction="row" pt={4.25} justifyContent="end" width="100%">
-            <Box>
-              <TextField
-                value={sort}
-                onChange={handleChange}
-                select
-                label="Sort by"
-                InputLabelProps={{ shrink: true }}
-                sx={{ width: 256 }}
-              >
-                <MenuItem key={1} value="ASC">
-                  A to Z
-                </MenuItem>
-                <MenuItem key={2} value="DESC">
-                  Z to A
-                </MenuItem>
-                <MenuItem key={3} value="OLDTONEW">
-                  Oldest to Newest
-                </MenuItem>
-                <MenuItem key={4} value="NEWTOOLD">
-                  Newest to Oldest
-                </MenuItem>
-                <MenuItem key={5} value="updated_at">
-                  Recently updated
-                </MenuItem>
-              </TextField>
+            </Breadcrumbs>
+          )}
+          {isMobile ? (
+            <Header>{location.pathname.replace(/[^a-z0-9]/g, ' ').trim()}</Header>
+          ) : (
+            <Box pt={isMobile ? 0 : 2}>
+              <Typography variant="h1" textTransform="capitalize" color="primary.main">
+                {location.pathname.replace(/[^a-z0-9]/g, ' ').trim()}
+              </Typography>
             </Box>
+          )}
+          <Stack
+            direction="row"
+            pt={isMobile ? 3 : 4.25}
+            px={isMobile ? 1 : 0}
+            justifyContent={isMobile ? 'center' : 'end'}
+            width="100%"
+          >
+            <TextField
+              value={sort}
+              onChange={handleChange}
+              select
+              label="Sort by"
+              InputLabelProps={{ shrink: true }}
+              sx={{ width: isMobile ? '100%' : 256 }}
+            >
+              <MenuItem key={1} value="ASC">
+                A to Z
+              </MenuItem>
+              <MenuItem key={2} value="DESC">
+                Z to A
+              </MenuItem>
+              <MenuItem key={3} value="OLDTONEW">
+                Oldest to Newest
+              </MenuItem>
+              <MenuItem key={4} value="NEWTOOLD">
+                Newest to Oldest
+              </MenuItem>
+              <MenuItem key={5} value="updated_at">
+                Recently updated
+              </MenuItem>
+            </TextField>
           </Stack>
-          <Box sx={{ pt: 4, width: '100%' }}>
+          <Box sx={{ pt: 4, width: '100%', px: isMobile ? 0.5 : 0 }}>
             <Box sx={{ display: 'flex', minHeight: 400 }}>
               <MaterialReactTable
                 columns={columns}
@@ -175,11 +184,11 @@ const ActivityLog = () => {
                 )}
                 muiTableHeadCellProps={{
                   sx: {
-                    border: 1,
-                    fontWeight: 'bold',
                     bgcolor: 'primary.container',
+                    border: 1,
                     borderColor: 'white',
                     color: 'white',
+                    fontWeight: 'bold',
                   },
                 }}
                 muiTableBodyCellProps={{
@@ -198,27 +207,48 @@ const ActivityLog = () => {
                 initialState={{ columnPinning: { right: ['action'] } }}
               />
             </Box>
-            <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Box
+              sx={{
+                alignItems: 'center',
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                mb: isMobile ? 2 : 0,
+                mt: 4,
+              }}
+            >
               <Pagination
                 page={store?.page || 1}
                 count={store?.metaList?.total_page || 1}
                 color="primary"
-                sx={{ display: 'flex', flex: 1, justifyContent: 'right', color: 'primary.main' }}
+                sx={{
+                  '& .MuiPagination-ul': { justifyContent: 'center', width: isMobile ? '100%' : 'auto' },
+                  color: 'primary.main',
+                  width: isMobile ? '100%' : 'auto',
+                }}
                 onChange={(e, val) => store?.setPage(val)}
               />
               <Box
-                sx={{ alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'right', color: 'primary.main' }}
+                sx={{
+                  alignItems: 'center',
+                  color: 'primary.main',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  mt: isMobile ? 2 : 0,
+                  width: isMobile ? '100%' : 'auto',
+                }}
               >
                 Show
                 <Select
                   size="small"
                   value={store?.pageSize}
-                  sx={{ mx: 1, color: 'inherit' }}
+                  sx={{ color: 'inherit', mx: 1 }}
                   onChange={(e) => {
-                    setPageSize(e.target.value);
-                    setPage(
-                      store?.page > Math.ceil(store?.metaList?.total_data / e.target.value)
-                        ? Math.ceil(store?.metaList?.total_data / e.target.value)
+                    store?.setPageSize(e.target.value);
+                    store?.setPage(
+                      store?.page > Math.ceil((store?.metaList?.total_data || 0) / e.target.value)
+                        ? Math.ceil((store?.metaList?.total_data || 0) / e.target.value)
                         : store?.page
                     );
                   }}

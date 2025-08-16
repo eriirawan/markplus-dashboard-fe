@@ -1,4 +1,5 @@
-import { useContext, useState } from 'react';
+/* eslint-disable react/no-unstable-nested-components */
+import React, { useContext, useState } from 'react';
 import {
   Box,
   Paper,
@@ -41,9 +42,73 @@ import MPDropdown from '@/components/mp-dropdown/MPDropdown';
 import Upload from '../../components/UploadFile';
 import { EvidenceContext, useEvidenceStore } from './EvidenceContext';
 import { AppContext } from '../../context/AppContext';
+import { Header } from '@/components/layout/MobileLayout';
+
+/**
+ * Name cell renderer component
+ * @param {Object} props - Cell props
+ * @param {Function} onFolderClick - Function to handle folder click
+ * @returns {React.ReactElement} Name cell with icon and clickable text
+ */
+const NameCellRenderer = ({ row, cell, onFolderClick }) => {
+  const isFolder = row?.original?.isFolder;
+  const name = cell?.getValue();
+  const fileUrl = row?.original?.file_url;
+
+  const handleClick = () => {
+    if (isFolder) {
+      onFolderClick(row?.original);
+    } else {
+      window.open(fileUrl);
+    }
+  };
+
+  return (
+    <Stack direction="row" alignItems="center" gap={0.5}>
+      {isFolder ? <FolderOutlined /> : <InsertDriveFileOutlined />}
+      <Typography sx={{ color: 'black', cursor: 'pointer' }} onClick={handleClick}>
+        {name}
+      </Typography>
+    </Stack>
+  );
+};
+
+/**
+ * File size cell renderer component
+ * @param {Object} props - Cell props
+ * @returns {string} Formatted file size or dash for folders
+ */
+const FileSizeCellRenderer = ({ row, cell }) => {
+  return row?.original?.isFolder ? '-' : formatBytes(cell?.getValue());
+};
+
+/**
+ * Date cell renderer component
+ * @param {Object} props - Cell props
+ * @returns {string} Formatted date string
+ */
+const DateCellRenderer = ({ cell }) => {
+  return ISODateToLuxon(cell?.getValue())?.toFormat('MMM dd, yyyy') || '-';
+};
+
+/**
+ * Action cell renderer component
+ * @param {Object} props - Cell props
+ * @param {Function} onEdit - Function to handle edit action
+ * @param {Function} onDelete - Function to handle delete action
+ * @returns {React.ReactElement} Action buttons
+ */
+const ActionCellRenderer = ({ row, onEdit, onDelete }) => {
+  return (
+    <Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5}>
+      <Edit sx={{ cursor: 'pointer', fontSize: 20 }} onClick={() => onEdit(row?.original)} />
+      <Delete sx={{ color: '#E56363', cursor: 'pointer', fontSize: 20 }} onClick={() => onDelete(row?.original)} />
+    </Stack>
+  );
+};
 
 const Evidence = () => {
-  const { me, isUserRole } = useContext(AppContext);
+  const { me, isUserRole, isMobile } = useContext(AppContext);
   const store = useEvidenceStore();
   const location = useLocation();
   // const navigate = useNavigate();
@@ -57,34 +122,38 @@ const Evidence = () => {
   const [fileName, setFileName] = useState(undefined);
   const [folderName, setFolderName] = useState('New Folder');
 
+  // Handle folder click
+  const handleFolderClick = (folder) => {
+    store.setFolder((prevState) => {
+      store.setPage(1);
+      return [...prevState, folder];
+    });
+  };
+
+  // Handle edit action
+  const handleEditAction = (item) => {
+    store?.setEvidenceId(item?.id);
+    setFileName(item?.name);
+    store?.setSelectedEvidence(item);
+    setOpenPopupRename(true);
+  };
+
+  // Handle delete action
+  const handleDeleteAction = (item) => {
+    store?.setEvidenceId(item?.id);
+    store?.setSelectedEvidence(item);
+    setOpenPopupDelete(true);
+  };
+
   const columns = [
     {
-      Cell: (params) => (
-        <Stack direction="row" alignItems="center" gap={0.5}>
-          {params?.row?.original?.isFolder ? <FolderOutlined /> : <InsertDriveFileOutlined />}
-          <Typography
-            sx={{ color: 'black', cursor: 'pointer' }}
-            onClick={() => {
-              if (params?.row?.original?.isFolder) {
-                store.setFolder((prevState) => {
-                  store.setPage(1);
-                  return [...prevState, params?.row?.original];
-                });
-              } else {
-                window.open(params?.row?.original?.file_url);
-              }
-            }}
-          >
-            {params?.cell?.getValue()}
-          </Typography>
-        </Stack>
-      ),
+      Cell: (params) => <NameCellRenderer row={params.row} cell={params.cell} onFolderClick={handleFolderClick} />,
       accessorKey: 'name',
       header: 'Name',
       size: 500,
     },
     {
-      Cell: (params) => (params?.row?.original?.isFolder ? '-' : formatBytes(params?.cell?.getValue())),
+      Cell: (params) => <FileSizeCellRenderer row={params.row} cell={params.cell} />,
       accessorKey: 'size',
       header: 'File Size',
       muiTableBodyCellProps: { align: 'center' },
@@ -92,7 +161,7 @@ const Evidence = () => {
       size: 142,
     },
     {
-      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('MMM dd, yyyy') || '-',
+      Cell: (params) => <DateCellRenderer cell={params.cell} />,
       accessorKey: 'created_at',
       header: 'Date Uploaded',
       muiTableBodyCellProps: {
@@ -103,7 +172,7 @@ const Evidence = () => {
       },
     },
     {
-      Cell: (params) => ISODateToLuxon(params?.cell?.getValue())?.toFormat('MMM dd, yyyy') || '-',
+      Cell: (params) => <DateCellRenderer cell={params.cell} />,
       accessorKey: 'updated_at',
       header: 'Last Updated',
       muiTableBodyCellProps: {
@@ -114,33 +183,12 @@ const Evidence = () => {
       },
     },
     {
-      Cell: (params) => (
-        <Stack direction="row" alignItems="center" justifyContent="center" spacing={1.5}>
-          <Edit
-            sx={{ cursor: 'pointer', fontSize: 20 }}
-            onClick={() => {
-              store?.setEvidenceId(params?.row?.original?.id);
-              setFileName(params?.row?.original?.name);
-              store?.setSelectedEvidence(params?.row?.original);
-              setOpenPopupRename(true);
-            }}
-          />
-          <Delete
-            sx={{ color: '#E56363', cursor: 'pointer', fontSize: 20 }}
-            onClick={() => {
-              store?.setEvidenceId(params?.row?.original?.id);
-              store?.setSelectedEvidence(params?.row?.original);
-              setOpenPopupDelete(true);
-            }}
-          />
-        </Stack>
-      ),
+      Cell: (params) => <ActionCellRenderer row={params.row} onEdit={handleEditAction} onDelete={handleDeleteAction} />,
       accessorKey: 'action',
       header: 'Action',
       muiTableBodyCellProps: {
         align: 'center',
       },
-
       muiTableHeadCellProps: {
         align: 'center',
       },
@@ -232,52 +280,58 @@ const Evidence = () => {
           <Button onClick={() => store?.handleAddFolder(folderName, setOpenAddFolder)}>Add</Button>
         </DialogActions>
       </Dialog>
-      <Paper sx={{ display: 'flex', height: windowDimensions.height - (appBarHeight + 10), p: 4 }}>
+      <Paper sx={{ display: 'flex', height: windowDimensions.height - (appBarHeight + 10), p: isMobile ? 0 : 4 }}>
         <Stack width="100%" height="100%">
-          <Stack direction="row" justifyContent="space-between">
-            <Typography variant="h2" color="primary.main" textTransform="capitalize" pb={2}>
-              {location.pathname.replace(/[^a-z0-9]/g, ' ').trim()} Page
-            </Typography>
-            {!isUserRole && (
-              <Button size="medium" startIcon={<Add />} onClick={() => setOpenAddFolder(true)}>
-                New Folder
-              </Button>
-            )}
-          </Stack>
-          <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
-            <Link to="/home" style={{ textDecoration: 'none' }}>
-              <Typography variant="body2" color="text.primary">
-                Home
+          {isMobile ? (
+            <Header>{location.pathname.replace(/[^a-z0-9]/g, ' ').trim()}</Header>
+          ) : (
+            <Stack direction="row" justifyContent="space-between">
+              <Typography variant="h2" color="primary.main" textTransform="capitalize" pb={2}>
+                {location.pathname.replace(/[^a-z0-9]/g, ' ').trim()} Page
               </Typography>
-            </Link>
-            <Link to="/evidence" style={{ textDecoration: 'none' }} onClick={() => store?.setFolder([])}>
-              <Typography variant="body2" color="text.primary">
-                root
-              </Typography>
-            </Link>
-            {store?.folder?.length > 1 &&
-              [...store?.folder].splice(0, store?.folder.length - 1)?.map?.((item) => (
-                <Link
-                  to="/evidence"
-                  style={{ textDecoration: 'none' }}
-                  onClick={() =>
-                    store?.setFolder((prevState) =>
-                      prevState.slice(0, prevState.findIndex((folder) => folder.id === item?.id) + 1)
-                    )
-                  }
-                >
-                  <Typography variant="body2" color="text.primary" textTransform="capitalize">
-                    {item?.name.trim()}
-                  </Typography>
-                </Link>
-              ))}
-            {store?.folder?.length > 0 && (
-              <Typography variant="body2" color="primary.main" textTransform="capitalize">
-                {store?.folder[store?.folder?.length - 1]?.name.trim()}
-              </Typography>
-            )}
-          </Breadcrumbs>
-          <Stack sx={{ flex: 1, overflowY: 'scroll', pt: 3 }}>
+              {!isUserRole && (
+                <Button size="medium" startIcon={<Add />} onClick={() => setOpenAddFolder(true)}>
+                  New Folder
+                </Button>
+              )}
+            </Stack>
+          )}
+          {!isMobile && (
+            <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon sx={{ fontSize: 11 }} />}>
+              <Link to="/home" style={{ textDecoration: 'none' }}>
+                <Typography variant="body2" color="text.primary">
+                  Home
+                </Typography>
+              </Link>
+              <Link to="/evidence" style={{ textDecoration: 'none' }} onClick={() => store?.setFolder([])}>
+                <Typography variant="body2" color="text.primary">
+                  root
+                </Typography>
+              </Link>
+              {store?.folder?.length > 1 &&
+                [...store?.folder]?.splice(0, store?.folder?.length - 1)?.map?.((item) => (
+                  <Link
+                    to="/evidence"
+                    style={{ textDecoration: 'none' }}
+                    onClick={() =>
+                      store?.setFolder((prevState) =>
+                        prevState.slice(0, prevState.findIndex((folder) => folder.id === item?.id) + 1)
+                      )
+                    }
+                  >
+                    <Typography variant="body2" color="text.primary" textTransform="capitalize">
+                      {item?.name.trim()}
+                    </Typography>
+                  </Link>
+                ))}
+              {store?.folder?.length > 0 && (
+                <Typography variant="body2" color="primary.main" textTransform="capitalize">
+                  {store?.folder[store?.folder?.length - 1]?.name.trim()}
+                </Typography>
+              )}
+            </Breadcrumbs>
+          )}
+          <Stack sx={{ flex: 1, overflowY: 'scroll', pt: 3, px: isMobile ? 0.5 : 0 }}>
             {me.role?.toLowerCase() !== 'user' && (
               <Upload
                 key={store?.folder[store?.folder?.length - 1]?.id || store?.clientSelected?.id}
@@ -620,9 +674,9 @@ const Evidence = () => {
                   onChange={(e) => {
                     store?.setPageSize(e.target.value);
                     store?.setPage(
-                      page > Math.ceil(store?.metaList?.total_data / e.target.value)
-                        ? Math.ceil(store?.metaList?.total_data / e.target.value)
-                        : page
+                      store?.page > Math.ceil((store?.metaList?.total_data || 0) / e.target.value)
+                        ? Math.ceil((store?.metaList?.total_data || 0) / e.target.value)
+                        : store?.page
                     );
                   }}
                 >

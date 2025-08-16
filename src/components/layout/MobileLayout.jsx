@@ -1,98 +1,75 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useOutlet, useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
-import {
-  Box,
-  Typography,
-  FormControl,
-  Select,
-  MenuItem,
-  Button,
-  BottomNavigation,
-  BottomNavigationAction,
-  useTheme,
-} from '@mui/material';
+import { Box, Typography, Button, BottomNavigation, BottomNavigationAction } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import WorkIcon from '@mui/icons-material/Work';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PeopleIcon from '@mui/icons-material/People';
 import HistoryIcon from '@mui/icons-material/History';
-import AddIcon from '@mui/icons-material/Add';
 import { AppContext } from '@/context/AppContext';
-import { AppBarContext } from '@/context/AppBarContext';
 
 const MobileContainer = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.background.default,
   display: 'flex',
   flexDirection: 'column',
   height: '100vh',
   width: '100%',
-  backgroundColor: theme.palette.background.default,
 }));
 
-const Header = styled(Typography)(({ theme }) => ({
-  padding: theme.spacing(2),
+export const Header = styled(Typography)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.common.white,
-  fontWeight: 'bold',
-  textAlign: 'center',
   fontSize: '1.2rem',
+  fontWeight: 'bold',
+  padding: theme.spacing(2),
+  textTransform: 'capitalize',
 }));
 
 const Content = styled(Box)(({ theme }) => ({
-  flex: 1,
-  padding: theme.spacing(2),
-  overflowY: 'auto',
   display: 'flex',
+  flex: 1,
   flexDirection: 'column',
   gap: theme.spacing(2),
+  overflowY: 'auto',
+  // padding: theme.spacing(2),
 }));
 
 const StyledBottomNavigation = styled(BottomNavigation)(({ theme }) => ({
-  width: '100%',
-  backgroundColor: theme.palette.background.paper,
-  borderTop: `1px solid ${theme.palette.divider}`,
-  '& .MuiBottomNavigationAction-root': {
-    minWidth: 'auto',
-    padding: theme.spacing(1, 0),
-    '&.Mui-selected': {
-      color: theme.palette.primary.main,
-    },
-  },
   '& .MuiBottomNavigationAction-label': {
-    fontSize: '0.7rem',
     '&.Mui-selected': {
       fontSize: '0.75rem',
     },
+    fontSize: '0.7rem',
   },
+  '& .MuiBottomNavigationAction-root': {
+    '&.Mui-selected': {
+      color: theme.palette.primary.main,
+    },
+    minWidth: 'auto',
+    padding: theme.spacing(1, 0),
+  },
+  backgroundColor: theme.palette.background.paper,
+  borderTop: `1px solid ${theme.palette.divider}`,
+  width: '100%',
 }));
 
 const AddChartButton = styled(Button)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  padding: theme.spacing(1.5),
-  borderRadius: theme.spacing(1),
-  border: `2px dashed ${theme.palette.primary.main}`,
-  color: theme.palette.primary.main,
-  backgroundColor: 'transparent',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: theme.spacing(1),
-  width: '100%',
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
   },
-}));
-
-const ClientSelectContainer = styled(Box)(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-}));
-
-const ClientSelectLabel = styled(Typography)(({ theme }) => ({
-  marginBottom: theme.spacing(1),
-  fontWeight: 500,
-  fontSize: '0.9rem',
-  color: theme.palette.text.secondary,
+  alignItems: 'center',
+  backgroundColor: 'transparent',
+  border: `2px dashed ${theme.palette.primary.main}`,
+  borderRadius: theme.spacing(1),
+  color: theme.palette.primary.main,
+  display: 'flex',
+  gap: theme.spacing(1),
+  justifyContent: 'center',
+  marginTop: theme.spacing(2),
+  padding: theme.spacing(1.5),
+  width: '100%',
 }));
 
 const MobileLayout = () => {
@@ -100,11 +77,8 @@ const MobileLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const appContext = useContext(AppContext);
-  const appBarContext = useContext(AppBarContext);
-  const theme = useTheme();
 
   const [value, setValue] = useState(0);
-  const [clientName, setClientName] = useState('');
   const { me } = appContext || {};
   const isUser = me?.role?.toLowerCase() === 'user';
   const isMasterAdmin = me?.role?.toLowerCase() === 'master admin';
@@ -126,12 +100,6 @@ const MobileLayout = () => {
       setValue(5);
     }
   }, [location]);
-
-  useEffect(() => {
-    if (appContext?.clientSelected?.company_name) {
-      setClientName(appContext.clientSelected.company_name);
-    }
-  }, [appContext?.clientSelected]);
 
   const handleNavChange = (event, newValue) => {
     setValue(newValue);
@@ -159,21 +127,9 @@ const MobileLayout = () => {
     }
   };
 
-  const handleClientChange = (event) => {
-    const selectedClientId = event.target.value;
-    const selectedClient = appContext.clientList.find((client) => client.id === selectedClientId);
-    if (selectedClient) {
-      appContext.setClientSelected(selectedClient);
-      setClientName(selectedClient.company_name);
-    }
-  };
-
-  const handleAddChart = () => {
-    navigate('/home/add-chart');
-  };
-
   // Filter navigation items based on user role
   const getNavigationItems = () => {
+    // Default items that are always shown
     const items = [
       <BottomNavigationAction key="home" label="Home" icon={<HomeIcon />} />,
       <BottomNavigationAction key="results" label="Result" icon={<AssessmentIcon />} />,
@@ -193,43 +149,26 @@ const MobileLayout = () => {
 
     return items;
   };
+
+  // Calculate the maximum value for navigation based on available items
+  const maxNavValue = (() => {
+    let max = 3; // Default items (Home, Result, Fieldwork, Evidence) are 0-3
+    if (!isUser) max++; // Users item
+    if (isMasterAdmin) max++; // Activity item
+    return max;
+  })();
+
+  // Ensure value stays within bounds of available navigation items
+  useEffect(() => {
+    if (value > maxNavValue) {
+      setValue(0); // Reset to Home if current value exceeds available items
+    }
+  }, [value, maxNavValue]);
+
   return (
     <MobileContainer>
-      <Header>MARKPLUS DASHBOARD</Header>
-      <Content>
-        <ClientSelectContainer>
-          <ClientSelectLabel>Set dashboard for</ClientSelectLabel>
-          <FormControl fullWidth size="small">
-            <Select
-              value={appContext?.clientSelected?.id || ''}
-              onChange={handleClientChange}
-              displayEmpty
-              sx={{
-                borderRadius: theme.shape.borderRadius,
-                '& .MuiSelect-select': {
-                  padding: theme.spacing(1.25),
-                },
-              }}
-            >
-              <MenuItem value="" disabled>
-                Select client
-              </MenuItem>
-              {appContext?.clientList?.map((client) => (
-                <MenuItem key={client.id} value={client.id}>
-                  {client.company_name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </ClientSelectContainer>
-
-        <AddChartButton onClick={handleAddChart}>
-          <AddIcon />
-          <Typography variant="button">Add Chart</Typography>
-        </AddChartButton>
-
-        {outlet}
-      </Content>
+      {/* <Header>MARKPLUS DASHBOARD</Header> */}
+      <Content>{outlet}</Content>
       <StyledBottomNavigation value={value} onChange={handleNavChange} showLabels>
         {getNavigationItems()}
       </StyledBottomNavigation>
