@@ -15,7 +15,9 @@ import {
   CircularProgress,
   Divider,
   Switch,
+  useMediaQuery,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Close, ErrorOutline, WarningOutlined } from '@mui/icons-material';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
@@ -42,6 +44,8 @@ import DialogConfirmation from '../../components/Dialog/DialogConfirmation';
 const AddChart = (props) => {
   const store = useAddOrEditChartStore();
   const appBarStore = useContext(AppBarContext);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { clientSelected, setOpenPopupClient } = appBarStore;
   const [isLoading, setIsLoading] = useState(false);
@@ -149,6 +153,31 @@ const AddChart = (props) => {
     ],
     [id]
   );
+
+  // Mobile-specific styles
+  const mobileStyles = {
+    container: {
+      padding: isMobile ? theme.spacing(2, 1) : theme.spacing(3),
+    },
+    formGrid: {
+      flexDirection: isMobile ? 'column' : 'row',
+    },
+    chartPreviewBox: {
+      width: isMobile ? '100%' : '549px',
+      marginTop: isMobile ? theme.spacing(3) : 0,
+    },
+    formField: {
+      marginBottom: theme.spacing(2),
+    },
+    buttonGroup: {
+      flexDirection: isMobile ? 'column' : 'row',
+      '& > button': {
+        marginBottom: isMobile ? theme.spacing(1) : 0,
+        marginRight: isMobile ? 0 : theme.spacing(1),
+      },
+    },
+  };
+
   const SettingContent = useMemo(() => {
     if (methods.getValues('chartType') && JSON.stringify(watchAllField.chartData) !== '{}') {
       switch (methods.getValues('chartType')) {
@@ -161,7 +190,7 @@ const AddChart = (props) => {
               </Typography>
               <LineChart
                 refChart={chartRef}
-                width="549px"
+                width={isMobile ? '100%' : '549px'}
                 maxWidthLegend="369px"
                 labelX={methods.getValues('verticalAxisLabel')}
                 labelY={methods.getValues('horizontalAxisLabel')}
@@ -226,8 +255,8 @@ const AddChart = (props) => {
               </Typography>
               <DonutChart
                 refChart={chartRef}
-                width="240px"
-                height="240px"
+                width={isMobile ? '100%' : '240px'}
+                height={isMobile ? '100%' : '240px'}
                 chartData={methods.getValues('chartDataDonutOrPie')}
                 legendClassName="legend-container-donut-chart"
                 options={{}}
@@ -244,8 +273,8 @@ const AddChart = (props) => {
               </Typography>
               <PieChart
                 refChart={chartRef}
-                width="240px"
-                height="240px"
+                width={isMobile ? '100%' : '240px'}
+                height={isMobile ? '100%' : '240px'}
                 legendClassName="legend-container-pie-chart"
                 chartData={methods.getValues('chartDataDonutOrPie')}
                 options={{}}
@@ -262,8 +291,8 @@ const AddChart = (props) => {
               </Typography>
               <AreaChart
                 refChart={chartRef}
-                width="549px"
-                height="335px"
+                width={isMobile ? '100%' : '549px'}
+                height={isMobile ? '100%' : '335px'}
                 legendClassName="legend-container-area-chart"
                 labelX={methods.getValues('verticalAxisLabel')}
                 labelY={methods.getValues('horizontalAxisLabel')}
@@ -292,8 +321,8 @@ const AddChart = (props) => {
             <Box sx={{ marginTop: '20px', maxWidth: '549px' }}>
               <BarChart
                 refChart={chartRef}
-                width="549px"
-                height="335px"
+                width={isMobile ? '100%' : '549px'}
+                height={isMobile ? '100%' : '335px'}
                 maxWidthLegend="369px"
                 chartData={methods.getValues('chartData')}
                 legendClassName="legend-container-bar-chart"
@@ -313,8 +342,8 @@ const AddChart = (props) => {
             <Box sx={{ marginTop: '20px', maxWidth: '549px' }}>
               <BarChart
                 refChart={chartRef}
-                width="549px"
-                height="335px"
+                width={isMobile ? '100%' : '549px'}
+                height={isMobile ? '100%' : '335px'}
                 maxWidthLegend="369px"
                 chartData={methods.getValues('chartData')}
                 legendClassName="legend-container-bar-chart"
@@ -642,7 +671,7 @@ const AddChart = (props) => {
           //   onClick={() => handleClickCover()}
         >
           <Paper sx={{ padding: '32px' }}>
-            <Grid container>
+            <Grid container sx={mobileStyles.formGrid}>
               <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
                 {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '548px', mt: 1 }}> */}
                 <Box sx={{ height: '100%', my: 'auto', width: '100%' }}>
