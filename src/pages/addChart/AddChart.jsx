@@ -40,14 +40,16 @@ import BarChart from '../../components/chart/BarChart';
 import LineChart from '../../components/chart/LineChart';
 import TableChart from '../../components/chart/TableChart';
 import DialogConfirmation from '../../components/Dialog/DialogConfirmation';
+import { AppContext } from '../../context/AppContext';
 
 const AddChart = (props) => {
   const store = useAddOrEditChartStore();
   const appBarStore = useContext(AppBarContext);
+  const appStoreCtx = useContext(AppContext);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const { clientSelected, setOpenPopupClient } = appBarStore;
+  const { clientSelected, setOpenPopupClient } = appStoreCtx;
   const [isLoading, setIsLoading] = useState(false);
   const {
     handleFileInputChange,
@@ -670,7 +672,7 @@ const AddChart = (props) => {
           gap="20px"
           //   onClick={() => handleClickCover()}
         >
-          <Paper sx={{ padding: '32px' }}>
+          <Paper sx={{ padding: isMobile ? '0' : '32px' }}>
             <Grid container sx={mobileStyles.formGrid}>
               <Grid item xs={12} lg={5.75} xl={5.5} md={12} sm={12}>
                 {/* <Paper sx={{ borderRadius: 1.25, display: 'flex', maxHeight: '548px', mt: 1 }}> */}

@@ -128,10 +128,10 @@ const MobileLayout = () => {
   }, [location]);
 
   useEffect(() => {
-    if (appBarContext?.clientSelected?.company_name) {
-      setClientName(appBarContext.clientSelected.company_name);
+    if (appContext?.clientSelected?.company_name) {
+      setClientName(appContext.clientSelected.company_name);
     }
-  }, [appBarContext?.clientSelected]);
+  }, [appContext?.clientSelected]);
 
   const handleNavChange = (event, newValue) => {
     setValue(newValue);
@@ -161,9 +161,9 @@ const MobileLayout = () => {
 
   const handleClientChange = (event) => {
     const selectedClientId = event.target.value;
-    const selectedClient = appBarContext.clientList.find((client) => client.id === selectedClientId);
+    const selectedClient = appContext.clientList.find((client) => client.id === selectedClientId);
     if (selectedClient) {
-      appBarContext.setClientSelected(selectedClient);
+      appContext.setClientSelected(selectedClient);
       setClientName(selectedClient.company_name);
     }
   };
@@ -193,7 +193,6 @@ const MobileLayout = () => {
 
     return items;
   };
-
   return (
     <MobileContainer>
       <Header>MARKPLUS DASHBOARD</Header>
@@ -202,7 +201,7 @@ const MobileLayout = () => {
           <ClientSelectLabel>Set dashboard for</ClientSelectLabel>
           <FormControl fullWidth size="small">
             <Select
-              value={appBarContext?.clientSelected?.id || ''}
+              value={appContext?.clientSelected?.id || ''}
               onChange={handleClientChange}
               displayEmpty
               sx={{
@@ -215,7 +214,7 @@ const MobileLayout = () => {
               <MenuItem value="" disabled>
                 Select client
               </MenuItem>
-              {appBarContext?.clientList?.map((client) => (
+              {appContext?.clientList?.map((client) => (
                 <MenuItem key={client.id} value={client.id}>
                   {client.company_name}
                 </MenuItem>

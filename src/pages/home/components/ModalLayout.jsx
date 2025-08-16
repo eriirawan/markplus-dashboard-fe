@@ -1,6 +1,7 @@
 import { Close } from '@mui/icons-material';
-import { Box, Button, Dialog, IconButton, Radio, Stack, Typography } from '@mui/material';
+import { Box, Button, Dialog, IconButton, Radio, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
+
 const ModalLayout = ({
   isLayoutModalOpen,
   setIsLayoutModalOpen,
@@ -10,141 +11,117 @@ const ModalLayout = ({
   getTextLayout,
   onSave,
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // <600px
+
   const renderMain = useMemo(() => {
     return (
       <Dialog
         open={isLayoutModalOpen}
-        sx={{ minWidth: '656px' }}
-        PaperProps={{ style: { minWidth: '656px' } }}
         onClose={() => setIsLayoutModalOpen((prev) => !prev)}
+        fullWidth
+        maxWidth={isMobile ? false : 'md'}
+        minWidth={isMobile ? '655px' : '100%'}
+        PaperProps={{
+          sx: {
+            width: isMobile ? '100%' : '656px',
+            minWidth: isMobile ? '100%' : '656px',
+            m: isMobile ? 0 : 'auto', // remove margin on mobile
+            borderRadius: isMobile ? 0 : 2, // flat edges on mobile if you like
+          },
+        }}
+        sx={{
+          '& .MuiDialog-container': {
+            alignItems: isMobile ? 'flex-start' : 'center', // stick to top on mobile
+          },
+        }}
       >
-        <Stack direction={'column'} padding="64px" minWidth={'656px'} sx={{ overflowX: 'hidden' }}>
-          <Stack
-            direction={'row'}
-            alignItems={'center'}
-            justifyContent={'space-between'}
-            // padding={'64px'}
-            // paddingTop={'32px'}
-            // maxWidth={'656px'}
-            minWidth={'528px'}
-            marginBottom={'24px'}
-          >
-            <Typography sx={{ fontWeight: 700, fontSize: '30px', lineHeight: '39px' }}>Choose Layout</Typography>
+        <Stack
+          direction="column"
+          padding={isMobile ? 2 : 8}
+          sx={{
+            overflowX: 'hidden',
+            width: '100%',
+            height: isMobile ? '100vh' : 'auto', // full height only on mobile
+            boxSizing: 'border-box',
+            minHeight: isMobile ? '100vh' : 'auto', // full height only on mobile
+          }}
+        >
+          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
+            <Typography fontWeight={700} fontSize="30px" sx={{ sm: {} }} lineHeight="39px">
+              Choose Layout
+            </Typography>
             <IconButton
               aria-label="close"
               onClick={() => setIsLayoutModalOpen((prev) => !prev)}
-              // aria-label="delete"
-              sx={{ border: 1.5, color: 'primary.main', height: '44px', width: '44px' }}
-              // sx={{
-
-              //   color: (theme) => theme.palette.grey[500],
-              // }}
+              sx={{
+                border: 1.5,
+                color: 'primary.main',
+                height: 44,
+                width: 44,
+              }}
             >
               <Close />
             </IconButton>
           </Stack>
-          {/* <DialogContent> */}
-          {/* <Grid container> */}
-          {/* <Grid item xl={2}>
-                <RadioGroup aria-labelledby="demo-error-radios" name="quiz" value={''} onChange={() => {}}>
-                  <FormControlLabel value="best" control={<Radio />} />
-                  <FormControlLabel value="worst" control={<Radio />} />
-                  <FormControlLabel value="worst" control={<Radio />} />
-                  <FormControlLabel value="worst" control={<Radio />} />
-                  <FormControlLabel value="worst" control={<Radio />} />
-                </RadioGroup>
-              </Grid> */}
-          {/* <Grid item xl={12}> */}
-          {sizeLayoutData.map((container, index) => {
-            return (
-              <Stack
-                display={'flex'}
-                justifyContent={'center'}
-                alignItems={'center'}
-                minWidth={'528px'}
-                padding={'16px'}
-                // columnGap="32px"
-                rowGap="32px"
-                flexWrap={'nowrap'}
-                flexDirection={'row'}
-                onClick={(e) => setSelectedLayout(index)}
-                sx={{
-                  cursor: 'pointer',
-                  // backgroundColor: (theme) => (index === selectedLayout ? theme.palette.primary.light : '#fff'),
-                  '&:hover': {
-                    background: (theme) => theme.palette.primary.light,
-                  },
-                }}
-              >
-                <Radio
-                  sx={{
-                    '& .MuiRadio-root.': {
-                      padding: '0 !important',
-                    },
-                  }}
-                  checked={index === selectedLayout}
-                  value={index}
-                  onChange={(e) => {
-                    setSelectedLayout(+e.target.value);
-                  }}
-                />
-                <Stack
-                  display={'flex'}
-                  flexDirection={'row'}
-                  sx={{
-                    // border: '1px #7E3399 solid',
-                    // borderRadius: '10px',
-                    width: '100%',
-                    // minHeight: '72px',
-                    // padding: '16px',
-                  }}
-                  gap="8px"
-                >
-                  {container.map((data) => {
-                    return (
-                      // <Grid container>
-                      <Box
-                        display={'flex'}
-                        justifyContent={'center'}
-                        alignItems={'center'}
-                        sx={{
-                          border: (theme) => `1px ${theme.palette.primary.main} solid`,
-                          borderRadius: '10px',
-                          width: '100%',
-                          maxWidth: getTextLayout(data),
-                          minHeight: '72px',
-                          padding: '16px',
-                        }}
-                        gap="8px"
-                      >
-                        <Typography>{getTextLayout(data)}</Typography>
-                      </Box>
-                      // </Grid>
-                    );
-                  })}
-                </Stack>
-              </Stack>
-            );
-          })}
-          <Stack display={'flex'} flexDirection={'row'} marginTop="40px" gap="16px">
-            <Button sx={{ width: '50%' }} variant="outlined" onClick={() => setIsLayoutModalOpen((prev) => !prev)}>
-              Cancel
-            </Button>
-            <Button
-              sx={{ width: '50%' }}
-              onClick={() => {
-                onSave();
-                // setDashboardContent((prev) => [...prev, sizeLayoutData[selectedLayout]]);
-                // setIsLayoutModalOpen(false);
+
+          {sizeLayoutData.map((container, index) => (
+            <Stack
+              key={index}
+              direction="row"
+              alignItems="center"
+              p={2}
+              mb={2}
+              onClick={() => setSelectedLayout(index)}
+              sx={{
+                cursor: 'pointer',
+                '&:hover': {
+                  background: (theme) => theme.palette.primary.light,
+                },
               }}
             >
+              <Radio
+                checked={index === selectedLayout}
+                value={index}
+                onChange={(e) => setSelectedLayout(+e.target.value)}
+              />
+              <Stack direction="row" gap={1} flex={1}>
+                {container.map((data, idx) => (
+                  <Box
+                    key={idx}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{
+                      border: (theme) => `1px solid ${theme.palette.primary.main}`,
+                      borderRadius: 2,
+                      width: '100%',
+                      maxWidth: getTextLayout(data),
+                      minHeight: 72,
+                      p: 2,
+                    }}
+                  >
+                    <Typography>{getTextLayout(data)}</Typography>
+                  </Box>
+                ))}
+              </Stack>
+            </Stack>
+          ))}
+
+          <Stack direction="row" mt={5} gap={2}>
+            <Button sx={{ flex: 1 }} variant="outlined" onClick={() => setIsLayoutModalOpen((prev) => !prev)}>
+              Cancel
+            </Button>
+            <Button sx={{ flex: 1 }} onClick={onSave}>
               Save
             </Button>
           </Stack>
         </Stack>
       </Dialog>
     );
-  }, [isLayoutModalOpen, selectedLayout]);
+  }, [isLayoutModalOpen, selectedLayout, isMobile]);
+
   return renderMain;
 };
+
 export default ModalLayout;
