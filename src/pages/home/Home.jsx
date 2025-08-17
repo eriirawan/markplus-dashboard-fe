@@ -175,10 +175,10 @@ const Home = () => {
             return visibleCharts.length > 0 ? (
               <DashboardGrid charts={visibleCharts} key={`section-${index}`} />
             ) : (
-              <Grid
-                container
-                gap="20px"
+              <Box
                 sx={{
+                  display: 'flex',
+                  gap: '20px',
                   flexWrap: {
                     md: 'nowrap',
                     sm: 'wrap',
@@ -188,13 +188,7 @@ const Home = () => {
                 key={`empty-section-${index}`}
               >
                 {emptySections.map((el, indexChild) => (
-                  <Grid
-                    item
-                    md={12}
-                    xs={12}
-                    xl={getGridNumber(el.layout)}
-                    lg={getGridNumber(el.layout)}
-                    sm={12}
+                  <Box
                     sx={{
                       border: (theme) =>
                         !el.hide || (data.some((e) => !e.hide) && el.hide)
@@ -203,8 +197,15 @@ const Home = () => {
                       height: '100%',
                       minHeight: '434px',
                       width: getTextLayout(el),
+                      flexBasis: {
+                        md: '100%',
+                        xs: '100%',
+                        xl: `${(getGridNumber(el.layout) * 100) / 12}%`,
+                        lg: `${(getGridNumber(el.layout) * 100) / 12}%`,
+                        sm: '100%',
+                      },
+                      gap: '24px',
                     }}
-                    gap="24px"
                     key={`empty-chart-${index}-${indexChild}`}
                   >
                     {(!el?.hide && !appCtxStore?.isUserRole) ||
@@ -261,9 +262,9 @@ const Home = () => {
                         <Typography>No chart created yet.</Typography>
                       </Box>
                     )}
-                  </Grid>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             );
           })}
         </Stack>

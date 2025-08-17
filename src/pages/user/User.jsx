@@ -5,6 +5,7 @@ import {
   Box,
   Breadcrumbs,
   Button,
+  Grid,
   InputAdornment,
   MenuItem,
   Paper,
@@ -65,7 +66,7 @@ const User = () => {
   const [sort, setSort] = useState('DESC');
   const [search, setSearch] = useState(undefined);
 
-  const columns = useColumnDef({ handleOpenActionSheet, setOpenPopupDelete });
+  const columns = useColumnDef({ handleOpenActionSheet, setOpenPopupDelete, store });
 
   useEffect(() => {
     if (!loadingUser && userDetail) {
@@ -136,68 +137,72 @@ const User = () => {
                 {location.pathname.replace(/[^a-z0-9]/g, ' ').trim()}
               </Typography>
             </Box>
-            <Stack direction="row" pt={4.25} justifyContent="space-between" width="100%">
-              <Button
-                size="medium"
-                sx={{ fontWeight: 500 }}
-                onClick={() => {
-                  store?.setAction('create');
-                  store?.setOpenPopup(true);
-                  methods.reset(defaultForm);
-                  setUserId(null);
-                }}
-              >
-                + Add New User
-              </Button>
-              <Box>
-                <TextField
-                  value={search}
-                  label="Search"
-                  placeholder="Search by ID/Username/Email/First Name/Last Name/Role"
-                  sx={{ mr: 2, width: 528 }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Search />
-                      </InputAdornment>
-                    ),
+            <Grid container spacing={2} sx={{ pt: 4.25, alignItems: 'center' }}>
+              <Grid size={4}>
+                <Button
+                  size="medium"
+                  sx={{ fontWeight: 500 }}
+                  onClick={() => {
+                    store?.setAction('create');
+                    store?.setOpenPopup(true);
+                    methods.reset(defaultForm);
+                    setUserId(null);
                   }}
-                  InputLabelProps={{ shrink: true }}
-                  variant="outlined"
-                  size="small"
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      setSearchCtx(search);
-                    }
-                  }}
-                />
-                <TextField
-                  value={sort}
-                  onChange={handleChange}
-                  select
-                  label="Sort by"
-                  InputLabelProps={{ shrink: true }}
-                  sx={{ width: 256 }}
                 >
-                  <MenuItem key={1} value="ASC">
-                    A to Z
-                  </MenuItem>
-                  <MenuItem key={2} value="DESC">
-                    Z to A
-                  </MenuItem>
-                  <MenuItem key={3} value="OLDTONEW">
-                    Oldest to Newest
-                  </MenuItem>
-                  <MenuItem key={4} value="NEWTOOLD">
-                    Newest to Oldest
-                  </MenuItem>
-                  <MenuItem key={5} value="updated_at">
-                    Recently updated
-                  </MenuItem>
-                </TextField>
-              </Box>
-            </Stack>
+                  + Add New User
+                </Button>
+              </Grid>
+              <Grid size={8}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <TextField
+                    value={search}
+                    label="Search"
+                    placeholder="Search by ID/Username/Email/First Name/Last Name/Role"
+                    sx={{ mr: 2, width: '100%' }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Search />
+                        </InputAdornment>
+                      ),
+                    }}
+                    InputLabelProps={{ shrink: true }}
+                    variant="outlined"
+                    size="small"
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        setSearchCtx(search);
+                      }
+                    }}
+                  />
+                  <TextField
+                    value={sort}
+                    onChange={handleChange}
+                    select
+                    label="Sort by"
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ width: 256 }}
+                  >
+                    <MenuItem key={1} value="ASC">
+                      A to Z
+                    </MenuItem>
+                    <MenuItem key={2} value="DESC">
+                      Z to A
+                    </MenuItem>
+                    <MenuItem key={3} value="OLDTONEW">
+                      Oldest to Newest
+                    </MenuItem>
+                    <MenuItem key={4} value="NEWTOOLD">
+                      Newest to Oldest
+                    </MenuItem>
+                    <MenuItem key={5} value="updated_at">
+                      Recently updated
+                    </MenuItem>
+                  </TextField>
+                </Stack>
+              </Grid>
+            </Grid>
             <UserTable columns={columns} />
           </Stack>
         </Paper>

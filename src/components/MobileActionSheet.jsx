@@ -65,31 +65,31 @@ const MobileActionSheet = ({ open, onClose, title = 'Action', menuItems = [] }) 
   return (
     <StyledDialog open={open} onClose={() => onClose()} fullWidth aria-labelledby="mobile-action-sheet-title">
       <TitleBox>
-        <Typography variant="h6" id="mobile-action-sheet-title">
+        <Typography variant="h3" id="mobile-action-sheet-title">
           {title}
         </Typography>
         <IconButton edge="end" color="inherit" onClick={() => onClose()} aria-label="close">
           <Close />
         </IconButton>
       </TitleBox>
-      <Divider />
+      <Divider sx={{ borderColor: '#EEF0F5' }} />
       <DialogContent sx={{ p: 0 }}>
-        <List>
+        <List sx={{ py: 0, bgcolor: 'white' }}>
           {menuItems.map((item, index) => (
             <React.Fragment key={`menu-item-${index}`}>
-              <StyledListItem component="button" onClick={() => handleItemClick(item.onClick)} color={item.color}>
+              <StyledListItem onClick={() => handleItemClick(item.onClick)}>
                 <ListItemText
                   primary={item.label}
                   primaryTypographyProps={{
                     style: {
-                      color: item.color === 'error' ? '#E56363' : undefined,
+                      color: item.color === 'error' ? '#E56363' : '#000000',
                       fontWeight: item.color === 'error' ? 'bold' : 'normal',
                     },
                     variant: 'body1',
                   }}
                 />
               </StyledListItem>
-              {index < menuItems.length - 1 && <Divider />}
+              {/* {index < menuItems.length - 1 && <Divider />} */}
             </React.Fragment>
           ))}
         </List>

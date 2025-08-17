@@ -164,20 +164,7 @@ const createTheme = (color) =>
         },
       },
 
-      MuiGrid: {
-        styleOverrides: {
-          root: {
-            '& .react-datepicker-wrapper input': {
-              border: 'none',
-              height: 32,
-              width: '100%',
-            },
-            '& .react-datepicker-wrapper input::placeholder': {
-              color: '#ABBAD0',
-            },
-          },
-        },
-      },
+      // MUI v7 datepicker styling will be handled via sx props where needed
 
       MuiOutlinedInput: {
         defaultProps: {

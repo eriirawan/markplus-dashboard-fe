@@ -93,7 +93,7 @@ export const useHomeStore = () => {
     });
     if (update?.status === 200) {
       enqueueSnackbar('Chart updated successfully.', {
-        variant: 'successSnackbar',
+        variant: 'success',
       });
       reFetch();
     }
@@ -110,7 +110,7 @@ export const useHomeStore = () => {
       if (submit?.status === 200) {
         setOpenPopup(false);
         enqueueSnackbar('Section added successfully.', {
-          variant: 'successSnackbar',
+          variant: 'success',
         });
         reFetch();
       }
@@ -124,7 +124,7 @@ export const useHomeStore = () => {
       if (update?.status === 200) {
         setOpenPopup(false);
         enqueueSnackbar('Section Delete successfully.', {
-          variant: 'successSnackbar',
+          variant: 'success',
         });
         reFetch();
         cb(false);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Box, useMediaQuery, useTheme } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import ChartRenderer from './ChartRenderer';
 import { getGridNumber } from '../utils/chartUtils';
 
@@ -15,18 +15,20 @@ const DashboardGrid = ({ charts }) => {
 
   return (
     <Box sx={{ flexGrow: 1, width: '100%' }}>
-      <Grid container spacing={2}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
         {charts?.map((chart, index) => (
-          <Grid
-            item
-            xs={getGridNumber(chart.layout, isMobile)}
+          <Box
             key={`chart-${index}`}
-            sx={{ minHeight: '300px', height: isMobile ? '350px' : '400px' }}
+            sx={{
+              flexBasis: `calc(${100 / getGridNumber(chart.layout, isMobile)}% - ${isMobile ? '8px' : '16px'})`,
+              minHeight: '300px',
+              height: isMobile ? '350px' : '400px',
+            }}
           >
             <ChartRenderer chart={chart} chartId={`chart-${index}`} />
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
     </Box>
   );
 };

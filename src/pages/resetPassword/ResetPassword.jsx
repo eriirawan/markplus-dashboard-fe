@@ -47,7 +47,7 @@ const ResetPassword = () => {
         });
       }
       enqueueSnackbar('Password updated successfully', {
-        variant: 'successSnackbar',
+        variant: 'success',
       });
       navigate('/login', { replace: true });
     } catch (e) {

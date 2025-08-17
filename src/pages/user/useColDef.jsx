@@ -3,7 +3,6 @@ import { InfoOutlined, Edit, SettingsOutlined, Delete, MoreVert } from '@mui/ico
 import { Stack } from '@mui/material';
 import React, { useContext, useMemo } from 'react';
 import { AppContext } from '@/context/AppContext';
-import { UserContext } from './UserContext';
 
 /**
  * Date cell renderer component
@@ -21,9 +20,9 @@ const DateCellRenderer = ({ cell }) => {
  * @param {Function} handleOpenActionSheet - Function to open action sheet
  * @returns {React.ReactElement} Mobile action button
  */
-const MobileActionCell = ({ row, handleOpenActionSheet }) => {
-  return <MoreVert sx={{ cursor: 'pointer' }} onClick={() => handleOpenActionSheet(row?.original?.id)} />;
-};
+const MobileActionCell = ({ row, handleOpenActionSheet }) => (
+  <MoreVert sx={{ cursor: 'pointer' }} onClick={() => handleOpenActionSheet(row?.original?.id)} />
+);
 
 /**
  * Action cell renderer component for desktop view
@@ -84,19 +83,19 @@ const DesktopActionCell = ({ row, actions }) => {
  * @param {Object} props - Props containing functions for user actions
  * @returns {Array} Column definitions for the table
  */
-const useColumnDef = ({ setOpenPopupDelete, handleOpenActionSheet }) => {
+const useColumnDef = ({ setOpenPopupDelete, handleOpenActionSheet, store }) => {
   // @ts-ignore
-  const { setOpenPopupTheme, setAction, setUserId, userDetail, setOpenPopup } = useContext(UserContext);
+  const { setOpenPopupTheme, setAction, setUserId, userDetail, setOpenPopup } = store;
   const { isMobile } = useContext(AppContext);
 
   // Create an object with all action functions to pass to the action cell
   const actionFunctions = {
-    setOpenPopupTheme,
     setAction,
-    setUserId,
-    userDetail,
     setOpenPopup,
     setOpenPopupDelete,
+    setOpenPopupTheme,
+    setUserId,
+    userDetail,
   };
 
   const columns = useMemo(

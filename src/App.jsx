@@ -37,8 +37,8 @@ const App = () => {
           }}
           SnackbarProps={{ style: { maxWidth: '650px' } }}
           Components={{
-            errorSnackbar: ErrorSnackbar,
-            successSnackbar: SuccessSnackbar,
+            error: ErrorSnackbar,
+            success: SuccessSnackbar,
           }}
         >
           <CssBaseline />

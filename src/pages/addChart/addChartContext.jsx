@@ -259,7 +259,7 @@ export const useAddOrEditChartStore = () => {
       if (submit?.status === 200) {
         setOpenPopup(false);
         enqueueSnackbar('Chart added successfully.', {
-          variant: 'successSnackbar',
+          variant: 'success',
         });
         // reFetch();
         navigate('/home');
@@ -337,13 +337,13 @@ export const useAddOrEditChartStore = () => {
             });
             if (updateTabular?.status === 200) {
               enqueueSnackbar('Chart updated successfully.', {
-                variant: 'successSnackbar',
+                variant: 'success',
               });
               navigate('/home');
             }
           } else {
             enqueueSnackbar('Chart updated successfully.', {
-              variant: 'successSnackbar',
+              variant: 'success',
             });
             navigate('/home');
           }
@@ -361,7 +361,7 @@ export const useAddOrEditChartStore = () => {
     const deleteAct = await deleteChart();
     if (deleteAct.status === 200) {
       enqueueSnackbar('Chart deleted successfully.', {
-        variant: 'successSnackbar',
+        variant: 'success',
       });
       cb(false);
       navigate('/home');

@@ -331,7 +331,7 @@ const Evidence = () => {
               )}
             </Breadcrumbs>
           )}
-          <Stack sx={{ flex: 1, overflowY: 'scroll', pt: 3, px: isMobile ? 0.5 : 0 }}>
+          <Stack sx={{ flex: 1, overflowY: 'auto', pt: 3, px: isMobile ? 0.5 : 0 }}>
             {me.role?.toLowerCase() !== 'user' && (
               <Upload
                 key={store?.folder[store?.folder?.length - 1]?.id || store?.clientSelected?.id}
@@ -372,59 +372,64 @@ const Evidence = () => {
               </Stack>
             ) : (
               <>
-                <Stack direction="row" mt={isUserRole ? 0 : 4} justifyContent="space-between" width="100%">
-                  <TextField
-                    value={search}
-                    label="Search"
-                    placeholder="Search by name"
-                    sx={{ mr: 2, width: 528 }}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <Search />
-                        </InputAdornment>
-                      ),
-                    }}
-                    InputLabelProps={{ shrink: true }}
-                    variant="outlined"
-                    size="small"
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        store?.setSearch(search);
-                      }
-                    }}
-                  />
-                  <Stack direction="row" gap={2}>
+                <Grid size={12} container spacing={2} sx={{ mt: isUserRole ? 0 : 4 }}>
+                  <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                     <TextField
-                      value={sort}
-                      onChange={handleChange}
-                      select
-                      label="Sort by"
+                      value={search}
+                      label="Search"
+                      placeholder="Search by name"
+                      sx={{ mr: 2, width: isMobile ? '100%' : '90%' }}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <Search />
+                          </InputAdornment>
+                        ),
+                      }}
                       InputLabelProps={{ shrink: true }}
-                      sx={{ width: 256 }}
-                    >
-                      <MenuItem key={1} value="ASC">
-                        A to Z
-                      </MenuItem>
-                      <MenuItem key={2} value="DESC">
-                        Z to A
-                      </MenuItem>
-                      <MenuItem key={3} value="OLDTONEW">
-                        Oldest to Newest
-                      </MenuItem>
-                      <MenuItem key={4} value="NEWTOOLD">
-                        Newest to Oldest
-                      </MenuItem>
-                      <MenuItem key={5} value="updated_at">
-                        Recently updated
-                      </MenuItem>
-                    </TextField>
-                    <IconButton onClick={() => setGridView(!isGridView)}>
-                      {isGridView ? <ReorderOutlined /> : <GridViewOutlined />}
-                    </IconButton>
-                  </Stack>
-                </Stack>
+                      variant="outlined"
+                      size="small"
+                      onChange={(e) => setSearch(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          store?.setSearch(search);
+                        }
+                      }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                    <Stack direction="row" gap={2} justifyContent={isMobile ? 'flex-start' : 'flex-end'}>
+                      <TextField
+                        value={sort}
+                        onChange={handleChange}
+                        select
+                        label="Sort by"
+                        InputLabelProps={{ shrink: true }}
+                        sx={{ width: isMobile ? '100%' : '80%' }}
+                      >
+                        <MenuItem key={1} value="ASC">
+                          A to Z
+                        </MenuItem>
+                        <MenuItem key={2} value="DESC">
+                          Z to A
+                        </MenuItem>
+                        <MenuItem key={3} value="OLDTONEW">
+                          Oldest to Newest
+                        </MenuItem>
+                        <MenuItem key={4} value="NEWTOOLD">
+                          Newest to Oldest
+                        </MenuItem>
+                        <MenuItem key={5} value="updated_at">
+                          Recently updated
+                        </MenuItem>
+                      </TextField>
+                      <IconButton onClick={() => setGridView(!isGridView)}>
+                        {isGridView ? <ReorderOutlined /> : <GridViewOutlined />}
+                      </IconButton>
+                    </Stack>
+                  </Grid>
+                </Grid>
+                {/* <Stack direction="row" mt={isUserRole ? 0 : 4} justifyContent="space-between" width="100%"> */}
                 <Box sx={{ pt: 4, width: '100%' }}>
                   {!isGridView ? (
                     <Box sx={{ display: 'flex', minHeight: 400 }}>
@@ -477,17 +482,17 @@ const Evidence = () => {
                       />
                     </Box>
                   ) : (
-                    <Grid container spacing={1}>
+                    <Grid size={12} container spacing={1} sx={{ px: 0.5 }}>
                       {store?.evidenceList?.subFolders?.length > 0 && (
-                        <Grid item>
+                        <Grid size={12}>
                           <Typography variant="h4">Folder</Typography>
                         </Grid>
                       )}
-                      <Grid item container spacing={2}>
+                      <Grid size={12} container spacing={2}>
                         {store?.evidenceList?.subFolders?.map((item) => (
-                          <Grid item xs={3}>
+                          <Grid size={{ xs: 6, sm: 6, md: 4, lg: 4 }}>
                             <Paper
-                              sx={{ bgcolor: '#f3f6fb', cursor: 'pointer', p: 2 }}
+                              sx={{ bgcolor: '#f3f6fb', cursor: 'pointer', p: 2, width: '100%' }}
                               onDoubleClick={(e) => {
                                 e.stopPropagation();
                                 store.setFolder((prevState) => {
@@ -546,13 +551,13 @@ const Evidence = () => {
                           </Grid>
                         ))}
                       </Grid>
-                      <Grid item>
+                      <Grid size={12}>
                         <Typography variant="h4">File</Typography>
                       </Grid>
-                      <Grid item container spacing={2}>
+                      <Grid size={12} container spacing={2}>
                         {store?.evidenceList?.evidences?.length > 0 ? (
                           store?.evidenceList?.evidences?.map((item) => (
-                            <Grid item xs={3}>
+                            <Grid size={{ xs: 6, sm: 6, md: 4, lg: 4 }}>
                               <Paper
                                 sx={{ bgcolor: '#f3f6fb', display: 'flex', flexDirection: 'column', height: 280, p: 2 }}
                               >
@@ -647,49 +652,60 @@ const Evidence = () => {
                 </Box>
               </>
             )}
-          </Stack>
-          {(store?.evidenceList?.evidences?.length > 0 || store?.evidenceList?.subFolders?.length > 0) && (
-            <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <Pagination
-                page={store?.page || 1}
-                count={store?.metaList?.total_page || 1}
-                color="primary"
-                sx={{ color: 'primary.main', display: 'flex', flex: 1, justifyContent: 'right' }}
-                onChange={(e, val) => store?.setPage(val)}
-              />
+            {(store?.evidenceList?.evidences?.length > 0 || store?.evidenceList?.subFolders?.length > 0) && (
               <Box
                 sx={{
-                  alignItems: 'center',
-                  color: 'primary.main',
                   display: 'flex',
-                  flex: 1,
-                  justifyContent: 'right',
+                  flexDirection: isMobile ? 'column' : 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  mt: isMobile ? 2 : 4,
+                  mb: isMobile ? 2 : 0,
+                  width: '100%',
+                  gap: isMobile ? 2 : 0,
                 }}
               >
-                Show
-                <Select
-                  size="small"
-                  value={store?.pageSize}
-                  sx={{ color: 'inherit', mx: 1 }}
-                  onChange={(e) => {
-                    store?.setPageSize(e.target.value);
-                    store?.setPage(
-                      store?.page > Math.ceil((store?.metaList?.total_data || 0) / e.target.value)
-                        ? Math.ceil((store?.metaList?.total_data || 0) / e.target.value)
-                        : store?.page
-                    );
+                <Pagination
+                  page={store?.page || 1}
+                  count={store?.metaList?.total_page || 1}
+                  color="primary"
+                  sx={{ color: 'primary.main', display: 'flex', flex: 1, justifyContent: 'right' }}
+                  onChange={(e, val) => store?.setPage(val)}
+                />
+                <Box
+                  sx={{
+                    alignItems: 'center',
+                    color: 'primary.main',
+                    display: 'flex',
+                    flex: 1,
+                    justifyContent: 'right',
                   }}
                 >
-                  {[5, 10, 20, 50, 100].map((item) => (
-                    <MenuItem key={item} value={item}>
-                      {item}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {`of ${store?.metaList?.total_data || 0} entries`}
+                  Show
+                  <Select
+                    size="small"
+                    value={store?.pageSize}
+                    sx={{ color: 'inherit', mx: 1 }}
+                    onChange={(e) => {
+                      store?.setPageSize(e.target.value);
+                      store?.setPage(
+                        store?.page > Math.ceil((store?.metaList?.total_data || 0) / e.target.value)
+                          ? Math.ceil((store?.metaList?.total_data || 0) / e.target.value)
+                          : store?.page
+                      );
+                    }}
+                  >
+                    {[5, 10, 20, 50, 100].map((item) => (
+                      <MenuItem key={item} value={item}>
+                        {item}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {`of ${store?.metaList?.total_data || 0} entries`}
+                </Box>
               </Box>
-            </Box>
-          )}
+            )}
+          </Stack>
         </Stack>
       </Paper>
     </EvidenceContext.Provider>

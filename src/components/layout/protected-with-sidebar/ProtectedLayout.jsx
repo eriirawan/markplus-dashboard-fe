@@ -11,7 +11,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 // import { alpha } from '@mui/material/styles';
-import { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom';
 // import TaskListDrawer from '@/components/TaskListDrawer';
 // import ProfileBarDrawer from '@/components/ProfileBarDrawer';
@@ -136,8 +136,8 @@ const ProtectedLayout = () => {
   // Otherwise render the desktop layout
   return (
     <AppBarContext.Provider value={store}>
-      <Grid container>
-        <Grid item container direction="row" xs={12} sx={styles.appContainer}>
+      <Stack sx={{ width: '100%', height: '100%' }}>
+        <Box sx={{ ...styles.appContainer, width: '100%' }}>
           <Stack direction="row" width="100%">
             <ClickAwayListener onClickAway={() => handleOpenSidebar(false)}>
               <Box position="relative">
@@ -197,8 +197,8 @@ const ProtectedLayout = () => {
               </RadioGroup>
             </FormControl>
           </DialogFormContainer>
-        </Grid>
-      </Grid>
+        </Box>
+      </Stack>
     </AppBarContext.Provider>
   );
 };
