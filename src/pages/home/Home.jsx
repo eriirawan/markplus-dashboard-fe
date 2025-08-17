@@ -45,6 +45,7 @@ const Home = () => {
   const appBarStore = useContext(AppBarContext);
   const appCtxStore = useContext(AppContext);
   const { clientSelected } = appBarStore;
+  const { isUserRole, me } = appCtxStore;
   // const storeCallback = useMemo(() => {
 
   // })
@@ -93,11 +94,12 @@ const Home = () => {
   };
 
   useEffect(() => {
-    if (clientSelected?.id || appCtxStore?.clientSelected?.id) {
+    if (clientSelected?.id || appCtxStore?.clientSelected?.id || isUserRole) {
       setSectionType(location?.pathname?.slice(1));
-      setUserId(clientSelected?.id || appCtxStore?.clientSelected?.id);
+      setUserId(clientSelected?.id || appCtxStore?.clientSelected?.id || me?.id);
     }
   }, [clientSelected, appCtxStore?.clientSelected, location?.pathname?.slice(1)]);
+
   // useEffect(() => {
   //   reFetch({ test: 2 });
   // }, [store.userId, store.sectionType]);
@@ -679,7 +681,7 @@ const Home = () => {
             </Box>
           </Stack>
         )}
-        {!sectionList?.length && (clientSelected || appCtxStore?.clientSelected) && (
+        {!sectionList?.length && (clientSelected || appCtxStore?.clientSelected || isUserRole) && (
           <Stack direction="column" justifyContent="center" alignItems="center" height="100%" gap="8px">
             <Typography fontSize="16px" fontWeight={400} lineHeight="24px">
               No chart created yet.
@@ -743,6 +745,7 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
   const { dashboardContent, setDashboardContent } = useDashboard();
   const [anchorElDownload, setAnchorElDownload] = useState(false);
   const { clientSelected } = useContext(AppBarContext);
+  const { isUserRole } = useContext(AppContext);
   const navigate = useNavigate();
   const { handleChangeAxis } = store;
   const MuiCustomToggleButton = styled(ToggleButton)(({ theme }) => ({
@@ -870,6 +873,7 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
             <ToggleButtonGroup
               value={data?.chart?.show_axis_labels}
               onMouseEnter={() => {}}
+              disabled={isUserRole}
               onChange={(_, value) => {
                 // store.setChartSelectedId(data?.chart?.id);
                 if (typeof value === 'boolean' && value !== data?.chart?.show_axis_labels) {
@@ -975,6 +979,7 @@ const HeaderContainerChart = ({ data, chartElement, indexContent, store, useButt
               arrow
             >
               <IconButton
+                disabled={isUserRole}
                 onClick={() => {
                   localStorage.setItem(
                     'indexChart',
