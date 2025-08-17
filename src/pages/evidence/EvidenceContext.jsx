@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import useAxios from 'axios-hooks';
 import { enqueueSnackbar } from 'notistack';
 
@@ -6,7 +6,7 @@ import { encodeQueryData } from '@/helpers/Utils';
 import { AppContext } from '../../context/AppContext';
 
 export const useEvidenceStore = () => {
-  const { clientSelected } = useContext(AppContext);
+  const { clientSelected, isUserRole, me, setClientSelected } = useContext(AppContext);
   const [isLoading, setIsLoading] = useState(false);
   const [evidenceId, setEvidenceId] = useState(null);
   const [selectedEvidence, setSelectedEvidence] = useState(null);
@@ -16,7 +16,6 @@ export const useEvidenceStore = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [folder, setFolder] = useState([]);
-
   const data = {
     page,
     page_size: pageSize,
@@ -27,7 +26,11 @@ export const useEvidenceStore = () => {
   };
 
   const querystring = encodeQueryData(data);
-
+  useEffect(() => {
+    if (isUserRole && me?.id) {
+      setClientSelected(me);
+    }
+  }, [isUserRole, me]);
   const [{ data: response, loading }, reFetch] = useAxios(
     {
       url: `/dashboard/v1/evidences/user/${clientSelected?.id}/folder/list?${querystring}`,
