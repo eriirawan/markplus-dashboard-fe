@@ -1,17 +1,27 @@
+import React, { Suspense } from 'react';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
-import { Suspense } from 'react';
-
 import { SnackbarProvider } from 'notistack';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+} from 'chart.js';
+
 import ErrorSnackbar from '@/components/noti-snackbar/ErrorSnackbar';
 import SuccessSnackbar from '@/components/noti-snackbar/SuccessSnackbar';
 import Loading from '@/components/Loading';
 import { AppContext, useStore } from './context/AppContext';
 import AppRoutes from './routes';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import makeUseAxios from './hooks/useAxios';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement);
 makeUseAxios();
 
 const App = () => {
