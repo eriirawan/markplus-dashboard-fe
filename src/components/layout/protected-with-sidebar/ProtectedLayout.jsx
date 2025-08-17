@@ -94,7 +94,9 @@ const ProtectedLayout = () => {
   useEffect(() => {
     if (token && token !== 'undefined' && token !== 'null') {
       refreshMeData();
-      refreshMasterData();
+      if (!isUserRole) {
+        refreshMasterData();
+      }
     } else {
       window.location.href = `/login`;
     }

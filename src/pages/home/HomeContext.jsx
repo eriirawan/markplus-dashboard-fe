@@ -1,14 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import useAxios from 'axios-hooks';
 // import  from 'axios-hooks'
 import { enqueueSnackbar } from 'notistack';
+import { AppContext } from '../../context/AppContext';
 
 export const useHomeStore = () => {
+  const { userToken: token, me, setClientSelected, isUserRole } = useContext(AppContext);
+
   const [isLoading, setIsLoading] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
   const [action, setAction] = useState('');
   const [userId, setUserId] = useState(null);
-  const [sectionType, setSectionType] = useState(null);
+  const [sectionType, setSectionType] = useState('home');
   // const [sortDir, setSortDir] = useState('DESC');
   // const [sortBy, setSortBy] = useState(null);
   const [pageSize, setPageSize] = useState(10);
@@ -16,7 +19,11 @@ export const useHomeStore = () => {
   const [sectionId, setSectionId] = useState(null);
   const [chartSelectedId, setChartSelectedId] = useState(null);
   // const [search, setSearch] = useState('');
-
+  useEffect(() => {
+    if (isUserRole) {
+      setUserId(me?.id);
+    }
+  }, [isUserRole]);
   const [{ data: response, loading }, reFetch] = useAxios(
     {
       url: `/dashboard/v1/sections/type/${sectionType}/user/${userId}/list?page=${page}&page_size=${pageSize}`,
@@ -26,7 +33,6 @@ export const useHomeStore = () => {
       manual: true,
     }
   );
-
   const callbackGetList = useCallback(() => {
     if (userId && sectionType) {
       return reFetch();
