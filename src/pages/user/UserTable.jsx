@@ -100,25 +100,25 @@ const UserTable = ({ columns }) => {
           gap: isMobile ? 2 : 0,
         }}
       >
-        <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
-          <Pagination
-            page={page}
-            count={totalPages}
-            color="primary"
-            sx={{
-              '& .MuiPagination-ul': { justifyContent: 'center' },
-              color: 'primary.main',
-            }}
-            onChange={(e, val) => store?.setPage(val)}
-          />
-        </Box>
+        <Pagination
+          page={page}
+          count={totalPages}
+          color="primary"
+          sx={{
+            justifyContent: isMobile ? 'center' : 'right',
+            color: 'primary.main',
+            display: 'flex',
+            flex: 1,
+          }}
+          onChange={(e, val) => store?.setPage(val)}
+        />
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: isMobile ? 'center' : 'flex-end',
             color: 'primary.main',
-            flexGrow: 0,
+            flex: 1,
           }}
         >
           Show

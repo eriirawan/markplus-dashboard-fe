@@ -231,6 +231,8 @@ const Evidence = () => {
         onClose={() => setOpenPopupRename(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        maxWidth="lg"
+        fullWidth={isMobile}
       >
         <DialogTitle id="alert-dialog-title">
           <Typography>{`Rename ${store?.selectedEvidence?.isFolder ? 'Folder' : 'File'}`}</Typography>
@@ -239,7 +241,7 @@ const Evidence = () => {
           <TextField
             value={fileName}
             placeholder="File Name"
-            sx={{ width: 450 }}
+            sx={{ width: isMobile ? '100%' : 450 }}
             variant="outlined"
             size="small"
             autoFocus
@@ -557,7 +559,7 @@ const Evidence = () => {
                       <Grid size={12} container spacing={2}>
                         {store?.evidenceList?.evidences?.length > 0 ? (
                           store?.evidenceList?.evidences?.map((item) => (
-                            <Grid size={{ xs: 6, sm: 6, md: 4, lg: 4 }}>
+                            <Grid size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
                               <Paper
                                 sx={{ bgcolor: '#f3f6fb', display: 'flex', flexDirection: 'column', height: 280, p: 2 }}
                               >

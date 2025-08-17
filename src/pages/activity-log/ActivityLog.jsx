@@ -209,13 +209,14 @@ const ActivityLog = () => {
             </Box>
             <Box
               sx={{
-                alignItems: 'center',
                 display: 'flex',
-                flexDirection: 'row',
-                flexWrap: 'wrap',
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: 'center',
                 justifyContent: 'space-between',
-                mb: isMobile ? 2 : 0,
                 mt: 4,
+                mb: isMobile ? 2 : 0,
+                width: '100%',
+                gap: isMobile ? 2 : 0,
               }}
             >
               <Pagination
@@ -223,9 +224,10 @@ const ActivityLog = () => {
                 count={store?.metaList?.total_page || 1}
                 color="primary"
                 sx={{
-                  '& .MuiPagination-ul': { justifyContent: 'center', width: isMobile ? '100%' : 'auto' },
+                  justifyContent: isMobile ? 'center' : 'right',
                   color: 'primary.main',
-                  width: isMobile ? '100%' : 'auto',
+                  display: 'flex',
+                  flex: 1,
                 }}
                 onChange={(e, val) => store?.setPage(val)}
               />
@@ -234,9 +236,8 @@ const ActivityLog = () => {
                   alignItems: 'center',
                   color: 'primary.main',
                   display: 'flex',
-                  justifyContent: 'center',
-                  mt: isMobile ? 2 : 0,
-                  width: isMobile ? '100%' : 'auto',
+                  justifyContent: isMobile ? 'center' : 'flex-end',
+                  flex: 1,
                 }}
               >
                 Show
