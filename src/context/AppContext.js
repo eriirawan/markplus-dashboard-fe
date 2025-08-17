@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useMediaQuery } from '@mui/material';
 import useAxios from 'axios-hooks';
 import { tokenString, userDataString, rolesDataString } from '../helpers/Constants';
@@ -65,10 +65,21 @@ export const useStore = () => {
 
   const theme = useMemo(() => createTheme(me?.colorway), [me]);
 
-  const [{ data: clientList, loading }, reFetch] = useAxios({
-    method: 'get',
-    url: `/dashboard/v1/users/list?page=${pageClientList}&page_size=${10}&sort_by=${'id'}&sort_dir=${'ASC'}`,
-  });
+  const [{ data: clientList, loading }, reFetch] = useAxios(
+    {
+      method: 'get',
+      url: `/dashboard/v1/users/list?page=${pageClientList}&page_size=${10}&sort_by=${'id'}&sort_dir=${'ASC'}`,
+    },
+    {
+      manual: true,
+    }
+  );
+
+  useEffect(() => {
+    if (userToken) {
+      reFetch();
+    }
+  }, [userToken]);
 
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
